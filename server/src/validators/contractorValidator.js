@@ -1,0 +1,41 @@
+const { z } = require('zod');
+const { optionalString, optionalDate, optionalInt } = require('./common');
+
+const contractorSchema = z.object({
+  contractorName: z.string().min(1, 'Contractor name is required').max(150),
+  contactPerson: z.string().min(1, 'Contact person is required').max(100),
+  phone: z.string().min(10, 'Enter a valid phone number').max(15),
+  email: z.string().email('Enter a valid email address'),
+  email2: optionalString().refine((v) => !v || z.string().email().safeParse(v).success, 'Enter a valid email'),
+  email3: optionalString().refine((v) => !v || z.string().email().safeParse(v).success, 'Enter a valid email'),
+  email4: optionalString().refine((v) => !v || z.string().email().safeParse(v).success, 'Enter a valid email'),
+  address: z.string().min(1, 'Address is required'),
+  city: optionalString(100),
+  state: optionalString(100),
+  pincode: optionalString(10),
+  aadhaarNo: z.string().regex(/^\d{12}$/, 'Aadhaar number must be 12 digits'),
+  panNo: z.string().regex(/^[A-Z]{5}\d{4}[A-Z]$/i, 'Enter a valid PAN number'),
+  wcPolicyNo: optionalString(50),
+  wcStartDate: optionalDate(),
+  wcExpiryDate: optionalDate(),
+  serviceType: optionalString(100),
+  serviceTaxNo: optionalString(50),
+  shopActLicenseNo: optionalString(50),
+  shopActExpiryDate: optionalDate(),
+  labourLicenseNo: optionalString(50),
+  labourLicenseStart: optionalDate(),
+  labourLicenseExpiry: optionalDate(),
+  bocwNo: optionalString(50),
+  bocwStartDate: optionalDate(),
+  bocwExpiryDate: optionalDate(),
+  rcCount: optionalInt(),
+  pfEstablishmentCode: optionalString(50),
+  esicEstablishmentCode: optionalString(50),
+  mlwfNo: optionalString(50),
+  ptecNo: optionalString(50),
+  ptrcNo: optionalString(50),
+  buildingName: optionalString(150),
+  status: z.enum(['ACTIVE', 'INACTIVE', 'BLACKLISTED']).optional(),
+});
+
+module.exports = { contractorSchema };

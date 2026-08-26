@@ -1,0 +1,445 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  SUPERVISOR
+  CONTRACTOR
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum LabourType {
+  SKILLED
+  SEMI_SKILLED
+  UNSKILLED
+  HIGH_SKILLED
+}
+
+enum EntityStatus {
+  ACTIVE
+  INACTIVE
+  BLACKLISTED
+}
+
+enum IdType {
+  AADHAAR
+  PAN
+  VOTER_ID
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  HALF_DAY
+}
+
+enum AttendanceSource {
+  QR_SCAN
+  MANUAL
+}
+
+enum GateDirection {
+  INWARD
+  OUTWARD
+}
+
+enum HolidayType {
+  WEEKLY_OFF
+  PAID_LEAVE
+}
+
+enum RepaymentStatus {
+  PENDING
+  PAID
+}
+
+enum DocType {
+  SHOP_ACT
+  PF_CODE
+  ESIC_CODE
+  PTEC
+  PTRC
+  MLWF_CODE
+  BOCW_LICENSE
+  LABOUR_LICENSE
+  WC_POLICY
+}
+
+model User {
+  id              String     @id @default(uuid())
+  loginId         String     @unique
+  passwordHash    String
+  role            Role
+  fullName        String?
+  contractorId    String?    @unique
+  contractor      Contractor? @relation(fields: [contractorId], references: [id])
+  supervisorId    String?    @unique
+  supervisor      Supervisor? @relation(fields: [supervisorId], references: [id])
+  isActive        Boolean    @default(true)
+  lastLoginAt     DateTime?
+  auditLogs       AuditLog[]
+  markedAttendances Attendance[]
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model Contractor {
+  id                    String               @id @default(uuid())
+  contractorCode        String               @unique
+  contractorName        String
+  contactPerson         String
+  phone                 String
+  email                 String
+  email2                String?
+  email3                String?
+  email4                String?
+  address               String
+  city                  String?
+  state                 String?
+  pincode               String?
+  aadhaarNo             String               @unique
+  panNo                 String               @unique
+  wcPolicyNo            String?
+  wcStartDate           DateTime?
+  wcExpiryDate          DateTime?
+  serviceType           String?
+  serviceTaxNo          String?
+  shopActLicenseNo      String?
+  shopActExpiryDate     DateTime?
+  labourLicenseNo       String?
+  labourLicenseStart    DateTime?
+  labourLicenseExpiry   DateTime?
+  bocwNo                String?
+  bocwStartDate         DateTime?
+  bocwExpiryDate        DateTime?
+  rcCount               Int?
+  pfEstablishmentCode   String?
+  esicEstablishmentCode String?
+  mlwfNo                String?
+  ptecNo                String?
+  ptrcNo                String?
+  buildingName          String?
+  status                EntityStatus         @default(ACTIVE)
+  documents             ContractorDocument[]
+  supervisors           Supervisor[]
+  workers               Worker[]
+  policies              Policy[]
+  idCards               IdCard[]
+  complianceTrackers    ComplianceTracker[]
+  holidays              Holiday[]
+  user                  User?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+}
+
+model ContractorDocument {
+  id           String     @id @default(uuid())
+  contractorId String
+  contractor   Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  docType      DocType
+  fileUrl      String
+  uploadedAt   DateTime   @default(now())
+}
+
+model Supervisor {
+  id                   String       @id @default(uuid())
+  supervisorCode       String       @unique
+  fullName             String
+  gender               Gender
+  dob                  DateTime
+  contactNo            String
+  email                String
+  aadhaarNo            String       @unique
+  aadhaarFrontUrl      String?
+  aadhaarBackUrl       String?
+  street               String?
+  city                 String?
+  state                String?
+  pincode              String?
+  assignedContractorId String?
+  assignedContractor   Contractor?  @relation(fields: [assignedContractorId], references: [id])
+  status               EntityStatus @default(ACTIVE)
+  user                 User?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+}
+
+model Designation {
+  id              String   @id @default(uuid())
+  designationCode String   @unique
+  designationName String
+  workers         Worker[]
+}
+
+model LabourCategory {
+  id           String     @id @default(uuid())
+  categoryCode String     @unique
+  categoryName LabourType
+  ratePerDay   Decimal
+  workers      Worker[]
+}
+
+model Worker {
+  id                   String              @id @default(uuid())
+  workerCode           String              @unique
+  firstName            String
+  middleName           String?
+  lastName             String
+  dob                  DateTime
+  gender               Gender
+  maritalStatus        String?
+  mobileNo             String
+  permanentAddress     String
+  currentAddress       String?
+  city                 String?
+  district             String?
+  state                String?
+  pincode              String?
+  contractorId         String
+  contractor           Contractor          @relation(fields: [contractorId], references: [id])
+  designationId        String
+  designation          Designation         @relation(fields: [designationId], references: [id])
+  labourCategoryId     String
+  labourCategory       LabourCategory      @relation(fields: [labourCategoryId], references: [id])
+  idType               IdType
+  idNumber             String              @unique
+  idFrontUrl           String?
+  idBackUrl            String?
+  bankPassbookUrl      String?
+  photoUrl             String?
+  bocwRegistrationNo   String?
+  bocwIssueDate        DateTime?
+  bocwValidDate        DateTime?
+  pfNumber             String?
+  uanNumber            String?
+  esicNumber           String?
+  panNumber            String?
+  ipNumber             String?
+  policeVerified       Boolean             @default(false)
+  joinDate             DateTime
+  bankName             String?
+  bankBranch           String?
+  accountNo            String?
+  ifscCode             String?
+  nomineeName          String?
+  nomineeRelation      String?
+  nomineeChildrenCount Int?
+  nomineeQualification String?
+  nomineeMobile        String?
+  sector               String?
+  status               EntityStatus        @default(ACTIVE)
+  attendances          Attendance[]
+  gateLogs             GateLog[]
+  damages              Damage[]
+  fines                Fine[]
+  accidents            Accident[]
+  advances             Advance[]
+  overtimes            Overtime[]
+  idCards              IdCard[]
+  complianceTracker    ComplianceTracker?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  @@index([contractorId])
+  @@index([designationId])
+  @@index([labourCategoryId])
+}
+
+model Attendance {
+  id         String           @id @default(uuid())
+  workerId   String
+  worker     Worker           @relation(fields: [workerId], references: [id])
+  date       DateTime         @db.Date
+  day        String
+  inTime     String
+  outTime    String?
+  status     AttendanceStatus
+  buildingNo String?
+  markedByUserId String
+  markedByUser   User    @relation(fields: [markedByUserId], references: [id])
+  source     AttendanceSource
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@unique([workerId, date])
+  @@index([date])
+}
+
+model GateLog {
+  id        String        @id @default(uuid())
+  workerId  String
+  worker    Worker        @relation(fields: [workerId], references: [id])
+  direction GateDirection
+  gateNo    String
+  timestamp DateTime
+
+  @@index([workerId, timestamp])
+}
+
+model Damage {
+  id              String   @id @default(uuid())
+  workerId        String
+  worker          Worker   @relation(fields: [workerId], references: [id])
+  imageUrl        String?
+  particulars     String
+  damageDate      DateTime
+  causeShown      Boolean
+  witnessName     String?
+  deductionAmount Decimal
+  installments    Int
+  remarks         String?
+  createdAt       DateTime @default(now())
+
+  @@index([workerId, damageDate])
+}
+
+model Fine {
+  id           String   @id @default(uuid())
+  workerId     String
+  worker       Worker   @relation(fields: [workerId], references: [id])
+  offence      String
+  offenceDate  DateTime
+  causeShown   Boolean
+  witnessName  String?
+  wagePeriod   String?
+  wagesPayable Decimal?
+  fineAmount   Decimal
+  remarks      String?
+  createdAt    DateTime @default(now())
+
+  @@index([workerId, offenceDate])
+}
+
+model Accident {
+  id               String    @id @default(uuid())
+  workerId         String
+  worker           Worker    @relation(fields: [workerId], references: [id])
+  accidentDate     DateTime
+  form24ReportDate DateTime?
+  natureOfAccident String
+  dateReturnToWork DateTime?
+  daysAbsent       Int
+  photoUrl         String?
+  createdAt        DateTime  @default(now())
+
+  @@index([workerId, accidentDate])
+}
+
+model Advance {
+  id                String             @id @default(uuid())
+  workerId          String
+  worker            Worker             @relation(fields: [workerId], references: [id])
+  advanceDate       DateTime
+  wagesPeriod       String?
+  wagesPayable      Decimal?
+  amount            Decimal
+  purpose           String
+  installmentsCount Int
+  remarks           String?
+  repayments        AdvanceRepayment[]
+  createdAt         DateTime           @default(now())
+
+  @@index([workerId, advanceDate])
+}
+
+model AdvanceRepayment {
+  id            String          @id @default(uuid())
+  advanceId     String
+  advance       Advance         @relation(fields: [advanceId], references: [id], onDelete: Cascade)
+  installmentNo Int
+  dueDate       DateTime
+  amount        Decimal
+  paidStatus    RepaymentStatus @default(PENDING)
+  paidDate      DateTime?
+}
+
+model Overtime {
+  id             String    @id @default(uuid())
+  workerId       String
+  worker         Worker    @relation(fields: [workerId], references: [id])
+  otDate         DateTime
+  hoursWorked    Decimal
+  normalWageRate Decimal
+  otWageRate     Decimal
+  otEarnings     Decimal
+  datePaid       DateTime?
+  remarks        String?
+  createdAt      DateTime  @default(now())
+
+  @@index([workerId, otDate])
+}
+
+model Policy {
+  id               String     @id @default(uuid())
+  contractorId     String
+  contractor       Contractor @relation(fields: [contractorId], references: [id])
+  policyName       String
+  policyNumber     String
+  insuranceCompany String
+  projectName      String?
+  policyDate       DateTime
+  validDate        DateTime
+  workerCount      Int
+  projectValue     Decimal?
+  personValue      Decimal?
+  fileUrl          String
+  createdAt        DateTime   @default(now())
+}
+
+model Holiday {
+  id           String      @id @default(uuid())
+  type         HolidayType
+  date         DateTime
+  notes        String?
+  contractorId String?
+  contractor   Contractor? @relation(fields: [contractorId], references: [id])
+}
+
+model IdCard {
+  id             String     @id @default(uuid())
+  workerId       String
+  worker         Worker     @relation(fields: [workerId], references: [id])
+  contractorId   String
+  contractor     Contractor @relation(fields: [contractorId], references: [id])
+  validityMonths Int
+  issueDate      DateTime
+  expiryDate     DateTime
+  qrCodeData     String
+}
+
+model ComplianceTracker {
+  id                  String     @id @default(uuid())
+  workerId            String     @unique
+  worker              Worker     @relation(fields: [workerId], references: [id])
+  contractorId        String
+  contractor          Contractor @relation(fields: [contractorId], references: [id])
+  continuousDaysCount Int        @default(0)
+  lastCalculatedDate  DateTime?
+  form90Generated     Boolean    @default(false)
+  form90GeneratedAt   DateTime?
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  action     String
+  entityType String
+  entityId   String
+  oldValue   Json?
+  newValue   Json?
+  timestamp  DateTime @default(now())
+
+  @@index([entityType, entityId])
+}

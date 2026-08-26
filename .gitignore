@@ -1,0 +1,15 @@
+node_modules/
+.env
+*.local
+
+# Claude Code session/tooling state, not project source
+.claude/
+
+# Reference materials not part of the app deliverable
+*.mp4
+files/
+files.zip
+
+# OS/editor noise
+.DS_Store
+Thumbs.db

@@ -1,0 +1,40 @@
+const express = require('express');
+const authRoutes = require('./authRoutes');
+const dashboardRoutes = require('./dashboardRoutes');
+const designationRoutes = require('./designationRoutes');
+const labourCategoryRoutes = require('./labourCategoryRoutes');
+const contractorRoutes = require('./contractorRoutes');
+const supervisorRoutes = require('./supervisorRoutes');
+const workerRoutes = require('./workerRoutes');
+const kycRoutes = require('./kycRoutes');
+const attendanceRoutes = require('./attendanceRoutes');
+const damageRoutes = require('./damageRoutes');
+const fineRoutes = require('./fineRoutes');
+const accidentRoutes = require('./accidentRoutes');
+const advanceRoutes = require('./advanceRoutes');
+const overtimeRoutes = require('./overtimeRoutes');
+const policyRoutes = require('./policyRoutes');
+const holidayRoutes = require('./holidayRoutes');
+const reportRoutes = require('./reportRoutes');
+
+const router = express.Router();
+
+router.use('/auth', authRoutes);
+router.use('/dashboard', dashboardRoutes);
+router.use('/designations', designationRoutes);
+router.use('/labour-categories', labourCategoryRoutes);
+router.use('/contractors', contractorRoutes);
+router.use('/supervisors', supervisorRoutes);
+router.use('/workers', workerRoutes);
+router.use('/kyc', kycRoutes);
+router.use('/attendance', attendanceRoutes);
+router.use('/damages', damageRoutes);
+router.use('/fines', fineRoutes);
+router.use('/accidents', accidentRoutes);
+router.use('/advances', advanceRoutes);
+router.use('/overtimes', overtimeRoutes);
+router.use('/policies', policyRoutes);
+router.use('/holidays', holidayRoutes);
+router.use('/reports', reportRoutes);
+
+module.exports = router;
