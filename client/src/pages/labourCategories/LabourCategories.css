@@ -1,7 +1,7 @@
 @reference "../../index.css";
 
 .labour-categories-container {
-  @apply mx-auto max-w-2xl;
+  @apply mx-auto;
 }
 
 .labour-categories-header-actions {

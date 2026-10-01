@@ -122,11 +122,11 @@ const ADMIN_SECTIONS = [
     title: 'Forms',
     icon: AlertTriangle,
     items: [
-      { to: '/reports/statutory?type=advance', label: 'Advance Master', icon: ClipboardList },
-      { to: '/reports/statutory?type=accident', label: 'Accident Master', icon: ClipboardList },
-      { to: '/reports/statutory?type=damage', label: 'Damage or Loss Master', icon: ClipboardList },
-      { to: '/reports/statutory?type=fine', label: 'Fine Master', icon: ClipboardList },
-      { to: '/reports/statutory?type=overtime', label: 'Overtime Master', icon: ClipboardList },
+      { to: '/reports/statutory?type=advance', label: 'Advance', icon: ClipboardList },
+      { to: '/reports/statutory?type=accident', label: 'Accident', icon: ClipboardList },
+      { to: '/reports/statutory?type=damage', label: 'Damage or Loss', icon: ClipboardList },
+      { to: '/reports/statutory?type=fine', label: 'Fine', icon: ClipboardList },
+      { to: '/reports/statutory?type=overtime', label: 'Overtime', icon: ClipboardList },
     ],
   },
   {

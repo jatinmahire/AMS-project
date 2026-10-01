@@ -91,7 +91,7 @@ export default function LabourCategories() {
         }
       />
 
-      <DataTable columns={columns} rows={categories} loading={loading} scrollable maxHeight="500px" />
+      <DataTable columns={columns} rows={categories} loading={loading} scrollable maxHeight="500px" fullWidth />
 
       <ConfirmDialog
         open={!!deleteTarget}
