@@ -12,7 +12,8 @@ files.zip
 SS/
 
 # Database dumps contain real demo PII and password hashes — never commit
-*.sql
+# (scoped to the root dump only; Prisma migration .sql files must stay tracked)
+/ams_database_backup.sql
 
 # Stray/duplicate schema copy, not the real source (server/prisma/schema.prisma is)
 /schema-1.prisma
