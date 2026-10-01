@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import './ChangePasswordModal.css';
 import Modal from './Modal';
 import Button from './Button';
 import FormField, { TextInput } from './FormField';
@@ -38,7 +39,7 @@ export default function ChangePasswordModal({ open, onClose }) {
 
   return (
     <Modal open={open} onClose={handleClose} title="Change Password" size="sm">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="change-password-modal-form">
         <FormField label="Current Password" required error={errors.currentPassword}>
           <TextInput
             type="password"
@@ -63,7 +64,7 @@ export default function ChangePasswordModal({ open, onClose }) {
             error={errors.confirmPassword}
           />
         </FormField>
-        <div className="flex justify-end gap-3 pt-2">
+        <div className="change-password-modal-actions">
           <Button type="button" variant="secondary" onClick={handleClose} disabled={saving}>
             Cancel
           </Button>

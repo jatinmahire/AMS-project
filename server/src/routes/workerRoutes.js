@@ -1,6 +1,6 @@
 const express = require('express');
 const workerController = require('../controllers/workerController');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate, requireRole } = require('../middlewares/auth');
 const validate = require('../middlewares/validate');
 const { workerSchema } = require('../validators/workerValidator');
 const { statusUpdateSchema } = require('../validators/statusValidator');
@@ -17,11 +17,12 @@ const uploadFields = upload.fields([
 
 router.use(authenticate);
 
-router.get('/', workerController.list);
-router.get('/search', workerController.searchWorkers);
-router.get('/:id', workerController.getById);
-router.post('/', uploadFields, validate(workerSchema), workerController.create);
-router.put('/:id', uploadFields, validate(workerSchema), workerController.update);
-router.patch('/:id/status', validate(statusUpdateSchema), workerController.updateStatus);
+router.get('/', requireRole('ADMIN', 'CONTRACTOR'), workerController.list);
+router.get('/search', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), workerController.searchWorkers);
+router.get('/scan/:code', requireRole('ADMIN', 'SUPERVISOR'), workerController.scanQr);
+router.get('/:id', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), workerController.getById);
+router.post('/', requireRole('ADMIN', 'SUPERVISOR'), uploadFields, validate(workerSchema), workerController.create);
+router.put('/:id', requireRole('ADMIN'), uploadFields, validate(workerSchema), workerController.update);
+router.patch('/:id/status', requireRole('ADMIN'), validate(statusUpdateSchema), workerController.updateStatus);
 
 module.exports = router;

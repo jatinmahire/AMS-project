@@ -1,0 +1,93 @@
+@reference "../../index.css";
+
+.ninety-days-form-field {
+  @apply mb-2 mr-6 inline-block text-sm text-black;
+}
+
+.ninety-days-form-underline {
+  @apply border-b border-dotted border-black px-1;
+}
+
+.ninety-days-form-input {
+  @apply border-x-0 border-t-0 border-b border-dotted border-black bg-transparent px-1 text-sm text-black focus:outline-none focus:ring-1 focus:ring-primary-400;
+}
+
+.ninety-days-form-search-bar {
+  @apply mb-6 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-end;
+}
+
+.ninety-days-form-search-field {
+  @apply flex-1;
+}
+
+.ninety-days-form-label {
+  @apply mb-1 block text-sm font-medium text-slate-700;
+}
+
+.ninety-days-form-note {
+  @apply mb-4 text-xs text-slate-500;
+}
+
+.ninety-days-form-certificate {
+  @apply mx-auto max-w-4xl bg-white p-8 text-black shadow-sm print:shadow-none;
+}
+
+.ninety-days-form-title-bar {
+  @apply mb-4 bg-black px-4 py-3 text-center text-sm font-semibold text-white;
+}
+
+.ninety-days-form-ref-row {
+  @apply mb-1 flex items-start justify-between text-sm;
+}
+
+.ninety-days-form-photo-wrap {
+  @apply mb-4 flex justify-end;
+}
+
+.ninety-days-form-photo-box {
+  @apply h-24 w-20 border border-black;
+}
+
+.ninety-days-form-section-title {
+  @apply mb-2 text-center text-sm font-semibold;
+}
+
+.ninety-days-form-row {
+  @apply mb-3;
+}
+
+.ninety-days-form-row-lg {
+  @apply mb-4;
+}
+
+.ninety-days-form-legal-text {
+  @apply mb-4 text-justify text-sm leading-relaxed;
+}
+
+.ninety-days-form-divider {
+  @apply my-4 border-black;
+}
+
+.ninety-days-form-row-xl {
+  @apply mb-8;
+}
+
+.ninety-days-form-signature-row {
+  @apply flex justify-end text-sm;
+}
+
+.ninety-days-form-signature-block {
+  @apply text-center;
+}
+
+.ninety-days-form-signature-line {
+  @apply mt-8 w-56 border-b border-black;
+}
+
+.ninety-days-form-history-title {
+  @apply mb-3 mt-8 text-lg font-semibold text-slate-800;
+}
+
+.ninety-days-form-align-group {
+  @apply grid grid-cols-[minmax(0,max-content)] justify-center;
+}

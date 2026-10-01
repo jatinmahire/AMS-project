@@ -1,0 +1,9 @@
+@reference "../../index.css";
+
+.worker-view-message {
+  @apply text-slate-500;
+}
+
+.worker-view-actions {
+  @apply flex gap-2;
+}

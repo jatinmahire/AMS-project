@@ -4,6 +4,10 @@ export function listDamages(params) {
   return api.get('/damages', { params }).then((res) => res.data);
 }
 
+export function getDamage(id) {
+  return api.get(`/damages/${id}`).then((res) => res.data);
+}
+
 export function createDamage(formData) {
   return api.post('/damages', formData).then((res) => res.data);
 }

@@ -2,8 +2,8 @@ const overtimeService = require('../services/overtimeService');
 const asyncHandler = require('../utils/asyncHandler');
 
 const list = asyncHandler(async (req, res) => {
-  const { contractorId, month, workerId, page, limit } = req.query;
-  const result = await overtimeService.list({ contractorId, month, workerId, page, limit });
+  const { contractorId, from, to, workerId, search, page, limit } = req.query;
+  const result = await overtimeService.list({ contractorId, from, to, workerId, search, page, limit });
   res.json(result);
 });
 
@@ -13,7 +13,7 @@ const getById = asyncHandler(async (req, res) => {
 });
 
 const create = asyncHandler(async (req, res) => {
-  const overtime = await overtimeService.create(req.body);
+  const overtime = await overtimeService.create(req.body, req.user.id);
   res.status(201).json(overtime);
 });
 

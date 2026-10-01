@@ -1,0 +1,9 @@
+@reference "../../index.css";
+
+.policy-view-message {
+  @apply text-slate-500;
+}
+
+.policy-view-doc-link {
+  @apply flex items-center gap-1 text-primary-600 hover:underline;
+}

@@ -1,0 +1,17 @@
+@reference "../../index.css";
+
+.fine-form-loading {
+  @apply text-slate-500;
+}
+
+.fine-form-card {
+  @apply space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+}
+
+.fine-form-col-span {
+  @apply sm:col-span-2 lg:col-span-3;
+}
+
+.fine-form-actions-row {
+  @apply flex justify-end gap-3 pt-2;
+}

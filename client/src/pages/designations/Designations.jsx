@@ -1,26 +1,22 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Eye, Pencil, Trash2, FileSpreadsheet } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
-import Table from '../../components/Table';
+import DataTable from '../../components/DataTable';
 import Button from '../../components/Button';
-import Modal from '../../components/Modal';
 import ConfirmDialog from '../../components/ConfirmDialog';
-import FormField, { TextInput } from '../../components/FormField';
-import { listDesignations, createDesignation, updateDesignation, deleteDesignation } from '../../api/designations';
-import { getErrorMessage, getFieldErrors } from '../../utils/errorMessage';
+import { listDesignations, deleteDesignation } from '../../api/designations';
+import { getErrorMessage } from '../../utils/errorMessage';
 import { useToast } from '../../context/ToastContext';
-
-const EMPTY_FORM = { designationCode: '', designationName: '' };
+import { exportToCsv } from '../../utils/exportCsv';
+import './Designations.css';
 
 export default function Designations() {
   const [designations, setDesignations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [errors, setErrors] = useState({});
-  const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
   const { showToast } = useToast();
 
   function load() {
@@ -32,42 +28,6 @@ export default function Designations() {
   }
 
   useEffect(load, []);
-
-  function openCreate() {
-    setEditing(null);
-    setForm(EMPTY_FORM);
-    setErrors({});
-    setModalOpen(true);
-  }
-
-  function openEdit(designation) {
-    setEditing(designation);
-    setForm({ designationCode: designation.designationCode, designationName: designation.designationName });
-    setErrors({});
-    setModalOpen(true);
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setSaving(true);
-    setErrors({});
-    try {
-      if (editing) {
-        await updateDesignation(editing.id, form);
-        showToast('Designation updated');
-      } else {
-        await createDesignation(form);
-        showToast('Designation created');
-      }
-      setModalOpen(false);
-      load();
-    } catch (err) {
-      setErrors(getFieldErrors(err));
-      showToast(getErrorMessage(err), 'error');
-    } finally {
-      setSaving(false);
-    }
-  }
 
   async function handleDelete() {
     setSaving(true);
@@ -90,11 +50,14 @@ export default function Designations() {
       key: 'actions',
       label: 'Actions',
       render: (row) => (
-        <div className="flex gap-2">
-          <button onClick={() => openEdit(row)} className="rounded p-1.5 text-slate-500 hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-indigo-400">
+        <div className="designations-actions-cell">
+          <button onClick={() => navigate(`/designations/${row.id}`)} className="designations-action-btn">
+            <Eye size={16} />
+          </button>
+          <button onClick={() => navigate(`/designations/${row.id}/edit`)} className="designations-action-btn">
             <Pencil size={16} />
           </button>
-          <button onClick={() => setDeleteTarget(row)} className="rounded p-1.5 text-slate-500 hover:bg-slate-100 hover:text-red-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-red-400">
+          <button onClick={() => setDeleteTarget(row)} className="designations-action-btn-danger">
             <Trash2 size={16} />
           </button>
         </div>
@@ -102,46 +65,31 @@ export default function Designations() {
     },
   ];
 
+  function handleExport() {
+    exportToCsv(
+      'designations.csv',
+      ['Code', 'Name'],
+      designations.map((d) => [d.designationCode, d.designationName])
+    );
+  }
+
   return (
-    <div>
+    <div className="designations-container">
       <PageHeader
+        centered
         title="Designations"
         description="Job designations used across worker registration."
         action={
-          <Button icon={Plus} onClick={openCreate}>
-            Add Designation
-          </Button>
+          <div className="designations-header-actions">
+            <Button variant="secondary" icon={FileSpreadsheet} onClick={handleExport} disabled={designations.length === 0}>
+              Export to Excel
+            </Button>
+            <Button icon={Plus} onClick={() => navigate('/designations/new')}>Add Designation</Button>
+          </div>
         }
       />
 
-      <Table columns={columns} rows={designations} loading={loading} />
-
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Designation' : 'Add Designation'} size="sm">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Designation Code" required error={errors.designationCode}>
-            <TextInput
-              value={form.designationCode}
-              onChange={(e) => setForm({ ...form, designationCode: e.target.value })}
-              error={errors.designationCode}
-            />
-          </FormField>
-          <FormField label="Designation Name" required error={errors.designationName}>
-            <TextInput
-              value={form.designationName}
-              onChange={(e) => setForm({ ...form, designationName: e.target.value })}
-              error={errors.designationName}
-            />
-          </FormField>
-          <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="secondary" onClick={() => setModalOpen(false)} disabled={saving}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={saving}>
-              {saving ? 'Saving...' : 'Save'}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      <DataTable columns={columns} rows={designations} loading={loading} scrollable maxHeight="500px" />
 
       <ConfirmDialog
         open={!!deleteTarget}

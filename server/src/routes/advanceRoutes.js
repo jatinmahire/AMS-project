@@ -1,12 +1,13 @@
 const express = require('express');
 const advanceController = require('../controllers/advanceController');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate, requireRole } = require('../middlewares/auth');
 const validate = require('../middlewares/validate');
 const { advanceSchema } = require('../validators/advanceValidator');
 
 const router = express.Router();
 
 router.use(authenticate);
+router.use(requireRole('ADMIN'));
 
 router.get('/', advanceController.list);
 router.get('/:id', advanceController.getById);

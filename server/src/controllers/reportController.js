@@ -1,4 +1,6 @@
 const reportService = require('../services/reportService');
+const musterRollService = require('../services/musterRollService');
+const pfChalanService = require('../services/pfChalanService');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiError = require('../utils/ApiError');
 
@@ -17,7 +19,13 @@ const generateIdCard = asyncHandler(async (req, res) => {
 });
 
 const ninetyDays = asyncHandler(async (req, res) => {
-  const result = await reportService.calculateCompliance(req.params.workerCode);
+  const result = await reportService.calculateCompliance(req.params.workerCode, req.user);
+  res.json(result);
+});
+
+const ninetyDaysHistory = asyncHandler(async (req, res) => {
+  const { contractorId, from, to, page, limit } = req.query;
+  const result = await reportService.form90History(req.user, { contractorId, from, to, page, limit });
   res.json(result);
 });
 
@@ -27,4 +35,16 @@ const statutoryRegister = asyncHandler(async (req, res) => {
   res.json(rows);
 });
 
-module.exports = { idCard, generateIdCard, ninetyDays, statutoryRegister };
+const musterRoll = asyncHandler(async (req, res) => {
+  const { contractorId, month } = req.query;
+  const rows = await musterRollService.getMusterRoll({ contractorId, month });
+  res.json(rows);
+});
+
+const pfChalan = asyncHandler(async (req, res) => {
+  const { contractorId, month } = req.query;
+  const rows = await pfChalanService.getPfChalan({ contractorId, month });
+  res.json(rows);
+});
+
+module.exports = { idCard, generateIdCard, ninetyDays, ninetyDaysHistory, statutoryRegister, musterRoll, pfChalan };

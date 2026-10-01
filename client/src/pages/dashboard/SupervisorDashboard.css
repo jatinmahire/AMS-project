@@ -1,0 +1,17 @@
+@reference "../../index.css";
+
+.supervisor-dashboard-cards-grid {
+  @apply mx-auto grid max-w-2xl grid-cols-1 gap-6 sm:grid-cols-2;
+}
+
+.supervisor-dashboard-action-row {
+  @apply mt-6 flex justify-center;
+}
+
+.supervisor-dashboard-action-button {
+  @apply w-full sm:w-auto;
+}
+
+.supervisor-dashboard-updates {
+  @apply mt-6;
+}

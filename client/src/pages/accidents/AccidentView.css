@@ -1,0 +1,13 @@
+@reference "../../index.css";
+
+.accident-view-message {
+  @apply text-slate-500;
+}
+
+.accident-view-content {
+  @apply space-y-5;
+}
+
+.accident-view-photo-link {
+  @apply text-primary-600 hover:underline;
+}

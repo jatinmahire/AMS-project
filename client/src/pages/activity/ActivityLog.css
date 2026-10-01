@@ -1,0 +1,9 @@
+@reference "../../index.css";
+
+.activity-log-type-cell {
+  @apply inline-flex items-center gap-2;
+}
+
+.activity-log-type-icon {
+  @apply text-primary-600;
+}

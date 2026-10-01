@@ -8,6 +8,7 @@ const supervisorRoutes = require('./supervisorRoutes');
 const workerRoutes = require('./workerRoutes');
 const kycRoutes = require('./kycRoutes');
 const attendanceRoutes = require('./attendanceRoutes');
+const gateLogRoutes = require('./gateLogRoutes');
 const damageRoutes = require('./damageRoutes');
 const fineRoutes = require('./fineRoutes');
 const accidentRoutes = require('./accidentRoutes');
@@ -16,6 +17,7 @@ const overtimeRoutes = require('./overtimeRoutes');
 const policyRoutes = require('./policyRoutes');
 const holidayRoutes = require('./holidayRoutes');
 const reportRoutes = require('./reportRoutes');
+const notificationRoutes = require('./notificationRoutes');
 
 const router = express.Router();
 
@@ -28,6 +30,7 @@ router.use('/supervisors', supervisorRoutes);
 router.use('/workers', workerRoutes);
 router.use('/kyc', kycRoutes);
 router.use('/attendance', attendanceRoutes);
+router.use('/gate-logs', gateLogRoutes);
 router.use('/damages', damageRoutes);
 router.use('/fines', fineRoutes);
 router.use('/accidents', accidentRoutes);
@@ -36,5 +39,6 @@ router.use('/overtimes', overtimeRoutes);
 router.use('/policies', policyRoutes);
 router.use('/holidays', holidayRoutes);
 router.use('/reports', reportRoutes);
+router.use('/notifications', notificationRoutes);
 
 module.exports = router;

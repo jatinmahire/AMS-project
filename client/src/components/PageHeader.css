@@ -1,0 +1,25 @@
+@reference "../index.css";
+
+.page-header-centered {
+  @apply mb-6 flex flex-col items-center gap-3 border-b border-slate-100 pb-5 text-center;
+}
+
+.page-header {
+  @apply mb-6 flex flex-col gap-3 border-b border-slate-100 pb-5 sm:flex-row sm:items-center sm:justify-between;
+}
+
+.page-header-titles {
+  @apply text-center sm:flex-1;
+}
+
+.page-header-title {
+  @apply text-xl font-bold tracking-tight text-slate-900;
+}
+
+.page-header-description {
+  @apply mt-1 text-sm text-slate-600;
+}
+
+.page-header-action {
+  @apply flex-none;
+}

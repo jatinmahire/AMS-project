@@ -1,0 +1,13 @@
+@reference "../index.css";
+
+.worker-info-card {
+  @apply grid grid-cols-1 gap-4 rounded-md bg-slate-50 px-4 py-3 text-sm sm:grid-cols-3;
+}
+
+.worker-info-card-label {
+  @apply text-xs text-slate-400;
+}
+
+.worker-info-card-value {
+  @apply text-slate-800;
+}

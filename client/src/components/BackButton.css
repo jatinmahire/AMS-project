@@ -1,0 +1,5 @@
+@reference "../index.css";
+
+.back-button {
+  @apply mb-4 flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700;
+}

@@ -6,6 +6,7 @@ import { uploadContractorDocument, deleteContractorDocument } from '../../api/co
 import { toFormData } from '../../utils/toFormData';
 import { getErrorMessage } from '../../utils/errorMessage';
 import { useToast } from '../../context/ToastContext';
+import './ContractorDocuments.css';
 
 const DOC_TYPES = ['SHOP_ACT', 'PF_CODE', 'ESIC_CODE', 'PTEC', 'PTRC', 'MLWF_CODE', 'BOCW_LICENSE', 'LABOUR_LICENSE', 'WC_POLICY'];
 
@@ -45,28 +46,28 @@ export default function ContractorDocuments({ contractorId, documents, onChange 
   }
 
   return (
-    <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Documents</h3>
+    <div className="contractor-documents-card">
+      <h3 className="contractor-documents-title">Documents</h3>
 
-      <div className="mb-4 space-y-2">
-        {documents.length === 0 && <p className="text-sm text-slate-400 dark:text-slate-500">No documents uploaded yet.</p>}
+      <div className="contractor-documents-list">
+        {documents.length === 0 && <p className="contractor-documents-empty">No documents uploaded yet.</p>}
         {documents.map((doc) => (
           <div
             key={doc.id}
-            className="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2 dark:border-slate-700"
+            className="contractor-documents-row"
           >
             <a
               href={doc.fileUrl}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-2 text-sm text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400"
+              className="contractor-documents-link"
             >
               <FileText size={16} />
-              {doc.docType.replace('_', ' ')}
+              {doc.docType.replace('_', '')}
             </a>
             <button
               onClick={() => handleDelete(doc.id)}
-              className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-red-600 dark:hover:bg-slate-800 dark:hover:text-red-400"
+              className="contractor-documents-delete-btn"
             >
               <Trash2 size={16} />
             </button>
@@ -74,22 +75,22 @@ export default function ContractorDocuments({ contractorId, documents, onChange 
         ))}
       </div>
 
-      <form onSubmit={handleUpload} className="flex flex-col gap-3 sm:flex-row sm:items-end">
-        <FormField label="Document Type" className="w-56">
+      <form onSubmit={handleUpload} className="contractor-documents-form">
+        <FormField label="Document Type" className="contractor-documents-type-field">
           <Select value={docType} onChange={(e) => setDocType(e.target.value)}>
             {DOC_TYPES.map((type) => (
               <option key={type} value={type}>
-                {type.replace('_', ' ')}
+                {type.replace('_', '')}
               </option>
             ))}
           </Select>
         </FormField>
-        <FormField label="File" className="flex-1">
+        <FormField label="File" className="contractor-documents-file-field">
           <input
             type="file"
             accept=".pdf,.jpg,.jpeg,.png"
             onChange={(e) => setFile(e.target.files[0])}
-            className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium hover:file:bg-slate-200 dark:text-slate-400 dark:file:bg-slate-700 dark:file:text-slate-200 dark:hover:file:bg-slate-600"
+            className="contractor-documents-file-input"
           />
         </FormField>
         <Button type="submit" icon={Upload} disabled={uploading}>

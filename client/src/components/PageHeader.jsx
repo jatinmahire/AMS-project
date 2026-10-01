@@ -1,11 +1,23 @@
-export default function PageHeader({ title, description, action }) {
-  return (
-    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{title}</h1>
-        {description && <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+import './PageHeader.css';
+
+export default function PageHeader({ title, description, action, centered = false }) {
+  if (centered) {
+    return (
+      <div className="page-header-centered">
+        <h1 className="page-header-title">{title}</h1>
+        {description && <p className="page-header-description">{description}</p>}
+        {action && <div>{action}</div>}
       </div>
-      {action && <div className="flex-none">{action}</div>}
+    );
+  }
+
+  return (
+    <div className="page-header">
+      <div className="page-header-titles">
+        <h1 className="page-header-title">{title}</h1>
+        {description && <p className="page-header-description">{description}</p>}
+      </div>
+      {action && <div className="page-header-action">{action}</div>}
     </div>
   );
 }

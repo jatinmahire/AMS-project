@@ -1,0 +1,53 @@
+@reference "../index.css";
+
+.data-table-container {
+  @apply mx-auto overflow-auto rounded-xl border border-slate-200 bg-white shadow-sm;
+}
+
+.data-table-container-full-width {
+  @apply w-full;
+}
+
+.data-table-container-fit-width {
+  @apply w-fit max-w-full;
+}
+
+.data-table {
+  @apply w-full text-left text-sm;
+}
+
+.data-table-header-cell {
+  @apply whitespace-nowrap border-b-2 border-primary-600 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-white bg-slate-900;
+}
+
+.data-table-header-cell-sticky {
+  @apply sticky top-0 z-10 bg-slate-900;
+}
+
+.data-table-body {
+  @apply divide-y divide-slate-100;
+}
+
+.data-table-empty-cell {
+  @apply px-4 py-10 text-center text-sm text-slate-400;
+}
+
+.data-table-row {
+  @apply transition-colors duration-150 hover:bg-primary-50/70;
+}
+
+.data-table-row-clickable {
+  @apply cursor-pointer;
+}
+
+.data-table-row-odd {
+  @apply bg-slate-50/70;
+}
+
+.data-table-row-even {
+  @apply bg-white;
+}
+
+.data-table-cell {
+  @apply whitespace-nowrap px-4 py-3 text-slate-700;
+}

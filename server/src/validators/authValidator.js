@@ -3,6 +3,7 @@ const { z } = require('zod');
 const loginSchema = z.object({
   loginId: z.string().min(1, 'Login ID is required'),
   password: z.string().min(1, 'Password is required'),
+  selectedRole: z.enum(['ADMIN', 'SUPERVISOR', 'CONTRACTOR'], { errorMap: () => ({ message: 'Select a valid role' }) }),
 });
 
 const changePasswordSchema = z

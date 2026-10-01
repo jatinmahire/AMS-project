@@ -1,0 +1,21 @@
+@reference "../../index.css";
+
+.attendance-actions-cell {
+  @apply flex gap-2;
+}
+
+.attendance-action-btn {
+  @apply rounded-md border border-slate-200 bg-white p-1.5 text-slate-500 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-600;
+}
+
+.attendance-date-filter-row {
+  @apply mb-4 flex items-center gap-3;
+}
+
+.attendance-date-filter-label {
+  @apply text-sm font-medium text-slate-700;
+}
+
+.attendance-date-filter-input {
+  @apply w-48;
+}

@@ -1,0 +1,9 @@
+@reference "../../index.css";
+
+.muster-roll-pending {
+  @apply font-medium text-amber-600;
+}
+
+.muster-roll-actions {
+  @apply flex gap-2;
+}

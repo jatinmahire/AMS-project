@@ -1,33 +1,23 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Eye, Pencil, Trash2, FileSpreadsheet } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
-import Table from '../../components/Table';
+import DataTable from '../../components/DataTable';
 import Button from '../../components/Button';
-import Modal from '../../components/Modal';
 import ConfirmDialog from '../../components/ConfirmDialog';
-import FormField, { TextInput, Select } from '../../components/FormField';
-import {
-  listLabourCategories,
-  createLabourCategory,
-  updateLabourCategory,
-  deleteLabourCategory,
-} from '../../api/labourCategories';
+import { listLabourCategories, deleteLabourCategory } from '../../api/labourCategories';
 import { formatCurrency } from '../../utils/format';
-import { getErrorMessage, getFieldErrors } from '../../utils/errorMessage';
+import { getErrorMessage } from '../../utils/errorMessage';
 import { useToast } from '../../context/ToastContext';
-
-const LABOUR_TYPES = ['SKILLED', 'SEMI_SKILLED', 'UNSKILLED', 'HIGH_SKILLED'];
-const EMPTY_FORM = { categoryCode: '', categoryName: 'SKILLED', ratePerDay: '' };
+import { exportToCsv } from '../../utils/exportCsv';
+import './LabourCategories.css';
 
 export default function LabourCategories() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [errors, setErrors] = useState({});
-  const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
   const { showToast } = useToast();
 
   function load() {
@@ -39,42 +29,6 @@ export default function LabourCategories() {
   }
 
   useEffect(load, []);
-
-  function openCreate() {
-    setEditing(null);
-    setForm(EMPTY_FORM);
-    setErrors({});
-    setModalOpen(true);
-  }
-
-  function openEdit(category) {
-    setEditing(category);
-    setForm({ categoryCode: category.categoryCode, categoryName: category.categoryName, ratePerDay: category.ratePerDay });
-    setErrors({});
-    setModalOpen(true);
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setSaving(true);
-    setErrors({});
-    try {
-      if (editing) {
-        await updateLabourCategory(editing.id, form);
-        showToast('Labour category updated');
-      } else {
-        await createLabourCategory(form);
-        showToast('Labour category created');
-      }
-      setModalOpen(false);
-      load();
-    } catch (err) {
-      setErrors(getFieldErrors(err));
-      showToast(getErrorMessage(err), 'error');
-    } finally {
-      setSaving(false);
-    }
-  }
 
   async function handleDelete() {
     setSaving(true);
@@ -92,17 +46,20 @@ export default function LabourCategories() {
 
   const columns = [
     { key: 'categoryCode', label: 'Code' },
-    { key: 'categoryName', label: 'Type', render: (row) => row.categoryName.replace('_', ' ') },
+    { key: 'categoryName', label: 'Type', render: (row) => row.categoryName.replace('_', '') },
     { key: 'ratePerDay', label: 'Rate / Day', render: (row) => formatCurrency(row.ratePerDay) },
     {
       key: 'actions',
       label: 'Actions',
       render: (row) => (
-        <div className="flex gap-2">
-          <button onClick={() => openEdit(row)} className="rounded p-1.5 text-slate-500 hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-indigo-400">
+        <div className="labour-categories-actions-cell">
+          <button onClick={() => navigate(`/labour-categories/${row.id}`)} className="labour-categories-action-btn">
+            <Eye size={16} />
+          </button>
+          <button onClick={() => navigate(`/labour-categories/${row.id}/edit`)} className="labour-categories-action-btn">
             <Pencil size={16} />
           </button>
-          <button onClick={() => setDeleteTarget(row)} className="rounded p-1.5 text-slate-500 hover:bg-slate-100 hover:text-red-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-red-400">
+          <button onClick={() => setDeleteTarget(row)} className="labour-categories-action-btn-danger">
             <Trash2 size={16} />
           </button>
         </div>
@@ -110,57 +67,31 @@ export default function LabourCategories() {
     },
   ];
 
+  function handleExport() {
+    exportToCsv(
+      'labour-categories.csv',
+      ['Code', 'Type', 'Rate / Day'],
+      categories.map((c) => [c.categoryCode, c.categoryName.replace('_', ''), c.ratePerDay])
+    );
+  }
+
   return (
-    <div>
+    <div className="labour-categories-container">
       <PageHeader
+        centered
         title="Labour Categories"
         description="Skill categories and their daily wage rate."
         action={
-          <Button icon={Plus} onClick={openCreate}>
-            Add Category
-          </Button>
+          <div className="labour-categories-header-actions">
+            <Button variant="secondary" icon={FileSpreadsheet} onClick={handleExport} disabled={categories.length === 0}>
+              Export to Excel
+            </Button>
+            <Button icon={Plus} onClick={() => navigate('/labour-categories/new')}>Add Category</Button>
+          </div>
         }
       />
 
-      <Table columns={columns} rows={categories} loading={loading} />
-
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Category' : 'Add Category'} size="sm">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Category Code" required error={errors.categoryCode}>
-            <TextInput
-              value={form.categoryCode}
-              onChange={(e) => setForm({ ...form, categoryCode: e.target.value })}
-              error={errors.categoryCode}
-            />
-          </FormField>
-          <FormField label="Labour Type" required error={errors.categoryName}>
-            <Select value={form.categoryName} onChange={(e) => setForm({ ...form, categoryName: e.target.value })}>
-              {LABOUR_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {type.replace('_', ' ')}
-                </option>
-              ))}
-            </Select>
-          </FormField>
-          <FormField label="Rate Per Day" required error={errors.ratePerDay}>
-            <TextInput
-              type="number"
-              step="0.01"
-              value={form.ratePerDay}
-              onChange={(e) => setForm({ ...form, ratePerDay: e.target.value })}
-              error={errors.ratePerDay}
-            />
-          </FormField>
-          <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="secondary" onClick={() => setModalOpen(false)} disabled={saving}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={saving}>
-              {saving ? 'Saving...' : 'Save'}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      <DataTable columns={columns} rows={categories} loading={loading} scrollable maxHeight="500px" />
 
       <ConfirmDialog
         open={!!deleteTarget}

@@ -4,6 +4,10 @@ export function listFines(params) {
   return api.get('/fines', { params }).then((res) => res.data);
 }
 
+export function getFine(id) {
+  return api.get(`/fines/${id}`).then((res) => res.data);
+}
+
 export function createFine(payload) {
   return api.post('/fines', payload).then((res) => res.data);
 }

@@ -1,17 +1,20 @@
 import { useState } from 'react';
-import Sidebar from './Sidebar';
+import './AppShell.css';
+import Navbar from './Navbar';
 import Topbar from './Topbar';
+import OfflineQueueBadge from './OfflineQueueBadge';
 
 export default function AppShell({ children }) {
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-slate-950">
-      <Sidebar mobileOpen={mobileSidebarOpen} onCloseMobile={() => setMobileSidebarOpen(false)} />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Topbar onOpenMobileSidebar={() => setMobileSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
-      </div>
+    <div className="app-shell">
+      <Topbar onToggleNav={() => setMobileNavOpen((v) => !v)} />
+      <Navbar mobileOpen={mobileNavOpen} onCloseMobile={() => setMobileNavOpen(false)} />
+      <main className="app-shell-main">
+        <div className="app-shell-content">{children}</div>
+      </main>
+      <OfflineQueueBadge />
     </div>
   );
 }

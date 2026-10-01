@@ -3,8 +3,8 @@ const asyncHandler = require('../utils/asyncHandler');
 const { fileUrl } = require('../utils/upload');
 
 const list = asyncHandler(async (req, res) => {
-  const { contractorId, month, workerId, page, limit } = req.query;
-  const result = await damageService.list({ contractorId, month, workerId, page, limit });
+  const { contractorId, from, to, workerId, search, page, limit } = req.query;
+  const result = await damageService.list({ contractorId, from, to, workerId, search, page, limit });
   res.json(result);
 });
 
@@ -16,7 +16,7 @@ const getById = asyncHandler(async (req, res) => {
 const create = asyncHandler(async (req, res) => {
   const data = { ...req.body };
   if (req.file) data.imageUrl = fileUrl('damages', req.file.filename);
-  const damage = await damageService.create(data);
+  const damage = await damageService.create(data, req.user.id);
   res.status(201).json(damage);
 });
 

@@ -1,61 +1,173 @@
-import { useState } from 'react';
-import { ChevronDown, KeyRound, LogOut, Menu, Moon, Sun, UserCircle } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronDown, ClipboardCheck, KeyRound, LogOut, Menu, Search, User, X } from 'lucide-react';
+import './Topbar.css';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
+import { initials } from '../utils/format';
+import { searchWorkers } from '../api/workers';
 import ChangePasswordModal from './ChangePasswordModal';
+import NotificationBell from './NotificationBell';
 
-export default function Topbar({ onOpenMobileSidebar }) {
+function useTopbarSearch(navigate, onNavigated) {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (query.trim().length < 2) {
+      setResults([]);
+      return;
+    }
+    const timeout = setTimeout(() => {
+      searchWorkers(query).then(setResults).catch(() => setResults([]));
+    }, 250);
+    return () => clearTimeout(timeout);
+  }, [query]);
+
+  function selectWorker(worker) {
+    navigate(`/workers/${worker.id}`);
+    setQuery('');
+    setResults([]);
+    setOpen(false);
+    onNavigated?.();
+  }
+
+  return { query, setQuery, results, open, setOpen, selectWorker };
+}
+
+export default function Topbar({ onToggleNav }) {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const desktopSearch = useTopbarSearch(navigate);
+  const mobileSearch = useTopbarSearch(navigate, () => setMobileSearchOpen(false));
+  const desktopSearchRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (desktopSearchRef.current && !desktopSearchRef.current.contains(e.target)) {
+        desktopSearch.setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [desktopSearch]);
 
   return (
-    <header className="flex h-16 flex-none items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6 dark:border-slate-800 dark:bg-slate-900">
+    <header className="no-print topbar">
+      <div className="topbar-inner">
       <button
-        onClick={onOpenMobileSidebar}
-        className="rounded-md p-2 text-slate-500 hover:bg-slate-100 lg:hidden dark:text-slate-400 dark:hover:bg-slate-800"
-        aria-label="Open menu"
+        onClick={onToggleNav}
+        className="topbar-nav-toggle"
+        aria-label="Toggle navigation menu"
       >
         <Menu size={20} />
       </button>
 
-      <div className="flex flex-1 items-center justify-end gap-2">
+      <div className="topbar-brand">
+        <div className="topbar-brand-icon">
+          <ClipboardCheck size={18} />
+        </div>
+        <span className="topbar-brand-name">AMS</span>
+      </div>
+
+      <div className="topbar-search" ref={desktopSearchRef}>
+        <div className="topbar-search-input-wrapper">
+          <Search size={16} className="topbar-search-icon" />
+          <input
+            type="text"
+            value={desktopSearch.query}
+            onChange={(e) => {
+              desktopSearch.setQuery(e.target.value);
+              desktopSearch.setOpen(true);
+            }}
+            onFocus={() => desktopSearch.setOpen(true)}
+            placeholder="Search workers by code or name..."
+            className="topbar-search-field"
+          />
+          {desktopSearch.open && desktopSearch.results.length > 0 && (
+            <div className="topbar-search-results">
+              {desktopSearch.results.map((w) => (
+                <button
+                  key={w.id}
+                  type="button"
+                  onClick={() => desktopSearch.selectWorker(w)}
+                  className="topbar-search-result"
+                >
+                  <span className="topbar-search-result-code">{w.workerCode}</span>
+                  <span className="topbar-search-result-name"> — {w.firstName} {w.lastName}</span>
+                  <span className="topbar-search-result-meta">{w.contractor?.contractorName} · {w.designation?.designationName}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="topbar-actions">
         <button
-          onClick={toggleTheme}
-          className="rounded-md p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
-          aria-label="Toggle dark mode"
+          onClick={() => setMobileSearchOpen(true)}
+          className="topbar-mobile-search-toggle"
+          aria-label="Search"
         >
-          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          <Search size={20} />
         </button>
 
-        <div className="relative">
+        <NotificationBell />
+
+        <div className="topbar-avatar-menu">
           <button
             onClick={() => setMenuOpen((v) => !v)}
-            className="flex items-center gap-2 rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 sm:px-3 dark:text-slate-200 dark:hover:bg-slate-800"
+            className="topbar-avatar-trigger"
           >
-            <UserCircle size={20} />
-            <span className="hidden sm:inline">{user?.fullName || user?.loginId}</span>
-            <ChevronDown size={16} />
+            <span className="topbar-avatar-badge">
+              {initials(user?.fullName || user?.loginId)}
+            </span>
+            <ChevronDown size={16} className="topbar-avatar-chevron" />
           </button>
 
           {menuOpen && (
             <>
-              <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-              <div className="absolute right-0 z-20 mt-1 w-48 rounded-md border border-slate-200 bg-white py-1 shadow-lg animate-[fadeIn_150ms_ease-out] dark:border-slate-700 dark:bg-slate-800">
+              <div className="topbar-menu-backdrop" onClick={() => setMenuOpen(false)} />
+              <div className="topbar-menu-panel">
+                <div className="topbar-menu-header">
+                  <span className="topbar-menu-avatar">
+                    {initials(user?.fullName || user?.loginId)}
+                  </span>
+                  <div className="topbar-menu-name-wrapper">
+                    <p className="topbar-menu-name">
+                      {user?.fullName || user?.loginId}
+                    </p>
+                    <p className="topbar-menu-login-id">{user?.loginId}</p>
+                  </div>
+                </div>
+                <div className="topbar-menu-divider" />
+                <button
+                  onClick={() => {
+                    navigate('/profile');
+                    setMenuOpen(false);
+                  }}
+                  className="topbar-menu-item"
+                >
+                  <User size={16} />
+                  My Profile
+                </button>
                 <button
                   onClick={() => {
                     setChangePasswordOpen(true);
                     setMenuOpen(false);
                   }}
-                  className="flex w-full items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700"
+                  className="topbar-menu-item"
                 >
                   <KeyRound size={16} />
                   Change Password
                 </button>
+                <div className="topbar-menu-divider" />
                 <button
                   onClick={logout}
-                  className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
+                  className="topbar-menu-item-danger"
                 >
                   <LogOut size={16} />
                   Logout
@@ -65,6 +177,48 @@ export default function Topbar({ onOpenMobileSidebar }) {
           )}
         </div>
       </div>
+      </div>
+
+      {mobileSearchOpen && (
+        <div className="topbar-mobile-search-panel">
+          <div className="topbar-mobile-search-row">
+            <Search size={18} className="topbar-mobile-search-icon" />
+            <input
+              type="text"
+              autoFocus
+              value={mobileSearch.query}
+              onChange={(e) => mobileSearch.setQuery(e.target.value)}
+              placeholder="Search workers by code or name..."
+              className="topbar-mobile-search-field"
+            />
+            <button
+              onClick={() => {
+                setMobileSearchOpen(false);
+                mobileSearch.setQuery('');
+              }}
+              className="topbar-mobile-search-close"
+            >
+              <X size={20} />
+            </button>
+          </div>
+          {mobileSearch.results.length > 0 && (
+            <div className="topbar-mobile-search-results">
+              {mobileSearch.results.map((w) => (
+                <button
+                  key={w.id}
+                  type="button"
+                  onClick={() => mobileSearch.selectWorker(w)}
+                  className="topbar-mobile-search-result"
+                >
+                  <span className="topbar-search-result-code">{w.workerCode}</span>
+                  <span className="topbar-search-result-name"> — {w.firstName} {w.lastName}</span>
+                  <span className="topbar-search-result-meta">{w.contractor?.contractorName} · {w.designation?.designationName}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <ChangePasswordModal open={changePasswordOpen} onClose={() => setChangePasswordOpen(false)} />
     </header>

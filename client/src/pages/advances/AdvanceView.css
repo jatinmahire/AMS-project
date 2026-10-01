@@ -1,0 +1,45 @@
+@reference "../../index.css";
+
+.advance-view-message {
+  @apply text-slate-500;
+}
+
+.advance-view-content {
+  @apply space-y-5;
+}
+
+.advance-view-repayment-card {
+  @apply rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+}
+
+.advance-view-repayment-title {
+  @apply mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500;
+}
+
+.advance-view-table-wrapper {
+  @apply overflow-hidden rounded-md border border-slate-200;
+}
+
+.advance-view-table {
+  @apply w-full text-left text-sm;
+}
+
+.advance-view-table-head {
+  @apply bg-slate-50;
+}
+
+.advance-view-th {
+  @apply px-3 py-2 font-medium text-slate-600;
+}
+
+.advance-view-table-body {
+  @apply divide-y divide-slate-100;
+}
+
+.advance-view-td {
+  @apply px-3 py-2 text-slate-700;
+}
+
+.advance-view-td-status {
+  @apply px-3 py-2;
+}

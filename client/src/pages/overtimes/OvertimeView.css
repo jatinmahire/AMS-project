@@ -1,0 +1,9 @@
+@reference "../../index.css";
+
+.overtime-view-message {
+  @apply text-slate-500;
+}
+
+.overtime-view-content {
+  @apply space-y-5;
+}

@@ -1,6 +1,8 @@
+const bcrypt = require('bcrypt');
 const prisma = require('../config/db');
 const ApiError = require('../utils/ApiError');
 const generateCode = require('../utils/codeGenerator');
+const recordAudit = require('../utils/auditLog');
 
 async function list({ search, status, page = 1, limit = 20 }) {
   page = Number(page) || 1;
@@ -22,6 +24,7 @@ async function list({ search, status, page = 1, limit = 20 }) {
   const [data, total] = await Promise.all([
     prisma.contractor.findMany({
       where,
+      include: { user: { select: { loginId: true } } },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * limit,
       take: limit,
@@ -35,20 +38,56 @@ async function list({ search, status, page = 1, limit = 20 }) {
 async function getById(id) {
   const contractor = await prisma.contractor.findUnique({
     where: { id },
-    include: { documents: true },
+    include: { documents: true, user: { select: { loginId: true } } },
   });
   if (!contractor) throw new ApiError(404, 'Contractor not found');
   return contractor;
 }
 
-async function create(data) {
+async function create(data, userId) {
+  const { password, ...contractorData } = data;
+  if (!password) {
+    throw new ApiError(400, 'Password is required', { password: 'Password is required' });
+  }
+
   const contractorCode = await generateCode('contractor');
-  return prisma.contractor.create({ data: { ...data, contractorCode } });
+  const loginId = contractorCode;
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  const contractor = await prisma.$transaction(async (tx) => {
+    const created = await tx.contractor.create({ data: { ...contractorData, contractorCode } });
+    await tx.user.create({
+      data: { loginId, passwordHash, role: 'CONTRACTOR', fullName: created.contractorName, contractorId: created.id },
+    });
+    return created;
+  });
+
+  await recordAudit({
+    userId,
+    action: 'CREATE_CONTRACTOR',
+    entityType: 'Contractor',
+    entityId: contractor.id,
+    contractorId: contractor.id,
+    newValue: contractor,
+  });
+
+  return { ...contractor, loginId };
 }
 
-async function update(id, data) {
-  await getById(id);
-  return prisma.contractor.update({ where: { id }, data });
+async function update(id, data, userId) {
+  const before = await getById(id);
+  const { password, ...contractorData } = data;
+  const updated = await prisma.contractor.update({ where: { id }, data: contractorData });
+  await recordAudit({
+    userId,
+    action: 'UPDATE_CONTRACTOR',
+    entityType: 'Contractor',
+    entityId: id,
+    contractorId: id,
+    oldValue: before,
+    newValue: updated,
+  });
+  return updated;
 }
 
 async function updateStatus(id, status) {

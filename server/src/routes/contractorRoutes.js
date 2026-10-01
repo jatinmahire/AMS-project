@@ -1,6 +1,6 @@
 const express = require('express');
 const contractorController = require('../controllers/contractorController');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate, requireRole } = require('../middlewares/auth');
 const validate = require('../middlewares/validate');
 const { contractorSchema } = require('../validators/contractorValidator');
 const { statusUpdateSchema } = require('../validators/statusValidator');
@@ -10,6 +10,7 @@ const router = express.Router();
 const upload = makeUploader('contractors');
 
 router.use(authenticate);
+router.use(requireRole('ADMIN'));
 
 router.get('/', contractorController.list);
 router.get('/dropdown', contractorController.dropdown);

@@ -4,23 +4,65 @@ const bcrypt = require('bcrypt');
 const prisma = new PrismaClient();
 
 async function main() {
-  const existing = await prisma.user.findUnique({ where: { loginId: 'admin' } });
-  if (existing) {
+  const existingAdmin = await prisma.user.findUnique({ where: { loginId: 'admin' } });
+  if (!existingAdmin) {
+    const passwordHash = await bcrypt.hash('Admin@123', 10);
+    await prisma.user.create({
+      data: {
+        loginId: 'admin',
+        passwordHash,
+        role: 'ADMIN',
+        fullName: 'System Admin',
+      },
+    });
+    console.log('Seeded admin user — loginId: admin, password: Admin@123');
+  } else {
     console.log('Admin user already exists, skipping seed.');
-    return;
   }
 
-  const passwordHash = await bcrypt.hash('Admin@123', 10);
-  await prisma.user.create({
-    data: {
-      loginId: 'admin',
-      passwordHash,
-      role: 'ADMIN',
-      fullName: 'System Admin',
-    },
-  });
+  const existingSupervisorUser = await prisma.user.findUnique({ where: { loginId: 'suresh.patil' } });
+  if (!existingSupervisorUser) {
+    const supervisor = await prisma.supervisor.findUnique({ where: { supervisorCode: 'SUP001' } });
+    if (supervisor) {
+      const passwordHash = await bcrypt.hash('Supervisor@123', 10);
+      await prisma.user.create({
+        data: {
+          loginId: 'suresh.patil',
+          passwordHash,
+          role: 'SUPERVISOR',
+          fullName: supervisor.fullName,
+          supervisorId: supervisor.id,
+        },
+      });
+      console.log('Seeded supervisor user — loginId: suresh.patil, password: Supervisor@123');
+    } else {
+      console.log('Supervisor record SUP001 not found, skipping supervisor user seed.');
+    }
+  } else {
+    console.log('Supervisor user already exists, skipping seed.');
+  }
 
-  console.log('Seeded admin user — loginId: admin, password: Admin@123');
+  const existingContractorUser = await prisma.user.findUnique({ where: { loginId: 'shree.constructions' } });
+  if (!existingContractorUser) {
+    const contractor = await prisma.contractor.findUnique({ where: { contractorCode: 'CON001' } });
+    if (contractor) {
+      const passwordHash = await bcrypt.hash('Contractor@123', 10);
+      await prisma.user.create({
+        data: {
+          loginId: 'shree.constructions',
+          passwordHash,
+          role: 'CONTRACTOR',
+          fullName: contractor.contractorName,
+          contractorId: contractor.id,
+        },
+      });
+      console.log('Seeded contractor user — loginId: shree.constructions, password: Contractor@123');
+    } else {
+      console.log('Contractor record CON001 not found, skipping contractor user seed.');
+    }
+  } else {
+    console.log('Contractor user already exists, skipping seed.');
+  }
 }
 
 main()

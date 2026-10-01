@@ -1,6 +1,8 @@
 const prisma = require('../config/db');
 const ApiError = require('../utils/ApiError');
-const { monthRange } = require('../utils/dateRange');
+const { monthRange, fromToRange } = require('../utils/dateRange');
+const { scopedContractorId: resolveScope } = require('../utils/scope');
+const { TITLE_BAR_TEXT, LEGAL_BOILERPLATE_MARATHI } = require('../templates/form90Marathi');
 
 async function getWorkerByCode(workerCode) {
   const worker = await prisma.worker.findUnique({
@@ -42,8 +44,27 @@ async function generateIdCard(workerId, validityMonths) {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-async function calculateCompliance(workerCode) {
+async function generateForm90ReferenceNo() {
+  const year = new Date().getFullYear();
+  const prefix = `F90/${year}/`;
+  const existing = await prisma.complianceTracker.findMany({
+    where: { form90ReferenceNo: { startsWith: prefix } },
+    select: { form90ReferenceNo: true },
+  });
+  const maxSeq = existing.reduce((max, row) => {
+    const seq = parseInt(row.form90ReferenceNo.slice(prefix.length), 10);
+    return Number.isNaN(seq) ? max : Math.max(max, seq);
+  }, 0);
+  return `${prefix}${String(maxSeq + 1).padStart(3, '0')}`;
+}
+
+async function calculateCompliance(workerCode, user) {
   const worker = await getWorkerByCode(workerCode);
+
+  const scopedContractorId = await resolveScope(user);
+  if (scopedContractorId && worker.contractorId !== scopedContractorId) {
+    throw new ApiError(404, `No worker found with code ${workerCode}`);
+  }
 
   const latest = await prisma.attendance.findFirst({
     where: { workerId: worker.id },
@@ -66,6 +87,11 @@ async function calculateCompliance(workerCode) {
     }
   }
 
+  const existingTracker = await prisma.complianceTracker.findUnique({ where: { workerId: worker.id } });
+  const referenceFields = existingTracker?.form90ReferenceNo
+    ? {}
+    : { form90ReferenceNo: await generateForm90ReferenceNo(), form90ReferenceDate: new Date() };
+
   const tracker = await prisma.complianceTracker.upsert({
     where: { workerId: worker.id },
     update: {
@@ -73,6 +99,7 @@ async function calculateCompliance(workerCode) {
       lastCalculatedDate: new Date(),
       form90Generated: true,
       form90GeneratedAt: new Date(),
+      ...referenceFields,
     },
     create: {
       workerId: worker.id,
@@ -81,10 +108,41 @@ async function calculateCompliance(workerCode) {
       lastCalculatedDate: new Date(),
       form90Generated: true,
       form90GeneratedAt: new Date(),
+      ...referenceFields,
     },
   });
 
-  return { worker, tracker };
+  return { worker, tracker, legalText: LEGAL_BOILERPLATE_MARATHI, titleBarText: TITLE_BAR_TEXT };
+}
+
+async function form90History(user, { contractorId, from, to, page = 1, limit = 20 }) {
+  page = Number(page) || 1;
+  limit = Number(limit) || 20;
+
+  const scopedContractorId = await resolveScope(user);
+  const effectiveContractorId = scopedContractorId || contractorId;
+
+  const where = {
+    form90Generated: true,
+    ...(effectiveContractorId ? { contractorId: effectiveContractorId } : {}),
+    ...(from || to ? { form90GeneratedAt: fromToRange(from, to) } : {}),
+  };
+
+  const [data, total] = await Promise.all([
+    prisma.complianceTracker.findMany({
+      where,
+      include: {
+        worker: { select: { workerCode: true, firstName: true, lastName: true } },
+        contractor: { select: { contractorName: true } },
+      },
+      orderBy: { form90GeneratedAt: 'desc' },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+    prisma.complianceTracker.count({ where }),
+  ]);
+
+  return { data, total, page, limit };
 }
 
 const STATUTORY_MODELS = {
@@ -108,11 +166,20 @@ async function statutoryRegister(type, { contractorId, month }) {
     where,
     include: {
       worker: {
-        select: { workerCode: true, firstName: true, lastName: true, contractor: { select: { contractorName: true } } },
+        select: {
+          workerCode: true,
+          firstName: true,
+          lastName: true,
+          fatherOrHusbandName: true,
+          gender: true,
+          designation: { select: { designationName: true } },
+          contractor: { select: { contractorName: true } },
+        },
       },
+      ...(type === 'advance' ? { repayments: { orderBy: { installmentNo: 'asc' } } } : {}),
     },
     orderBy: { [config.dateField]: 'desc' },
   });
 }
 
-module.exports = { getIdCard, generateIdCard, calculateCompliance, statutoryRegister };
+module.exports = { getIdCard, generateIdCard, calculateCompliance, form90History, statutoryRegister };

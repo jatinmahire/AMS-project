@@ -1,0 +1,25 @@
+@reference "../../index.css";
+
+.supervisors-image-cell {
+  @apply block h-10 w-10 overflow-hidden rounded border border-slate-200;
+}
+
+.supervisors-image-cell-img {
+  @apply h-full w-full object-cover;
+}
+
+.supervisors-actions-cell {
+  @apply flex gap-2;
+}
+
+.supervisors-action-btn {
+  @apply rounded-md border border-slate-200 bg-white p-1.5 text-slate-500 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-600;
+}
+
+.supervisors-action-toggle-active {
+  @apply rounded-md border border-slate-200 bg-white p-1.5 text-slate-500 hover:bg-slate-50 hover:border-red-300 hover:text-red-600;
+}
+
+.supervisors-action-toggle-inactive {
+  @apply rounded-md border border-slate-200 bg-white p-1.5 text-slate-500 hover:bg-slate-50 hover:border-green-300 hover:text-green-600;
+}

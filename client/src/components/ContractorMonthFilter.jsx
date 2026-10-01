@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import './ContractorMonthFilter.css';
 import { Select, TextInput } from './FormField';
 import { contractorDropdown } from '../api/contractors';
 
@@ -10,9 +11,9 @@ export default function ContractorMonthFilter({ contractorId, onContractorChange
   }, []);
 
   return (
-    <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end">
-      <div className="w-full sm:w-64">
-        <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Contractor</label>
+    <div className="contractor-month-filter">
+      <div className="contractor-month-filter-contractor-field">
+        <label className="contractor-month-filter-label">Contractor</label>
         <Select value={contractorId} onChange={(e) => onContractorChange(e.target.value)}>
           <option value="">All contractors</option>
           {contractors.map((c) => (
@@ -20,8 +21,8 @@ export default function ContractorMonthFilter({ contractorId, onContractorChange
           ))}
         </Select>
       </div>
-      <div className="w-full sm:w-48">
-        <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Month</label>
+      <div className="contractor-month-filter-month-field">
+        <label className="contractor-month-filter-label">Month</label>
         <TextInput type="month" value={month} onChange={(e) => onMonthChange(e.target.value)} />
       </div>
     </div>

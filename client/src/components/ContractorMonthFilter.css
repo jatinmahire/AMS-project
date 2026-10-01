@@ -1,0 +1,17 @@
+@reference "../index.css";
+
+.contractor-month-filter {
+  @apply mb-4 flex flex-col gap-3 sm:flex-row sm:items-end;
+}
+
+.contractor-month-filter-contractor-field {
+  @apply w-full sm:w-64;
+}
+
+.contractor-month-filter-label {
+  @apply mb-1 block text-sm font-medium text-slate-700;
+}
+
+.contractor-month-filter-month-field {
+  @apply w-full sm:w-48;
+}

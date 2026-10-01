@@ -1,0 +1,29 @@
+@reference "../index.css";
+
+.qr-scanner-unavailable {
+  @apply flex flex-col items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center;
+}
+
+.qr-scanner-unavailable-icon {
+  @apply text-slate-300;
+}
+
+.qr-scanner-unavailable-text {
+  @apply text-xs text-slate-400;
+}
+
+.qr-scanner-frame {
+  @apply relative mx-auto aspect-square w-full max-w-xs overflow-hidden rounded-lg border-2 border-slate-300 bg-black;
+}
+
+.qr-scanner-video {
+  @apply h-full w-full object-cover;
+}
+
+.qr-scanner-guide {
+  @apply pointer-events-none absolute inset-6 rounded-lg border-2 border-primary-400/70;
+}
+
+.qr-scanner-status-text {
+  @apply absolute inset-x-0 bottom-2 text-center text-xs text-white/80;
+}

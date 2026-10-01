@@ -1,0 +1,29 @@
+@reference "../index.css";
+
+.registration-success-message {
+  @apply text-sm text-slate-600;
+}
+
+.registration-success-code {
+  @apply font-semibold text-slate-900;
+}
+
+.registration-success-credentials {
+  @apply mt-4 space-y-3 rounded-lg border border-primary-200 bg-primary-50 p-4;
+}
+
+.registration-success-credentials-header {
+  @apply flex items-center gap-2 text-sm font-semibold text-primary-700;
+}
+
+.registration-success-field-label {
+  @apply text-xs uppercase tracking-wide text-slate-500;
+}
+
+.registration-success-field-value {
+  @apply font-mono text-base font-semibold text-slate-900;
+}
+
+.registration-success-actions {
+  @apply mt-6 flex justify-end;
+}

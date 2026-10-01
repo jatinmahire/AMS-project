@@ -20,12 +20,12 @@ const getById = asyncHandler(async (req, res) => {
 });
 
 const create = asyncHandler(async (req, res) => {
-  const contractor = await contractorService.create(req.body);
+  const contractor = await contractorService.create(req.body, req.user.id);
   res.status(201).json(contractor);
 });
 
 const update = asyncHandler(async (req, res) => {
-  const contractor = await contractorService.update(req.params.id, req.body);
+  const contractor = await contractorService.update(req.params.id, req.body, req.user.id);
   res.json(contractor);
 });
 

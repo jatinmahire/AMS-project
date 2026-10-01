@@ -1,0 +1,57 @@
+@reference "../index.css";
+
+.step-indicator {
+  @apply mb-6 flex items-start justify-center;
+}
+
+.step-indicator-item {
+  @apply flex items-start;
+}
+
+.step-indicator-step {
+  @apply flex w-[104px] flex-none flex-col items-center;
+}
+
+.step-indicator-circle {
+  @apply flex h-9 w-9 flex-none items-center justify-center rounded-full border-2 text-sm font-semibold shadow-sm transition-all duration-150;
+}
+
+.step-indicator-circle-current {
+  @apply border-primary-600 bg-primary-600 text-white shadow-primary-600/30;
+}
+
+.step-indicator-circle-completed {
+  @apply border-primary-600 bg-white text-primary-600 cursor-pointer hover:scale-110 hover:bg-primary-50;
+}
+
+.step-indicator-circle-pending {
+  @apply border-slate-300 bg-white text-slate-400 shadow-none;
+}
+
+.step-indicator-label {
+  @apply mt-2 max-w-[100px] text-center text-xs;
+}
+
+.step-indicator-label-current {
+  @apply font-semibold text-slate-900;
+}
+
+.step-indicator-label-completed {
+  @apply text-slate-600;
+}
+
+.step-indicator-label-pending {
+  @apply text-slate-400;
+}
+
+.step-indicator-connector {
+  @apply mx-1.5 mt-[17px] h-0.5 w-10 flex-none transition-colors duration-150 sm:w-16;
+}
+
+.step-indicator-connector-completed {
+  @apply bg-primary-600;
+}
+
+.step-indicator-connector-pending {
+  @apply bg-slate-200;
+}

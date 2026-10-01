@@ -1,15 +1,22 @@
-import { useState } from 'react';
-import { Search, QrCode } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { QrCode } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import Button from '../../components/Button';
-import { TextInput } from '../../components/FormField';
+import { Select } from '../../components/FormField';
+import WorkerSearchSelect from '../../components/WorkerSearchSelect';
 import { getIdCard, generateIdCard } from '../../api/reports';
+import { contractorDropdown } from '../../api/contractors';
 import { formatDate } from '../../utils/format';
 import { getErrorMessage } from '../../utils/errorMessage';
 import { useToast } from '../../context/ToastContext';
+import './WorkerIdCard.css';
+
+const VALIDITY_OPTIONS = ['3', '6', '12'];
 
 export default function WorkerIdCard() {
-  const [code, setCode] = useState('');
+  const [contractorId, setContractorId] = useState('');
+  const [contractors, setContractors] = useState([]);
+  const [selectedWorker, setSelectedWorker] = useState(null);
   const [worker, setWorker] = useState(null);
   const [idCard, setIdCard] = useState(null);
   const [validityMonths, setValidityMonths] = useState('12');
@@ -17,14 +24,18 @@ export default function WorkerIdCard() {
   const [generating, setGenerating] = useState(false);
   const { showToast } = useToast();
 
-  async function handleSearch(e) {
-    e.preventDefault();
-    if (!code.trim()) return;
-    setSearching(true);
+  useEffect(() => {
+    contractorDropdown().then(setContractors).catch(() => setContractors([]));
+  }, []);
+
+  async function handleSelectWorker(w) {
+    setSelectedWorker(w);
     setWorker(null);
     setIdCard(null);
+    if (!w) return;
+    setSearching(true);
     try {
-      const data = await getIdCard(code.trim());
+      const data = await getIdCard(w.workerCode);
       setWorker(data.worker);
       setIdCard(data.idCard);
     } catch (err) {
@@ -51,59 +62,75 @@ export default function WorkerIdCard() {
     <div>
       <PageHeader title="Worker ID Card" description="Look up a worker and view their ID card." />
 
-      <form
-        onSubmit={handleSearch}
-        className="no-print mb-6 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-end dark:border-slate-800 dark:bg-slate-900"
-      >
-        <div className="flex-1">
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Worker Code</label>
-          <TextInput value={code} onChange={(e) => setCode(e.target.value)} placeholder="e.g. WRK001" />
+      <div className="no-print worker-id-card-search-bar">
+        <div className="worker-id-card-contractor-field">
+          <label className="worker-id-card-field-label">Contractor</label>
+          <Select
+            value={contractorId}
+            onChange={(e) => {
+              setContractorId(e.target.value);
+              handleSelectWorker(null);
+            }}
+          >
+            <option value="">All Contractors</option>
+            {contractors.map((c) => (
+              <option key={c.id} value={c.id}>{c.contractorCode} — {c.contractorName}</option>
+            ))}
+          </Select>
         </div>
-        <Button type="submit" icon={Search} disabled={searching}>{searching ? 'Searching...' : 'Search'}</Button>
-      </form>
+        <div className="worker-id-card-worker-field">
+          <label className="worker-id-card-field-label">Worker</label>
+          <WorkerSearchSelect value={selectedWorker} onSelect={handleSelectWorker} contractorId={contractorId} placeholder="Search by worker code or name" />
+        </div>
+        {searching && <p className="worker-id-card-searching">Searching...</p>}
+      </div>
 
       {worker && !idCard && (
-        <div className="no-print mb-6 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-end dark:border-slate-800 dark:bg-slate-900">
-          <div className="w-full sm:w-40">
-            <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Validity (months)</label>
-            <TextInput type="number" min="1" value={validityMonths} onChange={(e) => setValidityMonths(e.target.value)} />
+        <div className="no-print worker-id-card-search-bar">
+          <div className="worker-id-card-validity-field">
+            <label className="worker-id-card-field-label">Validity</label>
+            <Select value={validityMonths} onChange={(e) => setValidityMonths(e.target.value)}>
+              {VALIDITY_OPTIONS.map((m) => (
+                <option key={m} value={m}>{m} Months</option>
+              ))}
+            </Select>
           </div>
           <Button onClick={handleGenerate} disabled={generating}>{generating ? 'Generating...' : 'Generate ID Card'}</Button>
         </div>
       )}
 
       {worker && idCard && (
-        <div onContextMenu={(e) => e.preventDefault()} className="print-blocked mx-auto max-w-sm">
-          <div className="rounded-xl border-2 border-slate-300 bg-white p-5 shadow-md dark:border-slate-700 dark:bg-slate-900">
-            <div className="mb-4 text-center">
-              <p className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Worker ID Card</p>
+        <div onContextMenu={(e) => e.preventDefault()} className="print-blocked worker-id-card-wrapper">
+          <div className="worker-id-card-card">
+            <div className="worker-id-card-title-wrap">
+              <p className="worker-id-card-title">Worker ID Card</p>
             </div>
-            <div className="mb-4 flex justify-center">
+            <div className="worker-id-card-photo-wrap">
               {worker.photoUrl ? (
-                <img src={worker.photoUrl} alt="Worker" className="h-28 w-28 rounded-md border border-slate-200 object-cover dark:border-slate-700" />
+                <img src={worker.photoUrl} alt="Worker" className="worker-id-card-photo" />
               ) : (
-                <div className="flex h-28 w-28 items-center justify-center rounded-md border border-slate-200 bg-slate-100 text-xs text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500">
+                <div className="worker-id-card-photo-placeholder">
                   No Photo
                 </div>
               )}
             </div>
-            <div className="space-y-1 text-center">
-              <p className="text-base font-semibold text-slate-900 dark:text-slate-100">{worker.firstName} {worker.lastName}</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">{worker.workerCode}</p>
-              <p className="text-sm text-slate-600 dark:text-slate-300">{worker.contractor?.contractorName}</p>
-              <p className="text-sm text-slate-600 dark:text-slate-300">{worker.designation?.designationName}</p>
+            <div className="worker-id-card-details">
+              <p className="worker-id-card-name">{worker.firstName} {worker.lastName}</p>
+              <p className="worker-id-card-code">{worker.workerCode}</p>
+              <p className="worker-id-card-meta">{worker.designation.designationName}</p>
+              <p className="worker-id-card-meta">{worker.contractor.contractorName}</p>
             </div>
-            <div className="my-4 flex justify-center">
-              <div className="flex h-24 w-24 items-center justify-center rounded-md border border-dashed border-slate-300 text-slate-300 dark:border-slate-600 dark:text-slate-600">
+            <div className="worker-id-card-qr-wrap">
+              <div className="worker-id-card-qr-box">
                 <QrCode size={48} />
               </div>
             </div>
-            <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+            <div className="worker-id-card-dates">
               <span>Issued: {formatDate(idCard.issueDate)}</span>
               <span>Valid Till: {formatDate(idCard.expiryDate)}</span>
             </div>
           </div>
-          <p className="mt-3 text-center text-xs text-slate-400 dark:text-slate-500">This card is view-only. Printing and right-click are disabled.</p>
+          <p className="worker-id-card-footnote">This card is view-only. Printing and right-click are disabled.</p>
         </div>
       )}
     </div>

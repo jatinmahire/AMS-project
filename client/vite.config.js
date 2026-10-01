@@ -9,5 +9,6 @@ export default defineConfig({
       '/api': 'http://localhost:5000',
       '/uploads': 'http://localhost:5000',
     },
+    allowedHosts: ['.trycloudflare.com'],
   },
 })

@@ -12,6 +12,7 @@ const policySchema = z.object({
   workerCount: z.coerce.number().int().nonnegative('Worker count cannot be negative'),
   projectValue: optionalNumber(),
   personValue: optionalNumber(),
+  remarks: optionalString(),
 });
 
 module.exports = { policySchema };

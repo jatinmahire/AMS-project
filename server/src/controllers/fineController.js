@@ -2,8 +2,8 @@ const fineService = require('../services/fineService');
 const asyncHandler = require('../utils/asyncHandler');
 
 const list = asyncHandler(async (req, res) => {
-  const { contractorId, month, workerId, page, limit } = req.query;
-  const result = await fineService.list({ contractorId, month, workerId, page, limit });
+  const { contractorId, from, to, workerId, search, page, limit } = req.query;
+  const result = await fineService.list({ contractorId, from, to, workerId, search, page, limit });
   res.json(result);
 });
 
@@ -13,7 +13,7 @@ const getById = asyncHandler(async (req, res) => {
 });
 
 const create = asyncHandler(async (req, res) => {
-  const fine = await fineService.create(req.body);
+  const fine = await fineService.create(req.body, req.user.id);
   res.status(201).json(fine);
 });
 

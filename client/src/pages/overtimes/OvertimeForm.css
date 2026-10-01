@@ -1,0 +1,25 @@
+@reference "../../index.css";
+
+.overtime-form-loading {
+  @apply text-slate-500;
+}
+
+.overtime-form-card {
+  @apply space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+}
+
+.overtime-form-col-span {
+  @apply sm:col-span-2 lg:col-span-3;
+}
+
+.overtime-form-earnings-box {
+  @apply rounded-md bg-slate-50 px-4 py-2 text-sm text-slate-600 sm:col-span-2 lg:col-span-3;
+}
+
+.overtime-form-earnings-value {
+  @apply font-medium text-slate-800;
+}
+
+.overtime-form-actions-row {
+  @apply flex justify-end gap-3 pt-2;
+}

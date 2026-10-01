@@ -1,0 +1,9 @@
+@reference "../index.css";
+
+.confirm-dialog-message {
+  @apply text-sm text-slate-600;
+}
+
+.confirm-dialog-actions {
+  @apply mt-6 flex justify-end gap-3;
+}

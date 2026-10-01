@@ -2,8 +2,8 @@ const authService = require('../services/authService');
 const asyncHandler = require('../utils/asyncHandler');
 
 const login = asyncHandler(async (req, res) => {
-  const { loginId, password } = req.body;
-  const result = await authService.login(loginId, password);
+  const { loginId, password, selectedRole } = req.body;
+  const result = await authService.login(loginId, password, selectedRole);
   res.json(result);
 });
 

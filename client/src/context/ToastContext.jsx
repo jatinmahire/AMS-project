@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useState } from 'react';
 import { CheckCircle2, XCircle, X } from 'lucide-react';
+import './ToastContext.css';
 
 const ToastContext = createContext(null);
 
@@ -24,19 +25,19 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2">
+      <div className="toast-context-stack">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`flex items-center gap-2 rounded-md border px-4 py-3 text-sm shadow-sm animate-[fadeIn_150ms_ease-out] ${
+            className={`toast-context-item ${
               toast.type === 'error'
-                ? 'border-red-200 bg-red-50 text-red-700'
-                : 'border-green-200 bg-green-50 text-green-700'
+                ? 'toast-context-item-error'
+                : 'toast-context-item-success'
             }`}
           >
             {toast.type === 'error' ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
             <span>{toast.message}</span>
-            <button onClick={() => dismiss(toast.id)} className="ml-2 text-current opacity-60 hover:opacity-100">
+            <button onClick={() => dismiss(toast.id)} className="toast-context-dismiss">
               <X size={14} />
             </button>
           </div>

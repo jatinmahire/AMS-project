@@ -4,6 +4,10 @@ export function listDesignations() {
   return api.get('/designations').then((res) => res.data);
 }
 
+export function getDesignation(id) {
+  return api.get(`/designations/${id}`).then((res) => res.data);
+}
+
 export function createDesignation(payload) {
   return api.post('/designations', payload).then((res) => res.data);
 }

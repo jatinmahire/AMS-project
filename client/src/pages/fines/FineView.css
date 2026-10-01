@@ -1,0 +1,9 @@
+@reference "../../index.css";
+
+.fine-view-message {
+  @apply text-slate-500;
+}
+
+.fine-view-content {
+  @apply space-y-5;
+}

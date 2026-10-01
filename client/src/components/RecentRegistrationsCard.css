@@ -1,0 +1,77 @@
+@reference "../index.css";
+
+.recent-registrations-card {
+  @apply rounded-xl border border-slate-200 bg-white shadow-sm;
+}
+
+.recent-registrations-card-header {
+  @apply flex items-center justify-between gap-2 border-b border-slate-200 px-5 py-4;
+}
+
+.recent-registrations-card-header-title {
+  @apply text-sm font-semibold text-slate-800;
+}
+
+.recent-registrations-filter {
+  @apply w-auto py-1.5 text-sm;
+}
+
+.recent-registrations-card-message {
+  @apply px-5 py-6 text-sm text-slate-400;
+}
+
+.recent-registrations-card-list {
+  @apply max-h-[420px] divide-y divide-slate-100 overflow-y-auto;
+}
+
+.recent-registrations-card-item {
+  @apply flex w-full items-center gap-3 px-5 py-3 text-left transition-colors duration-150 hover:bg-slate-50;
+}
+
+.recent-registrations-avatar {
+  @apply flex h-10 w-10 flex-none items-center justify-center overflow-hidden rounded-full;
+}
+
+.recent-registrations-avatar-img {
+  @apply h-full w-full object-cover;
+}
+
+.recent-registrations-avatar-contractor {
+  @apply bg-blue-100 text-blue-600;
+}
+
+.recent-registrations-avatar-supervisor {
+  @apply bg-violet-100 text-violet-600;
+}
+
+.recent-registrations-avatar-worker {
+  @apply bg-emerald-100 text-emerald-600;
+}
+
+.recent-registrations-card-item-body {
+  @apply flex min-w-0 flex-1 flex-col;
+}
+
+.recent-registrations-card-item-name {
+  @apply truncate text-sm font-semibold text-slate-800;
+}
+
+.recent-registrations-card-item-code {
+  @apply truncate text-xs text-slate-400;
+}
+
+.recent-registrations-badge {
+  @apply flex-none rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide;
+}
+
+.recent-registrations-badge-contractor {
+  @apply bg-blue-100 text-blue-700;
+}
+
+.recent-registrations-badge-supervisor {
+  @apply bg-violet-100 text-violet-700;
+}
+
+.recent-registrations-badge-worker {
+  @apply bg-emerald-100 text-emerald-700;
+}

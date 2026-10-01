@@ -1,19 +1,20 @@
 const { z } = require('zod');
-const { optionalString, optionalDate } = require('./common');
+const { optionalString, optionalDate, emailString, digitsString, optionalExactDigitsString } = require('./common');
 
 const supervisorSchema = z.object({
   fullName: z.string().min(1, 'Full name is required').max(150),
   gender: z.enum(['MALE', 'FEMALE', 'OTHER'], { errorMap: () => ({ message: 'Select a gender' }) }),
   dob: z.coerce.date({ errorMap: () => ({ message: 'Date of birth is required' }) }),
-  contactNo: z.string().min(10, 'Enter a valid contact number').max(15),
-  email: z.string().email('Enter a valid email address'),
-  aadhaarNo: z.string().regex(/^\d{12}$/, 'Aadhaar number must be 12 digits'),
+  contactNo: digitsString(10, 'Contact number must be exactly 10 digits'),
+  email: emailString(),
+  aadhaarNo: digitsString(12, 'Aadhaar number must be exactly 12 digits'),
   street: optionalString(200),
   city: optionalString(100),
   state: optionalString(100),
-  pincode: optionalString(10),
+  pincode: optionalExactDigitsString(6, 'Pincode must be exactly 6 digits'),
   assignedContractorId: optionalString(),
   status: z.enum(['ACTIVE', 'INACTIVE', 'BLACKLISTED']).optional(),
+  password: z.string().min(6, 'Password must be at least 6 characters').optional(),
 });
 
 module.exports = { supervisorSchema };

@@ -1,0 +1,13 @@
+@reference "../../index.css";
+
+.notifications-badge-read {
+  @apply rounded-full px-2 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-700;
+}
+
+.notifications-badge-unread {
+  @apply rounded-full px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700;
+}
+
+.notifications-mark-read-btn {
+  @apply flex items-center gap-1 rounded-md border border-slate-200 bg-white p-1.5 text-slate-500 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-600;
+}

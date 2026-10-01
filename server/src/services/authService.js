@@ -4,7 +4,23 @@ const prisma = require('../config/db');
 const { jwtSecret, jwtExpiresIn } = require('../config/env');
 const ApiError = require('../utils/ApiError');
 
-async function login(loginId, password) {
+async function assignedContractor(user) {
+  if (user.role === 'CONTRACTOR' && user.contractorId) {
+    return prisma.contractor.findUnique({ where: { id: user.contractorId }, select: { id: true, contractorName: true } });
+  }
+  if (user.role === 'SUPERVISOR' && user.supervisorId) {
+    const supervisor = await prisma.supervisor.findUnique({
+      where: { id: user.supervisorId },
+      include: { assignedContractor: { select: { id: true, contractorName: true } } },
+    });
+    return supervisor?.assignedContractor || null;
+  }
+  return null;
+}
+
+const SELECTED_ROLE_LABELS = { ADMIN: 'Admin', SUPERVISOR: 'Supervisor', CONTRACTOR: 'Contractor' };
+
+async function login(loginId, password, selectedRole) {
   const user = await prisma.user.findUnique({ where: { loginId } });
 
   if (!user || !user.isActive) {
@@ -16,16 +32,22 @@ async function login(loginId, password) {
     throw new ApiError(401, 'Invalid login ID or password');
   }
 
+  if (user.role !== selectedRole) {
+    throw new ApiError(401, `This ID is not registered as a ${SELECTED_ROLE_LABELS[selectedRole]}`);
+  }
+
   await prisma.user.update({
     where: { id: user.id },
     data: { lastLoginAt: new Date() },
   });
 
   const token = jwt.sign(
-    { id: user.id, role: user.role, loginId: user.loginId },
+    { id: user.id, role: user.role, loginId: user.loginId, supervisorId: user.supervisorId, contractorId: user.contractorId },
     jwtSecret,
     { expiresIn: jwtExpiresIn }
   );
+
+  const contractor = await assignedContractor(user);
 
   return {
     token,
@@ -34,6 +56,9 @@ async function login(loginId, password) {
       loginId: user.loginId,
       role: user.role,
       fullName: user.fullName,
+      supervisorId: user.supervisorId,
+      assignedContractorId: contractor?.id || null,
+      assignedContractorName: contractor?.contractorName || null,
     },
   };
 }
@@ -43,11 +68,17 @@ async function getProfile(userId) {
   if (!user) {
     throw new ApiError(404, 'User not found');
   }
+
+  const contractor = await assignedContractor(user);
+
   return {
     id: user.id,
     loginId: user.loginId,
     role: user.role,
     fullName: user.fullName,
+    supervisorId: user.supervisorId,
+    assignedContractorId: contractor?.id || null,
+    assignedContractorName: contractor?.contractorName || null,
   };
 }
 

@@ -21,10 +21,11 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
-  async function login(loginId, password) {
-    const { token, user: loggedInUser } = await authApi.login(loginId, password);
+  async function login(loginId, password, selectedRole) {
+    const { token, user: loggedInUser } = await authApi.login(loginId, password, selectedRole);
     localStorage.setItem('ams_token', token);
     setUser(loggedInUser);
+    return loggedInUser;
   }
 
   function logout() {

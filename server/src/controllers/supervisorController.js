@@ -26,13 +26,13 @@ function attachUploadUrls(body, files) {
 
 const create = asyncHandler(async (req, res) => {
   const data = attachUploadUrls(req.body, req.files);
-  const supervisor = await supervisorService.create(data);
+  const supervisor = await supervisorService.create(data, req.user.id);
   res.status(201).json(supervisor);
 });
 
 const update = asyncHandler(async (req, res) => {
   const data = attachUploadUrls(req.body, req.files);
-  const supervisor = await supervisorService.update(req.params.id, data);
+  const supervisor = await supervisorService.update(req.params.id, data, req.user.id);
   res.json(supervisor);
 });
 

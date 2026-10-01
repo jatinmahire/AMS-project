@@ -1,0 +1,5 @@
+@reference "../../index.css";
+
+.designation-view-message {
+  @apply text-slate-500;
+}

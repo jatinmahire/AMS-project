@@ -1,0 +1,5 @@
+@reference "../../index.css";
+
+.holiday-view-message {
+  @apply text-slate-500;
+}

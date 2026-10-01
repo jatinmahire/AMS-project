@@ -1,0 +1,13 @@
+@reference "../../index.css";
+
+.contractor-view-message {
+  @apply text-slate-500;
+}
+
+.contractor-view-actions {
+  @apply flex gap-2;
+}
+
+.contractor-view-doc-link {
+  @apply flex items-center gap-1 text-sm text-primary-600 hover:underline;
+}

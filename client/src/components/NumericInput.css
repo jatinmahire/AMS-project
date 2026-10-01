@@ -1,0 +1,13 @@
+@reference "../index.css";
+
+.numeric-input-wrapper {
+  @apply relative;
+}
+
+.numeric-input-flash {
+  @apply mt-1 text-xs font-medium text-red-600 transition-opacity duration-300 opacity-100;
+}
+
+.numeric-input-flash-hidden {
+  @apply opacity-0;
+}

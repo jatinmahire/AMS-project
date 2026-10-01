@@ -1,0 +1,85 @@
+@reference "../../index.css";
+
+.worker-id-card-search-bar {
+  @apply mb-6 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-end;
+}
+
+.worker-id-card-contractor-field {
+  @apply w-full sm:w-56;
+}
+
+.worker-id-card-field-label {
+  @apply mb-1 block text-sm font-medium text-slate-700;
+}
+
+.worker-id-card-worker-field {
+  @apply flex-1;
+}
+
+.worker-id-card-searching {
+  @apply text-sm text-slate-500;
+}
+
+.worker-id-card-validity-field {
+  @apply w-full sm:w-40;
+}
+
+.worker-id-card-wrapper {
+  @apply mx-auto max-w-sm;
+}
+
+.worker-id-card-card {
+  @apply rounded-xl border-2 border-slate-300 bg-white p-5 shadow-md;
+}
+
+.worker-id-card-title-wrap {
+  @apply mb-4 text-center;
+}
+
+.worker-id-card-title {
+  @apply text-sm font-semibold uppercase tracking-wide text-slate-500;
+}
+
+.worker-id-card-photo-wrap {
+  @apply mb-4 flex justify-center;
+}
+
+.worker-id-card-photo {
+  @apply h-28 w-28 rounded-md border border-slate-200 object-cover;
+}
+
+.worker-id-card-photo-placeholder {
+  @apply flex h-28 w-28 items-center justify-center rounded-md border border-slate-200 bg-slate-100 text-xs text-slate-400;
+}
+
+.worker-id-card-details {
+  @apply space-y-1 text-center;
+}
+
+.worker-id-card-name {
+  @apply text-base font-semibold text-slate-900;
+}
+
+.worker-id-card-code {
+  @apply text-sm text-slate-500;
+}
+
+.worker-id-card-meta {
+  @apply text-sm text-slate-600;
+}
+
+.worker-id-card-qr-wrap {
+  @apply my-4 flex justify-center;
+}
+
+.worker-id-card-qr-box {
+  @apply flex h-24 w-24 items-center justify-center rounded-md border border-dashed border-slate-300 text-slate-300;
+}
+
+.worker-id-card-dates {
+  @apply flex justify-between text-xs text-slate-500;
+}
+
+.worker-id-card-footnote {
+  @apply mt-3 text-center text-xs text-slate-400;
+}

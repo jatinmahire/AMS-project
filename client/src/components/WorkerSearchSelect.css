@@ -1,0 +1,45 @@
+@reference "../index.css";
+
+.worker-search-select {
+  @apply relative;
+}
+
+.worker-search-select-input-wrapper {
+  @apply relative;
+}
+
+.worker-search-select-icon {
+  @apply pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400;
+}
+
+.worker-search-select-field {
+  @apply w-full rounded-md border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500;
+}
+
+.worker-search-select-field-error {
+  @apply border-red-400;
+}
+
+.worker-search-select-dropdown {
+  @apply absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-md border border-slate-200 bg-white shadow-lg animate-[fadeIn_150ms_ease-out];
+}
+
+.worker-search-select-option {
+  @apply block w-full px-3 py-2 text-left text-sm hover:bg-slate-50;
+}
+
+.worker-search-select-option-code {
+  @apply font-medium text-slate-800;
+}
+
+.worker-search-select-option-name {
+  @apply text-slate-600;
+}
+
+.worker-search-select-option-meta {
+  @apply block text-xs text-slate-400;
+}
+
+.worker-search-select-error-text {
+  @apply mt-1 text-xs text-red-600;
+}

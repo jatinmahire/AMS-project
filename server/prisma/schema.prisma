@@ -64,6 +64,13 @@ enum RepaymentStatus {
   PAID
 }
 
+enum NotificationType {
+  KYC_MISSING
+  COMPLIANCE_90_DAY
+  GATE_MISMATCH
+  LICENSE_EXPIRING
+}
+
 enum DocType {
   SHOP_ACT
   PF_CODE
@@ -98,6 +105,7 @@ model Contractor {
   id                    String               @id @default(uuid())
   contractorCode        String               @unique
   contractorName        String
+  establishmentName     String?
   contactPerson         String
   phone                 String
   email                 String
@@ -105,11 +113,16 @@ model Contractor {
   email3                String?
   email4                String?
   address               String
+  village               String?
+  taluka                String?
   city                  String?
   state                 String?
   pincode               String?
   aadhaarNo             String               @unique
   panNo                 String               @unique
+  rc                    String?
+  principalEmployerName    String?
+  principalEmployerAddress String?
   wcPolicyNo            String?
   wcStartDate           DateTime?
   wcExpiryDate          DateTime?
@@ -138,6 +151,8 @@ model Contractor {
   idCards               IdCard[]
   complianceTrackers    ComplianceTracker[]
   holidays              Holiday[]
+  notifications         Notification[]
+  auditLogs             AuditLog[]
   user                  User?
   createdAt             DateTime             @default(now())
   updatedAt             DateTime             @updatedAt
@@ -196,12 +211,15 @@ model Worker {
   firstName            String
   middleName           String?
   lastName             String
+  fatherOrHusbandName  String?
   dob                  DateTime
   gender               Gender
   maritalStatus        String?
   mobileNo             String
   permanentAddress     String
   currentAddress       String?
+  village              String?
+  taluka               String?
   city                 String?
   district             String?
   state                String?
@@ -292,9 +310,10 @@ model Damage {
   workerId        String
   worker          Worker   @relation(fields: [workerId], references: [id])
   imageUrl        String?
+  nameOfWorksmen  String?
   particulars     String
   damageDate      DateTime
-  causeShown      Boolean
+  causeShown      String?
   witnessName     String?
   deductionAmount Decimal
   installments    Int
@@ -305,18 +324,19 @@ model Damage {
 }
 
 model Fine {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   workerId     String
-  worker       Worker   @relation(fields: [workerId], references: [id])
+  worker       Worker    @relation(fields: [workerId], references: [id])
   offence      String
   offenceDate  DateTime
-  causeShown   Boolean
+  causeShown   String?
   witnessName  String?
   wagePeriod   String?
   wagesPayable Decimal?
   fineAmount   Decimal
+  dateRealised DateTime?
   remarks      String?
-  createdAt    DateTime @default(now())
+  createdAt    DateTime  @default(now())
 
   @@index([workerId, offenceDate])
 }
@@ -394,6 +414,7 @@ model Policy {
   projectValue     Decimal?
   personValue      Decimal?
   fileUrl          String
+  remarks          String?
   createdAt        DateTime   @default(now())
 }
 
@@ -428,18 +449,38 @@ model ComplianceTracker {
   lastCalculatedDate  DateTime?
   form90Generated     Boolean    @default(false)
   form90GeneratedAt   DateTime?
+  form90ReferenceNo   String?
+  form90ReferenceDate DateTime?
+}
+
+model Notification {
+  id           String           @id @default(uuid())
+  type         NotificationType
+  message      String
+  entityType   String
+  entityId     String
+  contractorId String
+  contractor   Contractor       @relation(fields: [contractorId], references: [id])
+  isRead       Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+
+  @@index([contractorId, isRead])
+  @@index([type, entityId])
 }
 
 model AuditLog {
-  id         String   @id @default(uuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
-  action     String
-  entityType String
-  entityId   String
-  oldValue   Json?
-  newValue   Json?
-  timestamp  DateTime @default(now())
+  id           String     @id @default(uuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  action       String
+  entityType   String
+  entityId     String
+  contractorId String?
+  contractor   Contractor? @relation(fields: [contractorId], references: [id])
+  oldValue     Json?
+  newValue     Json?
+  timestamp    DateTime   @default(now())
 
   @@index([entityType, entityId])
+  @@index([contractorId, timestamp])
 }

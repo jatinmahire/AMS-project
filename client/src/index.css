@@ -1,6 +1,19 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@theme {
+  --color-primary-50: #f7f3f6;
+  --color-primary-100: #efe7ec;
+  --color-primary-200: #dbcad5;
+  --color-primary-300: #c1a3b7;
+  --color-primary-400: #a17391;
+  --color-primary-500: #7d3e67;
+  --color-primary-600: #5d0e41;
+  --color-primary-700: #4f0c37;
+  --color-primary-800: #410a2e;
+  --color-primary-900: #330824;
+  --color-primary-950: #25061a;
+  --color-primary: var(--color-primary-600);
+}
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -10,12 +23,16 @@ html {
   color-scheme: light;
 }
 
-html.dark {
-  color-scheme: dark;
+::selection {
+  background-color: rgb(93 14 65 / 0.25);
 }
 
-::selection {
-  background-color: rgb(99 102 241 / 0.25);
+/* Zero page margin removes the room Chrome reserves for its default print
+   header/footer (title, date, URL, page number) — the printed elements
+   already carry their own internal padding, so content doesn't run to the
+   paper edge. */
+@page {
+  margin: 0;
 }
 
 @media print {
@@ -25,6 +42,38 @@ html.dark {
 
   .print-blocked {
     display: none !important;
+  }
+
+  /* Scrollable table containers must render in full on print, not just
+     whatever portion happened to be scrolled into view on screen. */
+  .overflow-auto,
+  .overflow-x-auto,
+  .overflow-y-auto {
+    overflow: visible !important;
+    max-height: none !important;
+  }
+
+  /* AppShell's root wrapper is pinned to the viewport height (h-screen) so
+     its <main> can scroll on screen — on print that fixed height keeps the
+     scrollbar/clipping around, so it's released to grow with the content. */
+  .h-screen {
+    height: auto !important;
+  }
+
+  table {
+    font-size: 10px;
+  }
+
+  thead th {
+    position: static !important;
+  }
+
+  /* Browsers skip background colors on print by default to save ink —
+     the Form 90 title bar needs its black background to survive that. */
+  .print-color-exact {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 }
 

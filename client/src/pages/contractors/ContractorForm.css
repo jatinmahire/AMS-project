@@ -1,0 +1,29 @@
+@reference "../../index.css";
+
+.contractor-form-loading {
+  @apply text-slate-500;
+}
+
+.contractor-form-card {
+  @apply space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+}
+
+.contractor-form-col-span {
+  @apply sm:col-span-2 lg:col-span-3;
+}
+
+.contractor-form-col-span-2 {
+  @apply sm:col-span-2 lg:col-span-2;
+}
+
+.contractor-form-password-row {
+  @apply flex gap-2;
+}
+
+.contractor-form-actions-row {
+  @apply flex justify-between pt-2;
+}
+
+.contractor-form-actions-right {
+  @apply flex gap-3;
+}

@@ -4,8 +4,12 @@ export function listWorkers(params) {
   return api.get('/workers', { params }).then((res) => res.data);
 }
 
-export function searchWorkers(q) {
-  return api.get('/workers/search', { params: { q } }).then((res) => res.data);
+export function searchWorkers(q, contractorId) {
+  return api.get('/workers/search', { params: { q, contractorId } }).then((res) => res.data);
+}
+
+export function scanWorkerQr(code) {
+  return api.get(`/workers/scan/${encodeURIComponent(code)}`).then((res) => res.data);
 }
 
 export function getWorker(id) {

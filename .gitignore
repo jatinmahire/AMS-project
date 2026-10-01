@@ -9,6 +9,13 @@ node_modules/
 *.mp4
 files/
 files.zip
+SS/
+
+# Database dumps contain real demo PII and password hashes — never commit
+*.sql
+
+# Stray/duplicate schema copy, not the real source (server/prisma/schema.prisma is)
+/schema-1.prisma
 
 # OS/editor noise
 .DS_Store

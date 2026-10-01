@@ -1,7 +1,7 @@
 import api from './axios';
 
-export function login(loginId, password) {
-  return api.post('/auth/login', { loginId, password }).then((res) => res.data);
+export function login(loginId, password, selectedRole) {
+  return api.post('/auth/login', { loginId, password, selectedRole }).then((res) => res.data);
 }
 
 export function getProfile() {

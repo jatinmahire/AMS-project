@@ -1,6 +1,6 @@
 const express = require('express');
 const policyController = require('../controllers/policyController');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate, requireRole } = require('../middlewares/auth');
 const validate = require('../middlewares/validate');
 const { policySchema } = require('../validators/policyValidator');
 const { makeUploader } = require('../utils/upload');
@@ -10,10 +10,10 @@ const upload = makeUploader('policies');
 
 router.use(authenticate);
 
-router.get('/', policyController.list);
-router.get('/:id', policyController.getById);
-router.post('/', upload.single('file'), validate(policySchema), policyController.create);
-router.put('/:id', upload.single('file'), validate(policySchema), policyController.update);
-router.delete('/:id', policyController.remove);
+router.get('/', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), policyController.list);
+router.get('/:id', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), policyController.getById);
+router.post('/', requireRole('ADMIN'), upload.single('file'), validate(policySchema), policyController.create);
+router.put('/:id', requireRole('ADMIN'), upload.single('file'), validate(policySchema), policyController.update);
+router.delete('/:id', requireRole('ADMIN'), policyController.remove);
 
 module.exports = router;

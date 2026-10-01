@@ -1,0 +1,17 @@
+@reference "../../index.css";
+
+.advance-form-loading {
+  @apply text-slate-500;
+}
+
+.advance-form-card {
+  @apply space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+}
+
+.advance-form-col-span {
+  @apply sm:col-span-2 lg:col-span-3;
+}
+
+.advance-form-actions-row {
+  @apply flex justify-end gap-3 pt-2;
+}

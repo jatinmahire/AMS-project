@@ -1,42 +1,34 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, Users, UserCheck, CalendarCheck, ArrowUpRight } from 'lucide-react';
-import { getCounts } from '../../api/dashboard';
-import Button from '../../components/Button';
+import { Building2, Users, UserCheck, CalendarCheck } from 'lucide-react';
+import { getCounts, getRecentActivity, getRecentRegistrations } from '../../api/dashboard';
 import PageHeader from '../../components/PageHeader';
+import StatCard from '../../components/StatCard';
+import RecentUpdatesCard from '../../components/RecentUpdatesCard';
+import RecentRegistrationsCard from '../../components/RecentRegistrationsCard';
 import { useToast } from '../../context/ToastContext';
 import { getErrorMessage } from '../../utils/errorMessage';
+import './Dashboard.css';
 
 const CARDS = [
-  {
-    key: 'contractorCount',
-    label: 'Contractors',
-    icon: Building2,
-    color: 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-500/10',
-  },
-  {
-    key: 'supervisorCount',
-    label: 'Supervisors',
-    icon: UserCheck,
-    color: 'text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-500/10',
-  },
-  {
-    key: 'workerCount',
-    label: 'Workers',
-    icon: Users,
-    color: 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-500/10',
-  },
-  {
-    key: 'presentTodayCount',
-    label: "Today's Present Workers",
-    icon: CalendarCheck,
-    color: 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-500/10',
-  },
+  { key: 'contractorCount', label: 'Contractors', icon: Building2, to: '/contractors' },
+  { key: 'supervisorCount', label: 'Supervisors', icon: UserCheck, to: '/supervisors' },
+  { key: 'workerCount', label: 'Workers', icon: Users, to: '/workers' },
+  { key: 'presentTodayCount', label: "Today's Present Workers", icon: CalendarCheck, to: '/attendance' },
+];
+
+const QUICK_ACTIONS = [
+  { label: 'Mark Attendance', icon: CalendarCheck, to: '/attendance/new' },
 ];
 
 export default function Dashboard() {
   const [counts, setCounts] = useState(null);
+  const [activity, setActivity] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activityLoading, setActivityLoading] = useState(true);
+  const [registrationType, setRegistrationType] = useState('ALL');
+  const [registrations, setRegistrations] = useState([]);
+  const [registrationsLoading, setRegistrationsLoading] = useState(true);
   const navigate = useNavigate();
   const { showToast } = useToast();
 
@@ -45,39 +37,59 @@ export default function Dashboard() {
       .then(setCounts)
       .catch((err) => showToast(getErrorMessage(err), 'error'))
       .finally(() => setLoading(false));
+
+    getRecentActivity(15)
+      .then(setActivity)
+      .catch((err) => showToast(getErrorMessage(err), 'error'))
+      .finally(() => setActivityLoading(false));
   }, [showToast]);
+
+  useEffect(() => {
+    setRegistrationsLoading(true);
+    getRecentRegistrations(registrationType)
+      .then(setRegistrations)
+      .catch((err) => showToast(getErrorMessage(err), 'error'))
+      .finally(() => setRegistrationsLoading(false));
+  }, [registrationType, showToast]);
 
   return (
     <div>
-      <PageHeader
-        title="Dashboard"
-        description="Overview of workforce and today's attendance."
-        action={
-          <Button icon={ArrowUpRight} onClick={() => navigate('/attendance')}>
-            Go to Daily Attendance
-          </Button>
-        }
-      />
+      <PageHeader title="Dashboard" description="Overview of workforce and today's attendance." />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="dashboard-cards-grid">
         {CARDS.map((card) => (
-          <div
+          <StatCard
             key={card.key}
-            className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
-          >
-            <div className={`mb-3 inline-flex rounded-lg p-2.5 ${card.color}`}>
-              <card.icon size={20} />
-            </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{card.label}</p>
-            <p className="mt-1 text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-              {loading ? (
-                <span className="inline-block h-8 w-14 animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
-              ) : (
-                (counts?.[card.key] ?? 0)
-              )}
-            </p>
-          </div>
+            label={card.label}
+            icon={card.icon}
+            value={loading ? '-' : counts?.[card.key] ?? 0}
+            onClick={() => navigate(card.to)}
+          />
         ))}
+      </div>
+
+      <div className="dashboard-quick-actions">
+        {QUICK_ACTIONS.map((action) => (
+          <button
+            key={action.label}
+            onClick={() => navigate(action.to)}
+            className="dashboard-quick-action-button"
+          >
+            <action.icon size={16} className="dashboard-quick-action-icon" />
+            {action.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="dashboard-feature-row">
+        <RecentRegistrationsCard
+          items={registrations}
+          loading={registrationsLoading}
+          type={registrationType}
+          onTypeChange={setRegistrationType}
+        />
+        <RecentUpdatesCard activity={activity} loading={activityLoading} />
+        <div />
       </div>
     </div>
   );

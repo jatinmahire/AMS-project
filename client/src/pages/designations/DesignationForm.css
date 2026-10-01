@@ -1,0 +1,13 @@
+@reference "../../index.css";
+
+.designation-form-loading {
+  @apply text-slate-500;
+}
+
+.designation-form-card {
+  @apply space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+}
+
+.designation-form-actions-row {
+  @apply flex justify-end gap-3 pt-2;
+}

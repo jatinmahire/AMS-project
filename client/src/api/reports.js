@@ -12,6 +12,18 @@ export function getNinetyDays(workerCode) {
   return api.get(`/reports/90-days/${workerCode}`).then((res) => res.data);
 }
 
+export function getNinetyDaysHistory(params) {
+  return api.get('/reports/90-days-history', { params }).then((res) => res.data);
+}
+
 export function getStatutoryRegister(type, params) {
   return api.get(`/reports/statutory/${type}`, { params }).then((res) => res.data);
+}
+
+export function getMusterRoll(params) {
+  return api.get('/reports/muster-roll', { params }).then((res) => res.data);
+}
+
+export function getPfChalan(params) {
+  return api.get('/reports/pf-chalan', { params }).then((res) => res.data);
 }

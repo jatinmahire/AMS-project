@@ -1,0 +1,9 @@
+@reference "../../index.css";
+
+.supervisor-view-message {
+  @apply text-slate-500;
+}
+
+.supervisor-view-actions {
+  @apply flex gap-2;
+}

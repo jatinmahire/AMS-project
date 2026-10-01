@@ -4,6 +4,10 @@ export function listHolidays(params) {
   return api.get('/holidays', { params }).then((res) => res.data);
 }
 
+export function getHoliday(id) {
+  return api.get(`/holidays/${id}`).then((res) => res.data);
+}
+
 export function createHoliday(payload) {
   return api.post('/holidays', payload).then((res) => res.data);
 }

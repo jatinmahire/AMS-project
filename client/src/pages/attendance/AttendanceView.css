@@ -1,0 +1,9 @@
+@reference "../../index.css";
+
+.attendance-view-message {
+  @apply text-slate-500;
+}
+
+.attendance-view-content {
+  @apply space-y-5;
+}

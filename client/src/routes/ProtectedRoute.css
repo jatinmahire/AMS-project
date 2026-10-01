@@ -1,0 +1,5 @@
+@reference "../index.css";
+
+.protected-route-loading {
+  @apply flex h-screen items-center justify-center bg-slate-50 text-slate-500;
+}

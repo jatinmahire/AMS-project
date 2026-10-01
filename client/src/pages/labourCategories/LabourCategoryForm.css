@@ -1,0 +1,13 @@
+@reference "../../index.css";
+
+.labour-category-form-loading {
+  @apply text-slate-500;
+}
+
+.labour-category-form-card {
+  @apply space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+}
+
+.labour-category-form-actions-row {
+  @apply flex justify-end gap-3 pt-2;
+}

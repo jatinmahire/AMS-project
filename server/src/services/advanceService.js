@@ -1,15 +1,31 @@
 const prisma = require('../config/db');
 const ApiError = require('../utils/ApiError');
 const recordAudit = require('../utils/auditLog');
-const { monthRange } = require('../utils/dateRange');
+const { getWorkerAuditInfo } = require('../utils/workerAuditInfo');
+const { fromToRange } = require('../utils/dateRange');
 
-async function list({ contractorId, month, workerId, page = 1, limit = 50 }) {
+async function list({ contractorId, from, to, workerId, search, page = 1, limit = 50 }) {
   page = Number(page) || 1;
   limit = Number(limit) || 50;
   const where = {
     ...(workerId ? { workerId } : {}),
-    ...(contractorId ? { worker: { contractorId } } : {}),
-    ...(month ? { advanceDate: monthRange(month) } : {}),
+    ...(from || to ? { advanceDate: fromToRange(from, to) } : {}),
+    ...(contractorId || search
+      ? {
+          worker: {
+            ...(contractorId ? { contractorId } : {}),
+            ...(search
+              ? {
+                  OR: [
+                    { firstName: { contains: search, mode: 'insensitive' } },
+                    { lastName: { contains: search, mode: 'insensitive' } },
+                    { workerCode: { contains: search, mode: 'insensitive' } },
+                  ],
+                }
+              : {}),
+          },
+        }
+      : {}),
   };
 
   const [data, total] = await Promise.all([
@@ -57,21 +73,31 @@ function buildRepaymentRows(advanceId, amount, installmentsCount, advanceDate) {
   return rows;
 }
 
-async function create(data) {
+async function create(data, userId) {
+  const worker = await getWorkerAuditInfo(data.workerId);
   return prisma.$transaction(async (tx) => {
     const advance = await tx.advance.create({ data });
     const repaymentRows = buildRepaymentRows(advance.id, data.amount, data.installmentsCount, data.advanceDate);
     await tx.advanceRepayment.createMany({ data: repaymentRows });
-    return tx.advance.findUnique({ where: { id: advance.id }, include: { repayments: true } });
+    const result = await tx.advance.findUnique({ where: { id: advance.id }, include: { repayments: true } });
+    await recordAudit(
+      { userId, action: 'CREATE_ADVANCE', entityType: 'Advance', entityId: advance.id, contractorId: worker.contractorId, newValue: { ...result, worker } },
+      tx
+    );
+    return result;
   });
 }
 
 async function update(id, data, userId) {
   const before = await prisma.advance.findUnique({ where: { id } });
   if (!before) throw new ApiError(404, 'Advance record not found');
+  const worker = await getWorkerAuditInfo(before.workerId);
   return prisma.$transaction(async (tx) => {
     const result = await tx.advance.update({ where: { id }, data });
-    await recordAudit({ userId, action: 'UPDATE', entityType: 'Advance', entityId: id, oldValue: before, newValue: result }, tx);
+    await recordAudit(
+      { userId, action: 'UPDATE_ADVANCE', entityType: 'Advance', entityId: id, contractorId: worker.contractorId, oldValue: { ...before, worker }, newValue: { ...result, worker } },
+      tx
+    );
     return result;
   });
 }
@@ -79,9 +105,13 @@ async function update(id, data, userId) {
 async function remove(id, userId) {
   const before = await prisma.advance.findUnique({ where: { id } });
   if (!before) throw new ApiError(404, 'Advance record not found');
+  const worker = await getWorkerAuditInfo(before.workerId);
   return prisma.$transaction(async (tx) => {
     await tx.advance.delete({ where: { id } });
-    await recordAudit({ userId, action: 'DELETE', entityType: 'Advance', entityId: id, oldValue: before, newValue: null }, tx);
+    await recordAudit(
+      { userId, action: 'DELETE_ADVANCE', entityType: 'Advance', entityId: id, contractorId: worker.contractorId, oldValue: { ...before, worker }, newValue: null },
+      tx
+    );
   });
 }
 

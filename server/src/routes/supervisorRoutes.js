@@ -1,6 +1,6 @@
 const express = require('express');
 const supervisorController = require('../controllers/supervisorController');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate, requireRole } = require('../middlewares/auth');
 const validate = require('../middlewares/validate');
 const { supervisorSchema } = require('../validators/supervisorValidator');
 const { statusUpdateSchema } = require('../validators/statusValidator');
@@ -11,6 +11,7 @@ const upload = makeUploader('supervisors');
 const uploadFields = upload.fields([{ name: 'aadhaarFront', maxCount: 1 }, { name: 'aadhaarBack', maxCount: 1 }]);
 
 router.use(authenticate);
+router.use(requireRole('ADMIN'));
 
 router.get('/', supervisorController.list);
 router.get('/:id', supervisorController.getById);

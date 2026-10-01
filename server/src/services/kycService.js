@@ -1,12 +1,19 @@
 const prisma = require('../config/db');
 const ApiError = require('../utils/ApiError');
+const { scopedContractorId: resolveScope } = require('../utils/scope');
 
-async function lookupWorker(code) {
+async function lookupWorker(code, user) {
   const worker = await prisma.worker.findUnique({
     where: { workerCode: code },
     include: { contractor: true, designation: true, labourCategory: true },
   });
   if (!worker) throw new ApiError(404, `No worker found with code ${code}`);
+
+  const scopedContractorId = await resolveScope(user);
+  if (scopedContractorId && worker.contractorId !== scopedContractorId) {
+    throw new ApiError(404, `No worker found with code ${code}`);
+  }
+
   return worker;
 }
 

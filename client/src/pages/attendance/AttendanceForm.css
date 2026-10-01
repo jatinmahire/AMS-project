@@ -1,0 +1,29 @@
+@reference "../../index.css";
+
+.attendance-form-loading {
+  @apply text-slate-500;
+}
+
+.attendance-form-card {
+  @apply space-y-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+}
+
+.attendance-form-scanner-wrap {
+  @apply flex flex-col items-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6;
+}
+
+.attendance-form-toggle-link {
+  @apply flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:underline;
+}
+
+.attendance-form-readonly-grid {
+  @apply grid grid-cols-2 gap-4 sm:grid-cols-4;
+}
+
+.attendance-form-row-3 {
+  @apply grid grid-cols-1 gap-4 sm:grid-cols-3;
+}
+
+.attendance-form-actions-row {
+  @apply flex justify-end gap-3 pt-2;
+}

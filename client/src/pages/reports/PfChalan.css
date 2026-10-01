@@ -1,0 +1,9 @@
+@reference "../../index.css";
+
+.pf-chalan-pending {
+  @apply font-medium text-amber-600;
+}
+
+.pf-chalan-actions {
+  @apply flex gap-2;
+}

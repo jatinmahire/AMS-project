@@ -1,6 +1,6 @@
 const express = require('express');
 const accidentController = require('../controllers/accidentController');
-const { authenticate } = require('../middlewares/auth');
+const { authenticate, requireRole } = require('../middlewares/auth');
 const validate = require('../middlewares/validate');
 const { accidentSchema } = require('../validators/accidentValidator');
 const { makeUploader } = require('../utils/upload');
@@ -9,6 +9,7 @@ const router = express.Router();
 const upload = makeUploader('accidents');
 
 router.use(authenticate);
+router.use(requireRole('ADMIN'));
 
 router.get('/', accidentController.list);
 router.get('/:id', accidentController.getById);

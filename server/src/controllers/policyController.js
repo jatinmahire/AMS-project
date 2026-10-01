@@ -5,12 +5,12 @@ const ApiError = require('../utils/ApiError');
 
 const list = asyncHandler(async (req, res) => {
   const { contractorId, page, limit } = req.query;
-  const result = await policyService.list({ contractorId, page, limit });
+  const result = await policyService.list(req.user, { contractorId, page, limit });
   res.json(result);
 });
 
 const getById = asyncHandler(async (req, res) => {
-  const policy = await policyService.getById(req.params.id);
+  const policy = await policyService.getById(req.params.id, req.user);
   res.json(policy);
 });
 

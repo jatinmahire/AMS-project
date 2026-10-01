@@ -1,0 +1,105 @@
+@reference "../index.css";
+
+.navbar-desktop {
+  @apply hidden border-b border-slate-200 bg-white lg:block;
+}
+
+.navbar-desktop-inner {
+  @apply mx-auto flex max-w-[1400px] items-center justify-center gap-0.5 px-4 sm:px-6 md:px-5 lg:px-6;
+}
+
+.navbar-link {
+  @apply whitespace-nowrap rounded-md px-2.5 py-3 text-sm font-medium transition-colors duration-150;
+}
+
+.navbar-link-active {
+  @apply text-primary-600;
+}
+
+.navbar-link-inactive {
+  @apply text-slate-600 hover:text-slate-900;
+}
+
+.navbar-section {
+  @apply relative;
+}
+
+.navbar-section-trigger {
+  @apply flex items-center gap-1 whitespace-nowrap rounded-md px-2.5 py-3 text-sm font-medium transition-colors duration-150;
+}
+
+.navbar-section-trigger-active {
+  @apply bg-slate-100 text-slate-900;
+}
+
+.navbar-section-trigger-inactive {
+  @apply text-slate-600 hover:bg-slate-50 hover:text-slate-900;
+}
+
+.navbar-section-chevron {
+  @apply transition-transform duration-150;
+}
+
+.navbar-section-chevron-open {
+  @apply rotate-180;
+}
+
+.navbar-section-menu {
+  @apply absolute left-0 top-full z-20 mt-1 w-64 rounded-lg border border-slate-200 bg-white py-1 shadow-lg animate-[fadeIn_150ms_ease-out];
+}
+
+.navbar-section-menu-item {
+  @apply flex items-center gap-3 px-4 py-2 text-sm;
+}
+
+.navbar-section-menu-item-active {
+  @apply bg-primary-50 text-primary-700;
+}
+
+.navbar-section-menu-item-inactive {
+  @apply text-slate-600 hover:bg-slate-50 hover:text-slate-900;
+}
+
+.navbar-section-menu-item-icon {
+  @apply flex-none;
+}
+
+.navbar-mobile-overlay {
+  @apply fixed inset-0 z-40 lg:hidden;
+}
+
+.navbar-mobile-backdrop {
+  @apply absolute inset-0 bg-slate-950/50;
+}
+
+.navbar-mobile-panel {
+  @apply relative flex h-full w-72 flex-col overflow-y-auto bg-white shadow-xl animate-[slideIn_200ms_ease-out];
+}
+
+.navbar-mobile-nav {
+  @apply flex-1 space-y-6 px-3 py-4;
+}
+
+.navbar-mobile-section-title {
+  @apply mb-2 flex items-center gap-2 px-3 text-xs font-semibold uppercase tracking-wide text-slate-400;
+}
+
+.navbar-mobile-section-items {
+  @apply space-y-0.5;
+}
+
+.navbar-mobile-link {
+  @apply flex items-center gap-3 rounded-md border-l-2 px-3 py-2 text-sm font-medium transition-colors duration-150;
+}
+
+.navbar-mobile-link-active {
+  @apply border-primary-600 bg-primary-50 text-primary-700;
+}
+
+.navbar-mobile-link-inactive {
+  @apply border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900;
+}
+
+.navbar-mobile-link-icon {
+  @apply flex-none;
+}

@@ -1,0 +1,13 @@
+@reference "../../index.css";
+
+.damage-view-message {
+  @apply text-slate-500;
+}
+
+.damage-view-content {
+  @apply space-y-5;
+}
+
+.damage-view-photo-link {
+  @apply text-primary-600 hover:underline;
+}
