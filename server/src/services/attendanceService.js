@@ -26,6 +26,7 @@ async function list(user, { date, workerId, contractorId, page = 1, limit = 50 }
       where,
       include: {
         worker: { select: { workerCode: true, firstName: true, lastName: true, contractor: { select: { contractorName: true } } } },
+        markedByUser: { select: { fullName: true, loginId: true, role: true } },
       },
       orderBy: { date: 'desc' },
       skip: (page - 1) * limit,
@@ -38,7 +39,10 @@ async function list(user, { date, workerId, contractorId, page = 1, limit = 50 }
 }
 
 async function getById(id, user) {
-  const attendance = await prisma.attendance.findUnique({ where: { id }, include: { worker: true } });
+  const attendance = await prisma.attendance.findUnique({
+    where: { id },
+    include: { worker: true, markedByUser: { select: { fullName: true, loginId: true, role: true } } },
+  });
   if (!attendance) throw new ApiError(404, 'Attendance record not found');
 
   const scopedContractorId = await resolveScope(user);

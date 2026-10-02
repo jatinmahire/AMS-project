@@ -15,7 +15,24 @@ import { printNow } from '../../utils/printExport';
 import { TITLE_BAR_TEXT, LEGAL_BOILERPLATE_MARATHI } from '../../constants/form90Marathi';
 import { transliterateToDevanagari } from '../../utils/transliterate';
 import { translateDesignation } from '../../utils/designationTranslations';
+import { toDevanagariDigits } from '../../utils/devanagariDigits';
 import './NinetyDaysForm.css';
+
+const REQUIRED_PRINT_FIELDS = {
+  Worker: [['taluka', 'Taluka'], ['city', 'City'], ['district', 'District']],
+  // The Contractor record has no District column, so only Taluka and City can be checked there.
+  Contractor: [['taluka', 'Taluka'], ['city', 'City']],
+};
+
+function missingPrintFields(worker) {
+  const records = { Worker: worker, Contractor: worker?.contractor };
+  return Object.entries(REQUIRED_PRINT_FIELDS)
+    .map(([recordLabel, fields]) => {
+      const missing = fields.filter(([key]) => !records[recordLabel]?.[key]?.trim()).map(([, label]) => label);
+      return missing.length ? `${recordLabel}: ${missing.join(', ')}` : null;
+    })
+    .filter(Boolean);
+}
 
 const HISTORY_LIMIT = 10;
 
@@ -142,7 +159,7 @@ export default function NinetyDaysForm() {
       const w = data.worker;
       const c = w?.contractor;
       const t = data.tracker;
-      setEditable({
+      const prefilled = {
         referenceNo: t?.form90ReferenceNo || '',
         referenceDate: t?.form90ReferenceDate ? formatDDMMYYYY(t.form90ReferenceDate) : '',
         employerName: transliterateToDevanagari(c?.principalEmployerName),
@@ -170,7 +187,10 @@ export default function NinetyDaysForm() {
         workLocation: transliterateToDevanagari(c ? `${c.buildingName || ''} ${c.address}`.trim() : ''),
         appointmentDate: w ? formatDDMMYYYY(w.joinDate) : '',
         wagePerDay: w ? String(w.labourCategory.ratePerDay) : '',
-      });
+      };
+      // Every value — including transliterated addresses that may carry house numbers — gets
+      // Devanagari numerals, so the certificate is fully Marathi.
+      setEditable(Object.fromEntries(Object.entries(prefilled).map(([key, value]) => [key, toDevanagariDigits(value)])));
 
       loadHistory();
     } catch (err) {
@@ -193,7 +213,20 @@ export default function NinetyDaysForm() {
   }
 
   function updateEditable(key) {
-    return (value) => setEditable((prev) => ({ ...prev, [key]: value }));
+    return (value) => setEditable((prev) => ({ ...prev, [key]: toDevanagariDigits(value) }));
+  }
+
+  function handlePrint() {
+    if (!result) {
+      showToast('Search for a worker before printing the certificate', 'error');
+      return;
+    }
+    const missing = missingPrintFields(result.worker);
+    if (missing.length) {
+      showToast(`Cannot print — fill in the missing details first. ${missing.join('; ')}`, 'error');
+      return;
+    }
+    printNow();
   }
 
   function viewCertificate(workerCode) {
@@ -237,7 +270,7 @@ export default function NinetyDaysForm() {
             <TextInput value={code} onChange={(e) => setCode(e.target.value)} placeholder="e.g. WRK001" />
           </div>
           <Button type="submit" icon={Search} disabled={searching}>{searching ? 'Searching...' : 'Search'}</Button>
-          <Button type="button" variant="secondary" icon={Printer} onClick={printNow}>Print</Button>
+          <Button type="button" variant="secondary" icon={Printer} onClick={handlePrint}>Print</Button>
         </form>
 
         {result && (
@@ -251,7 +284,7 @@ export default function NinetyDaysForm() {
       {result && (
         <div id="form90-certificate" className="ninety-days-form-certificate">
           <div className="ninety-days-form-title-bar print-color-exact">
-            {TITLE_BAR_TEXT}
+            {toDevanagariDigits(TITLE_BAR_TEXT)}
           </div>
 
           <div className="ninety-days-form-ref-row">
@@ -292,7 +325,7 @@ export default function NinetyDaysForm() {
           </div>
 
           <p className="ninety-days-form-legal-text" lang="mr">
-            {LEGAL_BOILERPLATE_MARATHI}
+            {toDevanagariDigits(LEGAL_BOILERPLATE_MARATHI)}
           </p>
 
           <h3 className="ninety-days-form-section-title">बांधकाम कामगाराचा तपशील</h3>

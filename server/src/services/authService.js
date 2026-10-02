@@ -82,6 +82,16 @@ async function getProfile(userId) {
   };
 }
 
+async function updateProfile(userId, fullName) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    throw new ApiError(404, 'User not found');
+  }
+
+  await prisma.user.update({ where: { id: userId }, data: { fullName: fullName || null } });
+  return getProfile(userId);
+}
+
 async function changePassword(userId, currentPassword, newPassword) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
@@ -97,4 +107,4 @@ async function changePassword(userId, currentPassword, newPassword) {
   await prisma.user.update({ where: { id: userId }, data: { passwordHash } });
 }
 
-module.exports = { login, getProfile, changePassword };
+module.exports = { login, getProfile, updateProfile, changePassword };

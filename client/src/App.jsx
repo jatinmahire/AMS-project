@@ -106,7 +106,7 @@ export default function App() {
             <Route path="/supervisors/:id" element={<Protected><SupervisorView /></Protected>} />
 
             <Route path="/workers" element={<Protected roles={['ADMIN', 'CONTRACTOR']}><Workers /></Protected>} />
-            <Route path="/workers/new" element={<Protected roles={SHARED_ROLES}><WorkerForm /></Protected>} />
+            <Route path="/workers/new" element={<Protected roles={ALL_ROLES}><WorkerForm /></Protected>} />
             <Route path="/workers/:id/edit" element={<Protected><WorkerForm /></Protected>} />
             <Route path="/workers/:id" element={<Protected roles={ALL_ROLES}><WorkerView /></Protected>} />
 

@@ -24,6 +24,34 @@
   @apply mt-1 inline-block rounded-full bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700;
 }
 
+.profile-page-name-form {
+  @apply mt-6 border-t border-slate-200 pt-6;
+}
+
+.profile-page-name-label {
+  @apply mb-1.5 text-sm font-medium text-slate-500;
+}
+
+.profile-page-name-display-row {
+  @apply flex items-center gap-2;
+}
+
+.profile-page-name-display {
+  @apply text-lg font-bold text-slate-900;
+}
+
+.profile-page-name-edit-btn {
+  @apply rounded-md p-1.5 text-slate-500 transition-colors hover:bg-primary-50 hover:text-primary-600;
+}
+
+.profile-page-name-edit-row {
+  @apply flex flex-wrap items-center gap-2;
+}
+
 .profile-page-actions {
   @apply mt-6 border-t border-slate-200 pt-6;
+}
+
+.profile-page-name-input {
+  @apply w-auto min-w-48 flex-1;
 }

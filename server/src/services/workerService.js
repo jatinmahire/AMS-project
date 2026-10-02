@@ -64,7 +64,13 @@ async function getById(id, user) {
 
 async function create(data, user) {
   const scopedContractorId = await resolveScope(user);
-  if (scopedContractorId) data.contractorId = scopedContractorId;
+  if (scopedContractorId) {
+    data.contractorId = scopedContractorId;
+  } else if (user.role !== 'ADMIN') {
+    // A Supervisor/Contractor with no linked contractor must never fall back to the
+    // contractorId sent in the request body — that would let them register under anyone.
+    throw new ApiError(403, 'Your account is not linked to a contractor, so you cannot register workers');
+  }
 
   const workerCode = await generateCode('worker');
   const worker = await prisma.worker.create({ data: { ...data, workerCode } });

@@ -64,6 +64,14 @@ export function formatRelativeTime(value) {
   return `${diffDay} day${diffDay === 1 ? '' : 's'} ago`;
 }
 
+const ROLE_LABELS = { ADMIN: 'Admin', SUPERVISOR: 'Supervisor', CONTRACTOR: 'Contractor' };
+
+// Single source for "who is this user" text — falls back to the role label
+// (never blank) when the account has no display name set.
+export function displayName(user) {
+  return user?.fullName?.trim() || ROLE_LABELS[user?.role] || user?.loginId || '';
+}
+
 export function initials(name) {
   if (!name) return '?';
   const parts = name.trim().split(/\s+/);

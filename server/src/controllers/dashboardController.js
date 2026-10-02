@@ -38,7 +38,13 @@ const getRecentRegistrations = asyncHandler(async (req, res) => {
   res.json(rows);
 });
 
+const getAttendanceOverview = asyncHandler(async (req, res) => {
+  const overview = await dashboardService.getAttendanceOverview(req.user, req.query.range);
+  res.json(overview);
+});
+
 module.exports = {
+  getAttendanceOverview,
   getCounts,
   getAlerts,
   getSupervisorCounts,

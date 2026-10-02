@@ -8,7 +8,7 @@ import WorkerInfoCard from '../../components/WorkerInfoCard';
 import StatusBadge from '../../components/StatusBadge';
 import ViewCard, { ViewField, ViewSection } from '../../components/ViewField';
 import { getAttendance } from '../../api/attendance';
-import { formatDate } from '../../utils/format';
+import { displayName, formatDate } from '../../utils/format';
 import { getErrorMessage } from '../../utils/errorMessage';
 import { useToast } from '../../context/ToastContext';
 import './AttendanceView.css';
@@ -56,6 +56,7 @@ export default function AttendanceView() {
             <ViewField label="Status" value={<StatusBadge status={attendance.status} />} />
             <ViewField label="Building Number" value={attendance.buildingNo} />
             <ViewField label="Source" value={attendance.source} />
+            <ViewField label="Marked By" value={displayName(attendance.markedByUser)} />
           </ViewSection>
         </ViewCard>
       </div>

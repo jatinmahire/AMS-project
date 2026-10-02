@@ -69,6 +69,11 @@ const CONTRACTOR_SECTIONS = [
     items: [{ to: '/workers', label: 'Workers', icon: Users }],
   },
   {
+    title: 'Worker Registration',
+    icon: UserPlus,
+    items: [{ to: '/workers/new', label: 'Register Worker', icon: UserPlus }],
+  },
+  {
     title: 'KYC Lookup',
     icon: Search,
     items: [{ to: '/kyc', label: 'KYC Lookup', icon: Search }],

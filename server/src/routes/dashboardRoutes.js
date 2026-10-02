@@ -11,6 +11,7 @@ router.get('/alerts', requireRole('ADMIN'), dashboardController.getAlerts);
 router.get('/supervisor-counts', requireRole('SUPERVISOR'), dashboardController.getSupervisorCounts);
 router.get('/contractor-counts', requireRole('CONTRACTOR'), dashboardController.getContractorCounts);
 router.get('/recent-activity', dashboardController.getRecentActivity);
+router.get('/attendance-overview', dashboardController.getAttendanceOverview);
 router.get('/recent-registrations', requireRole('ADMIN'), dashboardController.getRecentRegistrations);
 router.get('/activity', dashboardController.getActivity);
 

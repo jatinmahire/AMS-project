@@ -12,10 +12,15 @@ const me = asyncHandler(async (req, res) => {
   res.json(user);
 });
 
+const updateProfile = asyncHandler(async (req, res) => {
+  const user = await authService.updateProfile(req.user.id, req.body.fullName);
+  res.json(user);
+});
+
 const changePassword = asyncHandler(async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   await authService.changePassword(req.user.id, currentPassword, newPassword);
   res.json({ message: 'Password updated successfully' });
 });
 
-module.exports = { login, me, changePassword };
+module.exports = { login, me, updateProfile, changePassword };

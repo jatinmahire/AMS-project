@@ -8,8 +8,9 @@ import FormSection from '../../components/FormSection';
 import FormField, { TextInput, Select } from '../../components/FormField';
 import NumericInput from '../../components/NumericInput';
 import EmailInput from '../../components/EmailInput';
+import StateCityFields from '../../components/StateCityFields';
 import Button from '../../components/Button';
-import { validateEmailField } from '../../utils/validators';
+import { AADHAAR_FILE_RULE, validateEmailField, validateUploadFile } from '../../utils/validators';
 import RegistrationSuccessModal from '../../components/RegistrationSuccessModal';
 import { getSupervisor, createSupervisor, updateSupervisor } from '../../api/supervisors';
 import { contractorDropdown } from '../../api/contractors';
@@ -28,7 +29,7 @@ const EMPTY_FORM = {
 const STEP_LABELS = ['Personal Info', 'Address & Assignment'];
 
 const STEP_FIELDS = [
-  ['fullName', 'gender', 'dob', 'contactNo', 'email', 'aadhaarNo', 'aadhaarFrontUrl', 'aadhaarBackUrl'],
+  ['fullName', 'gender', 'dob', 'contactNo', 'email', 'aadhaarNo', 'aadhaarFrontUrl', 'aadhaarBackUrl', 'aadhaarFront', 'aadhaarBack'],
   ['street', 'city', 'state', 'pincode', 'assignedContractorId', 'status', 'password'],
 ];
 
@@ -60,6 +61,14 @@ export default function SupervisorForm() {
   useEffect(() => {
     contractorDropdown().then(setContractors).catch((err) => showToast(getErrorMessage(err), 'error'));
   }, []);
+
+  function handleAadhaarFile(key, setFile, e) {
+    const file = e.target.files[0];
+    const error = validateUploadFile(file, AADHAAR_FILE_RULE);
+    setErrors((prev) => ({ ...prev, [key]: error }));
+    if (error) e.target.value = '';
+    setFile(error ? null : file);
+  }
 
   useEffect(() => {
     setAadhaarFront(null);
@@ -209,13 +218,13 @@ export default function SupervisorForm() {
             <FormField label="Aadhaar No." required error={errors.aadhaarNo}>
               <NumericInput {...field('aadhaarNo')} error={errors.aadhaarNo} exactLength={12} label="Aadhaar number" />
             </FormField>
-            <FormField label="Aadhaar Front">
-              <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => setAadhaarFront(e.target.files[0])}
+            <FormField label={`Aadhaar Front (${AADHAAR_FILE_RULE.typeLabel}, max ${AADHAAR_FILE_RULE.sizeLabel})`} error={errors.aadhaarFront}>
+              <input type="file" accept={AADHAAR_FILE_RULE.accept} onChange={(e) => handleAadhaarFile('aadhaarFront', setAadhaarFront, e)}
                 className="supervisor-form-file-input" />
               {supervisor?.aadhaarFrontUrl && <a href={supervisor.aadhaarFrontUrl} target="_blank" rel="noreferrer" className="supervisor-form-current-file-link">View current file</a>}
             </FormField>
-            <FormField label="Aadhaar Back">
-              <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => setAadhaarBack(e.target.files[0])}
+            <FormField label={`Aadhaar Back (${AADHAAR_FILE_RULE.typeLabel}, max ${AADHAAR_FILE_RULE.sizeLabel})`} error={errors.aadhaarBack}>
+              <input type="file" accept={AADHAAR_FILE_RULE.accept} onChange={(e) => handleAadhaarFile('aadhaarBack', setAadhaarBack, e)}
                 className="supervisor-form-file-input" />
               {supervisor?.aadhaarBackUrl && <a href={supervisor.aadhaarBackUrl} target="_blank" rel="noreferrer" className="supervisor-form-current-file-link">View current file</a>}
             </FormField>
@@ -228,12 +237,12 @@ export default function SupervisorForm() {
               <FormField label="Street" error={errors.street}>
                 <TextInput {...field('street')} error={errors.street} />
               </FormField>
-              <FormField label="City" error={errors.city}>
-                <TextInput {...field('city')} error={errors.city} />
-              </FormField>
-              <FormField label="State" error={errors.state}>
-                <TextInput {...field('state')} error={errors.state} />
-              </FormField>
+              <StateCityFields
+                state={form.state}
+                city={form.city}
+                onChange={(changes) => setForm((prev) => ({ ...prev, ...changes }))}
+                errors={errors}
+              />
               <FormField label="Pincode" error={errors.pincode}>
                 <NumericInput {...field('pincode')} error={errors.pincode} exactLength={6} label="Pincode" />
               </FormField>

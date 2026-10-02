@@ -6,6 +6,7 @@ import StepIndicator from '../../components/StepIndicator';
 import FormSection from '../../components/FormSection';
 import FormField, { TextInput, Select } from '../../components/FormField';
 import NumericInput from '../../components/NumericInput';
+import StateCityFields from '../../components/StateCityFields';
 import Button from '../../components/Button';
 import { getWorker, createWorker, updateWorker } from '../../api/workers';
 import { contractorDropdown } from '../../api/contractors';
@@ -14,6 +15,9 @@ import { listLabourCategories } from '../../api/labourCategories';
 import { toDateInputValue } from '../../utils/format';
 import { toFormData } from '../../utils/toFormData';
 import { getErrorMessage, getFieldErrors } from '../../utils/errorMessage';
+import {
+  AADHAAR_FILE_RULE, IFSC_REGEX, MIN_WORKER_AGE, PAN_REGEX, maxAdultDob, validatePattern, validateUploadFile,
+} from '../../utils/validators';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import './WorkerForm.css';
@@ -31,10 +35,15 @@ const EMPTY_FORM = {
 
 const FILE_FIELDS = [
   { key: 'photo', label: 'Photo', urlKey: 'photoUrl' },
-  { key: 'idFront', label: 'ID Front', urlKey: 'idFrontUrl' },
-  { key: 'idBack', label: 'ID Back', urlKey: 'idBackUrl' },
+  { key: 'idFront', label: 'ID Front', urlKey: 'idFrontUrl', rule: AADHAAR_FILE_RULE },
+  { key: 'idBack', label: 'ID Back', urlKey: 'idBackUrl', rule: AADHAAR_FILE_RULE },
   { key: 'bankPassbook', label: 'Bank Passbook', urlKey: 'bankPassbookUrl' },
 ];
+
+const PATTERN_FIELDS = {
+  panNumber: { regex: PAN_REGEX, label: 'PAN number', example: 'ABCDE1234F' },
+  ifscCode: { regex: IFSC_REGEX, label: 'IFSC code', example: 'HDFC0001234' },
+};
 
 const STEP_LABELS = ['Personal Info', 'Address', 'Employment & Documents', 'Bank & Nominee'];
 
@@ -43,17 +52,24 @@ const STEP_FIELDS = [
   ['permanentAddress', 'currentAddress', 'village', 'taluka', 'city', 'district', 'state', 'pincode'],
   [
     'contractorId', 'designationId', 'labourCategoryId', 'idType', 'idNumber', 'policeVerified', 'joinDate',
-    'bocwRegistrationNo', 'bocwIssueDate', 'bocwValidDate', 'pfNumber', 'uanNumber', 'esicNumber', 'panNumber', 'ipNumber',
+    'photo', 'idFront', 'idBack', 'bankPassbook', 'bocwRegistrationNo', 'bocwIssueDate', 'bocwValidDate', 'pfNumber', 'uanNumber', 'esicNumber', 'panNumber', 'ipNumber',
   ],
   ['bankName', 'bankBranch', 'accountNo', 'ifscCode', 'nomineeName', 'nomineeRelation', 'nomineeChildrenCount', 'nomineeQualification', 'nomineeMobile', 'sector'],
 ];
 
 const STEP_REQUIRED_FIELDS = [
-  ['firstName', 'lastName', 'dob', 'gender', 'mobileNo'],
-  ['permanentAddress'],
-  ['contractorId', 'designationId', 'labourCategoryId', 'idType', 'idNumber', 'joinDate'],
-  [],
+  ['firstName', 'lastName', 'dob', 'gender', 'maritalStatus', 'mobileNo'],
+  ['permanentAddress', 'state', 'city', 'district', 'pincode'],
+  ['contractorId', 'designationId', 'labourCategoryId', 'idType', 'idNumber', 'joinDate', 'panNumber'],
+  [
+    'bankName', 'bankBranch', 'accountNo', 'ifscCode',
+    'nomineeName', 'nomineeRelation', 'nomineeChildrenCount', 'nomineeQualification', 'nomineeMobile',
+  ],
 ];
+
+function isBlank(value) {
+  return value === '' || value === null || value === undefined;
+}
 
 const LAST_STEP = STEP_LABELS.length - 1;
 
@@ -63,10 +79,12 @@ export default function WorkerForm() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { user } = useAuth();
-  const isSupervisor = user?.role === 'SUPERVISOR';
+  // Supervisors and Contractors can only register under their own contractor — the field is
+  // pre-filled and locked here, and the server overrides it from the session regardless.
+  const isScopedRole = user?.role === 'SUPERVISOR' || user?.role === 'CONTRACTOR';
 
   const [form, setForm] = useState(() =>
-    isSupervisor ? { ...EMPTY_FORM, contractorId: user.assignedContractorId || '' } : EMPTY_FORM
+    isScopedRole ? { ...EMPTY_FORM, contractorId: user.assignedContractorId || '' } : EMPTY_FORM
   );
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(isEdit);
@@ -80,7 +98,7 @@ export default function WorkerForm() {
   const [completedSteps, setCompletedSteps] = useState(isEdit ? [0, 1, 2, 3] : []);
 
   useEffect(() => {
-    Promise.all([isSupervisor ? Promise.resolve([]) : contractorDropdown(), listDesignations(), listLabourCategories()])
+    Promise.all([isScopedRole ? Promise.resolve([]) : contractorDropdown(), listDesignations(), listLabourCategories()])
       .then(([c, d, l]) => {
         setContractors(c);
         setDesignations(d);
@@ -112,10 +130,40 @@ export default function WorkerForm() {
     return { value: form[name] ?? '', onChange: (e) => setForm({ ...form, [name]: e.target.value }) };
   }
 
+  function patternField(name) {
+    const { regex, label, example } = PATTERN_FIELDS[name];
+    return {
+      value: form[name] ?? '',
+      onChange: (e) => setForm({ ...form, [name]: e.target.value.toUpperCase().replace(/\s/g, '') }),
+      onBlur: (e) => setErrors((prev) => ({ ...prev, [name]: validatePattern(e.target.value, regex, label, example) })),
+    };
+  }
+
+  function handleFileChange(fileField, e) {
+    const file = e.target.files[0];
+    const error = fileField.rule ? validateUploadFile(file, fileField.rule) : undefined;
+    setErrors((prev) => ({ ...prev, [fileField.key]: error }));
+    if (error) {
+      e.target.value = '';
+      setFiles((prev) => ({ ...prev, [fileField.key]: undefined }));
+      return;
+    }
+    setFiles((prev) => ({ ...prev, [fileField.key]: file }));
+  }
+
   function validateStep(stepIndex) {
     const stepErrors = {};
     for (const key of STEP_REQUIRED_FIELDS[stepIndex]) {
-      if (!form[key]) stepErrors[key] = 'This field is required';
+      if (isBlank(form[key])) stepErrors[key] = 'This field is required';
+    }
+    if (STEP_FIELDS[stepIndex].includes('dob') && form.dob && form.dob > maxAdultDob()) {
+      stepErrors.dob = `Worker must be at least ${MIN_WORKER_AGE} years old`;
+    }
+    for (const [key, { regex, label, example }] of Object.entries(PATTERN_FIELDS)) {
+      if (STEP_FIELDS[stepIndex].includes(key) && !stepErrors[key]) {
+        const patternError = validatePattern(form[key], regex, label, example);
+        if (patternError) stepErrors[key] = patternError;
+      }
     }
     return stepErrors;
   }
@@ -220,7 +268,7 @@ export default function WorkerForm() {
               <TextInput {...field('lastName')} error={errors.lastName} />
             </FormField>
             <FormField label="Date of Birth" required error={errors.dob}>
-              <TextInput type="date" {...field('dob')} error={errors.dob} />
+              <TextInput type="date" {...field('dob')} max={maxAdultDob()} error={errors.dob} />
             </FormField>
             <FormField label="Gender" required error={errors.gender}>
               <Select {...field('gender')}>
@@ -229,7 +277,7 @@ export default function WorkerForm() {
                 <option value="OTHER">Other</option>
               </Select>
             </FormField>
-            <FormField label="Marital Status" error={errors.maritalStatus}>
+            <FormField label="Marital Status" required error={errors.maritalStatus}>
               <Select {...field('maritalStatus')} error={errors.maritalStatus}>
                 <option value="">Select</option>
                 <option value="MARRIED">Married</option>
@@ -256,16 +304,17 @@ export default function WorkerForm() {
             <FormField label="Taluka" error={errors.taluka}>
               <TextInput {...field('taluka')} error={errors.taluka} />
             </FormField>
-            <FormField label="City" error={errors.city}>
-              <TextInput {...field('city')} error={errors.city} />
-            </FormField>
-            <FormField label="District" error={errors.district}>
+            <StateCityFields
+              state={form.state}
+              city={form.city}
+              onChange={(changes) => setForm((prev) => ({ ...prev, ...changes }))}
+              errors={errors}
+              required
+            />
+            <FormField label="District" required error={errors.district}>
               <TextInput {...field('district')} error={errors.district} />
             </FormField>
-            <FormField label="State" error={errors.state}>
-              <TextInput {...field('state')} error={errors.state} />
-            </FormField>
-            <FormField label="Pincode" error={errors.pincode}>
+            <FormField label="Pincode" required error={errors.pincode}>
               <NumericInput {...field('pincode')} error={errors.pincode} exactLength={6} label="Pincode" />
             </FormField>
           </FormSection>
@@ -275,7 +324,7 @@ export default function WorkerForm() {
           <>
             <FormSection title="Employment">
               <FormField label="Contractor" required error={errors.contractorId}>
-                {isSupervisor ? (
+                {isScopedRole ? (
                   <TextInput value={user.assignedContractorName || 'No contractor assigned'} disabled />
                 ) : (
                   <Select {...field('contractorId')}>
@@ -328,11 +377,11 @@ export default function WorkerForm() {
                 </Select>
               </FormField>
               {FILE_FIELDS.map((f) => (
-                <FormField label={f.label} key={f.key}>
+                <FormField label={f.rule ? `${f.label} (${f.rule.typeLabel}, max ${f.rule.sizeLabel})` : f.label} key={f.key} error={errors[f.key]}>
                   <input
                     type="file"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={(e) => setFiles({ ...files, [f.key]: e.target.files[0] })}
+                    accept={f.rule?.accept || '.pdf,.jpg,.jpeg,.png'}
+                    onChange={(e) => handleFileChange(f, e)}
                     className="worker-form-file-input"
                   />
                   {worker?.[f.urlKey] && <a href={worker[f.urlKey]} target="_blank" rel="noreferrer" className="worker-form-current-file-link">View current file</a>}
@@ -359,8 +408,8 @@ export default function WorkerForm() {
               <FormField label="ESIC Number" error={errors.esicNumber}>
                 <NumericInput {...field('esicNumber')} error={errors.esicNumber} maxLength={17} label="ESIC number" />
               </FormField>
-              <FormField label="PAN Number" error={errors.panNumber}>
-                <TextInput {...field('panNumber')} error={errors.panNumber} />
+              <FormField label="PAN Number" required error={errors.panNumber}>
+                <TextInput {...patternField('panNumber')} maxLength={10} placeholder="ABCDE1234F" error={errors.panNumber} />
               </FormField>
               <FormField label="IP Number" error={errors.ipNumber}>
                 <NumericInput {...field('ipNumber')} error={errors.ipNumber} maxLength={10} label="IP number" />
@@ -372,34 +421,34 @@ export default function WorkerForm() {
         {currentStep === 3 && (
           <>
             <FormSection title="Bank Details">
-              <FormField label="Bank Name" error={errors.bankName}>
+              <FormField label="Bank Name" required error={errors.bankName}>
                 <TextInput {...field('bankName')} error={errors.bankName} />
               </FormField>
-              <FormField label="Bank Branch" error={errors.bankBranch}>
+              <FormField label="Bank Branch" required error={errors.bankBranch}>
                 <TextInput {...field('bankBranch')} error={errors.bankBranch} />
               </FormField>
-              <FormField label="Account No." error={errors.accountNo}>
+              <FormField label="Account No." required error={errors.accountNo}>
                 <NumericInput {...field('accountNo')} error={errors.accountNo} maxLength={18} label="Account number" />
               </FormField>
-              <FormField label="IFSC Code" error={errors.ifscCode}>
-                <TextInput {...field('ifscCode')} error={errors.ifscCode} />
+              <FormField label="IFSC Code" required error={errors.ifscCode}>
+                <TextInput {...patternField('ifscCode')} maxLength={11} placeholder="HDFC0001234" error={errors.ifscCode} />
               </FormField>
             </FormSection>
 
             <FormSection title="Nominee Details">
-              <FormField label="Nominee Name" error={errors.nomineeName}>
+              <FormField label="Nominee Name" required error={errors.nomineeName}>
                 <TextInput {...field('nomineeName')} error={errors.nomineeName} />
               </FormField>
-              <FormField label="Relation" error={errors.nomineeRelation}>
+              <FormField label="Relation" required error={errors.nomineeRelation}>
                 <TextInput {...field('nomineeRelation')} error={errors.nomineeRelation} />
               </FormField>
-              <FormField label="Children Count" error={errors.nomineeChildrenCount}>
-                <TextInput type="number" {...field('nomineeChildrenCount')} error={errors.nomineeChildrenCount} />
+              <FormField label="Children Count" required error={errors.nomineeChildrenCount}>
+                <TextInput type="number" min={0} {...field('nomineeChildrenCount')} error={errors.nomineeChildrenCount} />
               </FormField>
-              <FormField label="Qualification" error={errors.nomineeQualification}>
+              <FormField label="Qualification" required error={errors.nomineeQualification}>
                 <TextInput {...field('nomineeQualification')} error={errors.nomineeQualification} />
               </FormField>
-              <FormField label="Nominee Mobile" error={errors.nomineeMobile}>
+              <FormField label="Nominee Mobile" required error={errors.nomineeMobile}>
                 <NumericInput {...field('nomineeMobile')} error={errors.nomineeMobile} exactLength={10} label="Nominee mobile number" />
               </FormField>
               <FormField label="Sector" error={errors.sector}>

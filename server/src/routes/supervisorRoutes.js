@@ -4,10 +4,11 @@ const { authenticate, requireRole } = require('../middlewares/auth');
 const validate = require('../middlewares/validate');
 const { supervisorSchema } = require('../validators/supervisorValidator');
 const { statusUpdateSchema } = require('../validators/statusValidator');
-const { makeUploader } = require('../utils/upload');
+const { makeUploader, AADHAAR_RULE } = require('../utils/upload');
 
 const router = express.Router();
-const upload = makeUploader('supervisors');
+// Every file on this form is an Aadhaar scan, so the 700KB cap can sit directly in Multer's limit.
+const upload = makeUploader('supervisors', { aadhaarFront: AADHAAR_RULE, aadhaarBack: AADHAAR_RULE }, AADHAAR_RULE.maxSize);
 const uploadFields = upload.fields([{ name: 'aadhaarFront', maxCount: 1 }, { name: 'aadhaarBack', maxCount: 1 }]);
 
 router.use(authenticate);

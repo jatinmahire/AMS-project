@@ -17,4 +17,8 @@ const changePasswordSchema = z
     path: ['confirmPassword'],
   });
 
-module.exports = { loginSchema, changePasswordSchema };
+const updateProfileSchema = z.object({
+  fullName: z.string().trim().max(100, 'Display name must be 100 characters or fewer'),
+});
+
+module.exports = { loginSchema, changePasswordSchema, updateProfileSchema };

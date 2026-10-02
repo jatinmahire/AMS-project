@@ -8,6 +8,11 @@ function errorHandler(err, req, res, next) {
     });
   }
 
+  if (err.name === 'MulterError') {
+    const message = err.code === 'LIMIT_FILE_SIZE' ? 'File is too large' : err.message;
+    return res.status(400).json({ message, fieldErrors: err.field ? { [err.field]: message } : undefined });
+  }
+
   if (err.code === 'P2002') {
     const field = err.meta?.target?.[0] || 'field';
     return res.status(409).json({ message: `${field} already exists` });

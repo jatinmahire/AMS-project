@@ -8,6 +8,10 @@ export function getProfile() {
   return api.get('/auth/me').then((res) => res.data);
 }
 
+export function updateProfile(payload) {
+  return api.patch('/auth/profile', payload).then((res) => res.data);
+}
+
 export function changePassword(payload) {
   return api.post('/auth/change-password', payload).then((res) => res.data);
 }

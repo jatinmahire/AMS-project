@@ -18,6 +18,7 @@ const policyRoutes = require('./policyRoutes');
 const holidayRoutes = require('./holidayRoutes');
 const reportRoutes = require('./reportRoutes');
 const notificationRoutes = require('./notificationRoutes');
+const geoRoutes = require('./geoRoutes');
 
 const router = express.Router();
 
@@ -40,5 +41,6 @@ router.use('/policies', policyRoutes);
 router.use('/holidays', holidayRoutes);
 router.use('/reports', reportRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/geo', geoRoutes);
 
 module.exports = router;

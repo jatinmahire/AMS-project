@@ -6,6 +6,7 @@ import PageHeader from '../../components/PageHeader';
 import StatCard from '../../components/StatCard';
 import RecentUpdatesCard from '../../components/RecentUpdatesCard';
 import RecentRegistrationsCard from '../../components/RecentRegistrationsCard';
+import AttendanceOverviewCard from '../../components/AttendanceOverviewCard';
 import { useToast } from '../../context/ToastContext';
 import { getErrorMessage } from '../../utils/errorMessage';
 import './Dashboard.css';
@@ -89,7 +90,7 @@ export default function Dashboard() {
           onTypeChange={setRegistrationType}
         />
         <RecentUpdatesCard activity={activity} loading={activityLoading} />
-        <div />
+        <AttendanceOverviewCard />
       </div>
     </div>
   );

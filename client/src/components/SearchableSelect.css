@@ -1,0 +1,33 @@
+@reference "../index.css";
+
+.searchable-select {
+  @apply relative;
+}
+
+.searchable-select-input {
+  @apply pr-9;
+}
+
+.searchable-select-chevron {
+  @apply pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400;
+}
+
+.searchable-select-list {
+  @apply absolute z-30 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-slate-200 bg-white py-1 text-sm shadow-lg;
+}
+
+.searchable-select-option {
+  @apply cursor-pointer px-3 py-1.5 text-slate-700;
+}
+
+.searchable-select-option-active {
+  @apply bg-primary-50 text-primary-700;
+}
+
+.searchable-select-option-selected {
+  @apply font-semibold;
+}
+
+.searchable-select-empty {
+  @apply px-3 py-2 text-slate-400;
+}

@@ -12,6 +12,7 @@
     "prisma:migrate": "prisma migrate dev"
   },
   "dependencies": {
+    "@countrystatecity/countries": "^1.0.9",
     "@prisma/client": "^6.3.1",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",

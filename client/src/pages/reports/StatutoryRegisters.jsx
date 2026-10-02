@@ -17,9 +17,19 @@ function workerName(row) {
   return `${row.worker.firstName} ${row.worker.lastName}`;
 }
 
+function repaymentLine(r) {
+  return `${formatDate(r.paidDate || r.dueDate)} / ${formatCurrency(r.amount)}`;
+}
+
+// Flat text for CSV export — the on-screen cell stacks these as separate lines instead.
 function repaymentsSummary(row) {
   if (!row.repayments?.length) return '-';
-  return row.repayments.map((r) => `${formatDate(r.paidDate || r.dueDate)} / ${formatCurrency(r.amount)}`).join('; ');
+  return row.repayments.map(repaymentLine).join('; ');
+}
+
+function repaymentsCell(row) {
+  if (!row.repayments?.length) return '-';
+  return row.repayments.map((r, i) => <div key={r.id ?? i}>{repaymentLine(r)}</div>);
 }
 
 function lastRepaymentDate(row) {
@@ -49,7 +59,7 @@ const REGISTER_TYPES = [
       { key: 'amount', label: 'Amount of Advance Made', render: (r) => formatCurrency(r.amount) },
       { key: 'purpose', label: 'Purpose(s) for which Advance Made' },
       { key: 'installmentsCount', label: 'No. of Instalments' },
-      { key: 'repayments', label: 'Date & Amount of Each Instalment Repaid', render: repaymentsSummary },
+      { key: 'repayments', label: 'Date & Amount of Each Instalment Repaid', render: repaymentsCell, exportValue: repaymentsSummary },
       { key: 'lastRepaid', label: 'Date on Which Last Instalment was Repaid', render: lastRepaymentDate },
       { key: 'remarks', label: 'Remark', render: (r) => r.remarks || '-' },
     ],
@@ -178,7 +188,7 @@ export default function StatutoryRegisters() {
 
   function handleExport() {
     const headers = registerConfig.columns.map((c) => c.label);
-    const dataRows = rows.map((row, i) => registerConfig.columns.map((c) => c.render(row, i)));
+    const dataRows = rows.map((row, i) => registerConfig.columns.map((c) => (c.exportValue || c.render)(row, i)));
     exportToCsv(`${registerConfig.value}-register.csv`, headers, dataRows);
   }
 

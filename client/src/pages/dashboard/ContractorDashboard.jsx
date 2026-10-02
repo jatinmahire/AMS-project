@@ -7,6 +7,7 @@ import RecentUpdatesCard from '../../components/RecentUpdatesCard';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { getErrorMessage } from '../../utils/errorMessage';
+import { displayName } from '../../utils/format';
 import './ContractorDashboard.css';
 
 const CARDS = [
@@ -38,7 +39,7 @@ export default function ContractorDashboard() {
     <div>
       <PageHeader
         centered
-        title={`Welcome, ${user?.fullName || user?.loginId}`}
+        title={`Welcome, ${displayName(user)}`}
         description="Your registered workforce and today's attendance."
       />
 

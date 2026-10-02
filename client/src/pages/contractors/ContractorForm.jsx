@@ -8,6 +8,7 @@ import FormSection from '../../components/FormSection';
 import FormField, { TextInput, Select } from '../../components/FormField';
 import NumericInput from '../../components/NumericInput';
 import EmailInput from '../../components/EmailInput';
+import StateCityFields from '../../components/StateCityFields';
 import Button from '../../components/Button';
 import { validateEmailField } from '../../utils/validators';
 import RegistrationSuccessModal from '../../components/RegistrationSuccessModal';
@@ -245,12 +246,12 @@ export default function ContractorForm() {
               <FormField label="Taluka" error={errors.taluka}>
                 <TextInput {...field('taluka')} error={errors.taluka} />
               </FormField>
-              <FormField label="City" error={errors.city}>
-                <TextInput {...field('city')} error={errors.city} />
-              </FormField>
-              <FormField label="State" error={errors.state}>
-                <TextInput {...field('state')} error={errors.state} />
-              </FormField>
+              <StateCityFields
+                state={form.state}
+                city={form.city}
+                onChange={(changes) => setForm((prev) => ({ ...prev, ...changes }))}
+                errors={errors}
+              />
               <FormField label="Pincode" error={errors.pincode}>
                 <NumericInput {...field('pincode')} error={errors.pincode} exactLength={6} label="Pincode" />
               </FormField>

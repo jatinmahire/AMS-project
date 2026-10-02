@@ -24,6 +24,10 @@ export function listActivity(params) {
   return api.get('/dashboard/activity', { params }).then((res) => res.data);
 }
 
+export function getAttendanceOverview(range) {
+  return api.get('/dashboard/attendance-overview', { params: { range } }).then((res) => res.data);
+}
+
 export function getRecentRegistrations(type) {
   return api.get('/dashboard/recent-registrations', { params: { type } }).then((res) => res.data);
 }

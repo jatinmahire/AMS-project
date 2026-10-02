@@ -175,6 +175,80 @@ async function listActivity(user, { action, from, to, page = 1, limit = 20 }) {
   return { data: logs.map(toActivityRow), total, page, limit };
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function overviewRange(range) {
+  const today = todayDateOnly();
+  if (range === 'yesterday') {
+    const day = new Date(today.getTime() - DAY_MS);
+    return { from: day, to: day };
+  }
+  if (range === 'week') {
+    return { from: new Date(today.getTime() - 6 * DAY_MS), to: today };
+  }
+  return { from: today, to: today };
+}
+
+// Rounds to whole percentages that always add up to exactly 100 (largest-remainder),
+// so the gauge arcs and the list beneath it never disagree.
+function percentagesOf(counts) {
+  const sum = counts.reduce((a, b) => a + b, 0);
+  if (sum === 0) return counts.map(() => 0);
+  const raw = counts.map((c) => (c / sum) * 100);
+  const floors = raw.map(Math.floor);
+  let remainder = 100 - floors.reduce((a, b) => a + b, 0);
+  raw
+    .map((value, index) => ({ index, frac: value - Math.floor(value) }))
+    .sort((a, b) => b.frac - a.frac)
+    .forEach(({ index }) => {
+      if (remainder > 0) {
+        floors[index] += 1;
+        remainder -= 1;
+      }
+    });
+  return floors;
+}
+
+async function getAttendanceOverview(user, range = 'today') {
+  const key = ['today', 'yesterday', 'week'].includes(range) ? range : 'today';
+  const { from, to } = overviewRange(key);
+  const contractorId = await scopedContractorId(user);
+  const workerScope = contractorId ? { worker: { contractorId } } : {};
+
+  const [byStatus, overtimeRows] = await Promise.all([
+    prisma.attendance.groupBy({
+      by: ['status'],
+      where: { date: { gte: from, lte: to }, ...workerScope },
+      _count: { _all: true },
+    }),
+    prisma.overtime.findMany({
+      where: { otDate: { gte: from, lt: new Date(to.getTime() + DAY_MS) }, ...workerScope },
+      select: { workerId: true, otDate: true },
+    }),
+  ]);
+
+  const countOf = (status) => byStatus.find((row) => row.status === status)?._count._all || 0;
+  const present = countOf('PRESENT');
+  const absent = countOf('ABSENT');
+  const total = byStatus.reduce((sum, row) => sum + row._count._all, 0);
+  const overtime = new Set(overtimeRows.map((row) => `${row.workerId}|${row.otDate.toISOString().slice(0, 10)}`)).size;
+
+  const counts = [present, absent, overtime];
+  const [presentPct, absentPct, overtimePct] = percentagesOf(counts);
+
+  return {
+    range: key,
+    from: from.toISOString().slice(0, 10),
+    to: to.toISOString().slice(0, 10),
+    total,
+    segments: [
+      { key: 'present', label: 'Present', count: present, percent: presentPct },
+      { key: 'absent', label: 'Absent', count: absent, percent: absentPct },
+      { key: 'overtime', label: 'Overtime', count: overtime, percent: overtimePct },
+    ],
+  };
+}
+
 const RECENT_REGISTRATIONS_LIMIT = 8;
 
 function toRegistrationRow(type, row) {
@@ -251,4 +325,5 @@ module.exports = {
   getRecentActivity,
   listActivity,
   getRecentRegistrations,
+  getAttendanceOverview,
 };

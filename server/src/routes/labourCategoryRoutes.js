@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.use(authenticate);
 
-router.get('/', requireRole('ADMIN', 'SUPERVISOR'), labourCategoryController.list);
+router.get('/', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), labourCategoryController.list);
 router.get('/:id', requireRole('ADMIN'), labourCategoryController.getById);
 router.post('/', requireRole('ADMIN'), validate(labourCategorySchema), labourCategoryController.create);
 router.put('/:id', requireRole('ADMIN'), validate(labourCategorySchema), labourCategoryController.update);

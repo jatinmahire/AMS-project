@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.use(authenticate);
 
-router.get('/', requireRole('ADMIN', 'SUPERVISOR'), designationController.list);
+router.get('/', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), designationController.list);
 router.get('/:id', requireRole('ADMIN'), designationController.getById);
 router.post('/', requireRole('ADMIN'), validate(designationSchema), designationController.create);
 router.put('/:id', requireRole('ADMIN'), validate(designationSchema), designationController.update);

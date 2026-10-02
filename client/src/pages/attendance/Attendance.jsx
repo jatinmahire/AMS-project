@@ -9,7 +9,7 @@ import Pagination from '../../components/Pagination';
 import StatusBadge from '../../components/StatusBadge';
 import { listAttendance } from '../../api/attendance';
 import { getErrorMessage } from '../../utils/errorMessage';
-import { formatDate } from '../../utils/format';
+import { displayName, formatDate } from '../../utils/format';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import './Attendance.css';
@@ -64,6 +64,7 @@ export default function Attendance() {
     { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> },
     { key: 'buildingNo', label: 'Building', render: (row) => row.buildingNo || '-' },
     { key: 'source', label: 'Source' },
+    { key: 'markedBy', label: 'Marked By', render: (row) => displayName(row.markedByUser) || '-' },
     {
       key: 'actions',
       label: 'Actions',

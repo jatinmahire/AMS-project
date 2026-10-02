@@ -53,7 +53,7 @@ function buildAuditMessage(log) {
 
 function actorLabel(user) {
   if (!user) return 'Someone';
-  if (user.role === 'ADMIN') return 'Admin';
+  if (user.role === 'ADMIN') return user.fullName?.trim() || 'Admin';
   const role = user.role ? user.role.charAt(0) + user.role.slice(1).toLowerCase() : '';
   return `${role} ${user.fullName || user.loginId || ''}`.trim();
 }

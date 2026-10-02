@@ -37,7 +37,7 @@ const EXPORT_FIELDS = [
 function imageCell(url) {
   if (!url) return '-';
   return (
-    <a href={url} target="_blank" rel="noreferrer" className="workers-image-cell">
+    <a href={url} target="_blank" rel="noopener noreferrer" className="workers-image-cell">
       <img src={url} alt="" className="workers-image-cell-img" />
     </a>
   );

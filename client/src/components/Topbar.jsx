@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronDown, ClipboardCheck, KeyRound, LogOut, Menu, Search, User, X } from 'lucide-react';
 import './Topbar.css';
 import { useAuth } from '../context/AuthContext';
-import { initials } from '../utils/format';
+import { displayName, initials } from '../utils/format';
 import { searchWorkers } from '../api/workers';
 import ChangePasswordModal from './ChangePasswordModal';
 import NotificationBell from './NotificationBell';
@@ -123,7 +123,7 @@ export default function Topbar({ onToggleNav }) {
             className="topbar-avatar-trigger"
           >
             <span className="topbar-avatar-badge">
-              {initials(user?.fullName || user?.loginId)}
+              {initials(displayName(user))}
             </span>
             <ChevronDown size={16} className="topbar-avatar-chevron" />
           </button>
@@ -134,11 +134,11 @@ export default function Topbar({ onToggleNav }) {
               <div className="topbar-menu-panel">
                 <div className="topbar-menu-header">
                   <span className="topbar-menu-avatar">
-                    {initials(user?.fullName || user?.loginId)}
+                    {initials(displayName(user))}
                   </span>
                   <div className="topbar-menu-name-wrapper">
                     <p className="topbar-menu-name">
-                      {user?.fullName || user?.loginId}
+                      {displayName(user)}
                     </p>
                     <p className="topbar-menu-login-id">{user?.loginId}</p>
                   </div>
