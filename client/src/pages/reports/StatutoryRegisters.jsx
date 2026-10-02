@@ -51,7 +51,6 @@ const REGISTER_TYPES = [
     columns: [
       { key: 'srNo', label: 'Sr. No.', render: (r, i) => i + 1 },
       { key: 'name', label: 'Name of the Workmen', render: workerName },
-      { key: 'father', label: "Father's/Husband's Name", render: (r) => r.worker.fatherOrHusbandName || '-' },
       { key: 'advanceDate', label: 'Date of Advance', render: (r) => formatDate(r.advanceDate) },
       { key: 'sex', label: 'Sex', render: (r) => r.worker.gender || '-' },
       { key: 'designation', label: 'Nature of Employment / Designation', render: (r) => r.worker.designation?.designationName || '-' },
@@ -118,7 +117,6 @@ const REGISTER_TYPES = [
       { key: 'srNo', label: 'Sr. No.', render: (r, i) => i + 1 },
       { key: 'workerId', label: 'Worker Id', render: (r) => r.worker.workerCode },
       { key: 'name', label: 'Name of the Workmen', render: workerName },
-      { key: 'father', label: "Father's/Husband's Name", render: (r) => r.worker.fatherOrHusbandName || '-' },
       { key: 'designation', label: 'Designation / Nature of Employment', render: (r) => r.worker.designation?.designationName || '-' },
       { key: 'offence', label: 'Act/Omission for which Fine Imposed' },
       { key: 'offenceDate', label: 'Date of Offence', render: (r) => formatDate(r.offenceDate) },
@@ -142,7 +140,6 @@ const REGISTER_TYPES = [
     columns: [
       { key: 'srNo', label: 'Sr. No.', render: (r, i) => i + 1 },
       { key: 'name', label: 'Name of Workman', render: workerName },
-      { key: 'father', label: "Father's/Husband's Name", render: (r) => r.worker.fatherOrHusbandName || '-' },
       { key: 'otDate', label: 'Date on which Overtime Worked', render: (r) => formatDate(r.otDate) },
       { key: 'sex', label: 'Sex', render: (r) => r.worker.gender || '-' },
       { key: 'designation', label: 'Designation / Nature of Employment', render: (r) => r.worker.designation?.designationName || '-' },

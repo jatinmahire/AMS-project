@@ -15,10 +15,13 @@ export default function FormField({ label, error, required, children, className 
 
 const baseInputClass = 'form-field-input-base';
 
-export function TextInput({ error, className = '', ...props }) {
+export function TextInput({ error, className = '', onWheel, ...props }) {
+  // Scrolling the page over a focused number input silently changes its value — blur it instead.
+  const handleWheel = props.type === 'number' ? (e) => { e.currentTarget.blur(); onWheel?.(e); } : onWheel;
   return (
     <input
       className={`${baseInputClass} ${error ? 'form-field-input-error' : ''} ${className}`}
+      onWheel={handleWheel}
       {...props}
     />
   );

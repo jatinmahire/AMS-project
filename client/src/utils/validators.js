@@ -54,3 +54,16 @@ export function validateUploadFile(file, rule) {
   if (file.size > rule.maxBytes) return `File must be ${rule.sizeLabel} or smaller`;
   return undefined;
 }
+
+export const MIN_DOB = '1900-01-01';
+
+// Mirrors the server's adultDob rule: 4-digit year in 1900..current year, and MIN_WORKER_AGE+.
+export function validateDob(value, label = 'Person') {
+  if (!value) return undefined;
+  const match = /^(\d+)-\d{2}-\d{2}$/.exec(value);
+  if (!match || match[1].length !== 4) return 'Enter a valid date of birth (year must be 4 digits)';
+  const year = Number(match[1]);
+  if (year < 1900 || year > new Date().getFullYear()) return 'Year must be between 1900 and the current year';
+  if (value > maxAdultDob()) return `${label} must be at least ${MIN_WORKER_AGE} years old`;
+  return undefined;
+}

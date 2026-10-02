@@ -1,10 +1,10 @@
 const { z } = require('zod');
-const { optionalString, optionalDate, emailString, digitsString, optionalExactDigitsString } = require('./common');
+const { adultDob, optionalString, optionalDate, emailString, digitsString, optionalExactDigitsString } = require('./common');
 
 const supervisorSchema = z.object({
   fullName: z.string().min(1, 'Full name is required').max(150),
   gender: z.enum(['MALE', 'FEMALE', 'OTHER'], { errorMap: () => ({ message: 'Select a gender' }) }),
-  dob: z.coerce.date({ errorMap: () => ({ message: 'Date of birth is required' }) }),
+  dob: adultDob('Supervisor'),
   contactNo: digitsString(10, 'Contact number must be exactly 10 digits'),
   email: emailString(),
   aadhaarNo: digitsString(12, 'Aadhaar number must be exactly 12 digits'),

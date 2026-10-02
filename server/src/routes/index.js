@@ -19,6 +19,7 @@ const holidayRoutes = require('./holidayRoutes');
 const reportRoutes = require('./reportRoutes');
 const notificationRoutes = require('./notificationRoutes');
 const geoRoutes = require('./geoRoutes');
+const verificationRoutes = require('./verificationRoutes');
 
 const router = express.Router();
 
@@ -42,5 +43,6 @@ router.use('/holidays', holidayRoutes);
 router.use('/reports', reportRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/geo', geoRoutes);
+router.use('/verifications', verificationRoutes);
 
 module.exports = router;

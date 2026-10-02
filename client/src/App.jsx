@@ -22,6 +22,8 @@ import Supervisors from './pages/supervisors/Supervisors';
 import SupervisorForm from './pages/supervisors/SupervisorForm';
 import SupervisorView from './pages/supervisors/SupervisorView';
 import Workers from './pages/workers/Workers';
+import VerificationList from './pages/verifications/VerificationList';
+import VerificationForm from './pages/verifications/VerificationForm';
 import WorkerForm from './pages/workers/WorkerForm';
 import WorkerView from './pages/workers/WorkerView';
 import KycLookup from './pages/kyc/KycLookup';
@@ -107,6 +109,8 @@ export default function App() {
 
             <Route path="/workers" element={<Protected roles={['ADMIN', 'CONTRACTOR']}><Workers /></Protected>} />
             <Route path="/workers/new" element={<Protected roles={ALL_ROLES}><WorkerForm /></Protected>} />
+            <Route path="/verifications/:type" element={<Protected roles={SHARED_ROLES}><VerificationList /></Protected>} />
+            <Route path="/verifications/:type/:workerId" element={<Protected roles={SHARED_ROLES}><VerificationForm /></Protected>} />
             <Route path="/workers/:id/edit" element={<Protected><WorkerForm /></Protected>} />
             <Route path="/workers/:id" element={<Protected roles={ALL_ROLES}><WorkerView /></Protected>} />
 

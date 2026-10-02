@@ -1,23 +1,32 @@
 @reference "../index.css";
 
+.view-field {
+  @apply flex items-baseline gap-2 py-1 text-sm;
+}
+
 .view-field-label {
-  @apply text-xs font-medium uppercase tracking-wide text-slate-400;
+  @apply w-40 flex-none font-medium text-slate-500;
+}
+
+.view-field-separator {
+  @apply flex-none text-slate-400;
 }
 
 .view-field-value {
-  @apply mt-0.5 text-sm text-slate-800;
+  @apply min-w-0 flex-1 break-words text-slate-800;
 }
 
 .view-section {
-  @apply flex min-h-[180px] flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm;
+  @apply flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm;
 }
 
+/* Same treatment as .form-section-title so form and view headings match. */
 .view-section-title {
-  @apply mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500;
+  @apply mb-3 text-sm font-bold uppercase tracking-wider text-slate-900;
 }
 
 .view-section-grid {
-  @apply grid grid-cols-2 gap-4;
+  @apply flex flex-col divide-y divide-slate-100;
 }
 
 .view-card {

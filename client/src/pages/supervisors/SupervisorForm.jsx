@@ -10,7 +10,7 @@ import NumericInput from '../../components/NumericInput';
 import EmailInput from '../../components/EmailInput';
 import StateCityFields from '../../components/StateCityFields';
 import Button from '../../components/Button';
-import { AADHAAR_FILE_RULE, validateEmailField, validateUploadFile } from '../../utils/validators';
+import { AADHAAR_FILE_RULE, MIN_DOB, maxAdultDob, validateDob, validateEmailField, validateUploadFile } from '../../utils/validators';
 import RegistrationSuccessModal from '../../components/RegistrationSuccessModal';
 import { getSupervisor, createSupervisor, updateSupervisor } from '../../api/supervisors';
 import { contractorDropdown } from '../../api/contractors';
@@ -103,6 +103,10 @@ export default function SupervisorForm() {
     if (STEP_FIELDS[stepIndex].includes('email') && !stepErrors.email) {
       const emailErr = validateEmailField(form.email);
       if (emailErr) stepErrors.email = emailErr;
+    }
+    if (STEP_FIELDS[stepIndex].includes('dob') && !stepErrors.dob) {
+      const dobError = validateDob(form.dob, 'Supervisor');
+      if (dobError) stepErrors.dob = dobError;
     }
     return stepErrors;
   }
@@ -207,7 +211,7 @@ export default function SupervisorForm() {
               </Select>
             </FormField>
             <FormField label="Date of Birth" required error={errors.dob}>
-              <TextInput type="date" {...field('dob')} error={errors.dob} />
+              <TextInput type="date" {...field('dob')} min={MIN_DOB} max={maxAdultDob()} error={errors.dob} />
             </FormField>
             <FormField label="Contact No." required error={errors.contactNo}>
               <NumericInput {...field('contactNo')} error={errors.contactNo} exactLength={10} label="Contact number" />

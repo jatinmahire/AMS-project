@@ -14,7 +14,6 @@ async function getMusterRoll({ contractorId, month }) {
     workerCode: row.worker.workerCode,
     uanNumber: row.worker.uanNumber,
     fullName: `${row.worker.firstName} ${row.worker.middleName ? row.worker.middleName + ' ' : ''}${row.worker.lastName}`,
-    fatherOrHusbandName: row.worker.fatherOrHusbandName,
     gender: row.worker.gender,
     dob: row.worker.dob,
     doj: row.worker.joinDate,

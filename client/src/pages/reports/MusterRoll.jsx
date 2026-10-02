@@ -51,7 +51,6 @@ export default function MusterRoll() {
     { key: 'workerCode', label: 'Worker ID' },
     { key: 'uanNumber', label: 'UAN No', render: (r) => r.uanNumber || '-' },
     { key: 'fullName', label: 'Full Name' },
-    { key: 'fatherOrHusbandName', label: "Father's Name", render: (r) => r.fatherOrHusbandName || '-' },
     { key: 'gender', label: 'Gender' },
     { key: 'dob', label: 'DOB', render: (r) => formatDate(r.dob) },
     { key: 'doj', label: 'DOJ', render: (r) => formatDate(r.doj) },

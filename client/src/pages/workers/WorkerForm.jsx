@@ -16,7 +16,7 @@ import { toDateInputValue } from '../../utils/format';
 import { toFormData } from '../../utils/toFormData';
 import { getErrorMessage, getFieldErrors } from '../../utils/errorMessage';
 import {
-  AADHAAR_FILE_RULE, IFSC_REGEX, MIN_WORKER_AGE, PAN_REGEX, maxAdultDob, validatePattern, validateUploadFile,
+  AADHAAR_FILE_RULE, IFSC_REGEX, MIN_DOB, PAN_REGEX, maxAdultDob, validateDob, validatePattern, validateUploadFile,
 } from '../../utils/validators';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
@@ -26,7 +26,7 @@ const EMPTY_FORM = {
   firstName: '', middleName: '', lastName: '', dob: '', gender: 'MALE', maritalStatus: '', mobileNo: '',
   permanentAddress: '', currentAddress: '', village: '', taluka: '', city: '', district: '', state: '', pincode: '',
   contractorId: '', designationId: '', labourCategoryId: '',
-  idType: 'AADHAAR', idNumber: '', policeVerified: false, joinDate: '', sector: '', status: 'ACTIVE',
+  idType: 'AADHAAR', idNumber: '', joinDate: '', sector: '', status: 'ACTIVE',
   bocwRegistrationNo: '', bocwIssueDate: '', bocwValidDate: '',
   pfNumber: '', uanNumber: '', esicNumber: '', panNumber: '', ipNumber: '',
   bankName: '', bankBranch: '', accountNo: '', ifscCode: '',
@@ -51,7 +51,7 @@ const STEP_FIELDS = [
   ['firstName', 'middleName', 'lastName', 'dob', 'gender', 'maritalStatus', 'mobileNo'],
   ['permanentAddress', 'currentAddress', 'village', 'taluka', 'city', 'district', 'state', 'pincode'],
   [
-    'contractorId', 'designationId', 'labourCategoryId', 'idType', 'idNumber', 'policeVerified', 'joinDate',
+    'contractorId', 'designationId', 'labourCategoryId', 'idType', 'idNumber', 'joinDate',
     'photo', 'idFront', 'idBack', 'bankPassbook', 'bocwRegistrationNo', 'bocwIssueDate', 'bocwValidDate', 'pfNumber', 'uanNumber', 'esicNumber', 'panNumber', 'ipNumber',
   ],
   ['bankName', 'bankBranch', 'accountNo', 'ifscCode', 'nomineeName', 'nomineeRelation', 'nomineeChildrenCount', 'nomineeQualification', 'nomineeMobile', 'sector'],
@@ -156,8 +156,9 @@ export default function WorkerForm() {
     for (const key of STEP_REQUIRED_FIELDS[stepIndex]) {
       if (isBlank(form[key])) stepErrors[key] = 'This field is required';
     }
-    if (STEP_FIELDS[stepIndex].includes('dob') && form.dob && form.dob > maxAdultDob()) {
-      stepErrors.dob = `Worker must be at least ${MIN_WORKER_AGE} years old`;
+    if (STEP_FIELDS[stepIndex].includes('dob') && !stepErrors.dob) {
+      const dobError = validateDob(form.dob, 'Worker');
+      if (dobError) stepErrors.dob = dobError;
     }
     for (const [key, { regex, label, example }] of Object.entries(PATTERN_FIELDS)) {
       if (STEP_FIELDS[stepIndex].includes(key) && !stepErrors[key]) {
@@ -268,7 +269,7 @@ export default function WorkerForm() {
               <TextInput {...field('lastName')} error={errors.lastName} />
             </FormField>
             <FormField label="Date of Birth" required error={errors.dob}>
-              <TextInput type="date" {...field('dob')} max={maxAdultDob()} error={errors.dob} />
+              <TextInput type="date" {...field('dob')} min={MIN_DOB} max={maxAdultDob()} error={errors.dob} />
             </FormField>
             <FormField label="Gender" required error={errors.gender}>
               <Select {...field('gender')}>
@@ -365,16 +366,7 @@ export default function WorkerForm() {
                 </Select>
               </FormField>
               <FormField label="ID Number" required error={errors.idNumber}>
-                <TextInput {...field('idNumber')} error={errors.idNumber} />
-              </FormField>
-              <FormField label="Police Verified">
-                <Select
-                  value={form.policeVerified ? 'true' : 'false'}
-                  onChange={(e) => setForm({ ...form, policeVerified: e.target.value === 'true' })}
-                >
-                  <option value="false">No</option>
-                  <option value="true">Yes</option>
-                </Select>
+                <TextInput {...field('idNumber')} maxLength={15} error={errors.idNumber} />
               </FormField>
               {FILE_FIELDS.map((f) => (
                 <FormField label={f.rule ? `${f.label} (${f.rule.typeLabel}, max ${f.rule.sizeLabel})` : f.label} key={f.key} error={errors[f.key]}>

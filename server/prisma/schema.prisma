@@ -99,6 +99,7 @@ model User {
   markedAttendances Attendance[]
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
+  verificationsDone WorkerVerification[]
 }
 
 model Contractor {
@@ -272,6 +273,7 @@ model Worker {
   @@index([contractorId])
   @@index([designationId])
   @@index([labourCategoryId])
+  verifications        WorkerVerification[]
 }
 
 model Attendance {
@@ -483,4 +485,37 @@ model AuditLog {
 
   @@index([entityType, entityId])
   @@index([contractorId, timestamp])
+}
+
+
+enum VerificationType {
+  AADHAAR
+  POLICE
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  NOT_REQUIRED
+}
+
+// Manual attestation: an authorised user records that they personally checked the document.
+// There is no third-party verification API behind this.
+model WorkerVerification {
+  id               String             @id @default(uuid())
+  workerId         String
+  worker           Worker             @relation(fields: [workerId], references: [id])
+  type             VerificationType
+  status           VerificationStatus @default(PENDING)
+  verifiedByUserId String?
+  verifiedByUser   User?              @relation(fields: [verifiedByUserId], references: [id])
+  verifiedAt       DateTime?
+  referenceNo      String?
+  remarks          String?
+  documentUrl      String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@unique([workerId, type])
 }

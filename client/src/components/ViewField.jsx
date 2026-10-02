@@ -2,9 +2,10 @@ import './ViewField.css';
 
 export function ViewField({ label, value }) {
   return (
-    <div>
-      <p className="view-field-label">{label}</p>
-      <p className="view-field-value">{value ?? '-'}</p>
+    <div className="view-field">
+      <span className="view-field-label">{label}</span>
+      <span className="view-field-separator">:</span>
+      <span className="view-field-value">{value ?? '-'}</span>
     </div>
   );
 }

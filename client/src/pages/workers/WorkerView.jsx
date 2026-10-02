@@ -66,7 +66,6 @@ export default function WorkerView() {
         <ViewSection title="Personal">
           <ViewField label="Worker Code" value={worker.workerCode} />
           <ViewField label="Name" value={`${worker.firstName} ${worker.middleName || ''} ${worker.lastName}`} />
-          <ViewField label="Father/Husband Name" value={worker.fatherOrHusbandName} />
           <ViewField label="Gender" value={worker.gender} />
           <ViewField label="Date of Birth" value={formatDate(worker.dob)} />
           <ViewField label="Mobile" value={worker.mobileNo} />
@@ -95,7 +94,6 @@ export default function WorkerView() {
         <ViewSection title="Identity & Statutory">
           <ViewField label="ID Type" value={worker.idType} />
           <ViewField label="ID Number" value={worker.idNumber} />
-          <ViewField label="Police Verified" value={worker.policeVerified ? 'Yes' : 'No'} />
           <ViewField label="BOCW Registration No." value={worker.bocwRegistrationNo} />
           <ViewField label="PF Number" value={worker.pfNumber} />
           <ViewField label="UAN Number" value={worker.uanNumber} />

@@ -18,7 +18,7 @@ import './Workers.css';
 
 const EXPORT_FIELDS = [
   ['workerCode', 'Worker Id'], ['firstName', 'First Name'], ['middleName', 'Middle Name'], ['lastName', 'Last Name'],
-  ['fatherOrHusbandName', 'Father/Husband Name'], ['gender', 'Gender'], ['dob', 'DOB', formatDate],
+  ['gender', 'Gender'], ['dob', 'DOB', formatDate],
   ['maritalStatus', 'Marital Status'], ['mobileNo', 'Mobile No'], ['permanentAddress', 'Permanent Address'],
   ['currentAddress', 'Current Address'], ['village', 'Village'], ['taluka', 'Taluka'], ['city', 'City'],
   ['district', 'District'], ['state', 'State'], ['pincode', 'Pin Code'],

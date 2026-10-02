@@ -1,17 +1,8 @@
 const { z } = require('zod');
-const { optionalString, optionalDate, digitsString, optionalDigitsString, optionalExactDigitsString } = require('./common');
+const { adultDob, optionalString, optionalDate, digitsString, optionalDigitsString, optionalExactDigitsString } = require('./common');
 
 const PAN_REGEX = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
 const IFSC_REGEX = /^[A-Z]{4}0[A-Z0-9]{6}$/;
-const MIN_WORKER_AGE = 18;
-
-// Recomputed on every request, so the cutoff moves forward each year with no code change.
-function latestAllowedDob() {
-  const cutoff = new Date();
-  cutoff.setFullYear(cutoff.getFullYear() - MIN_WORKER_AGE);
-  return cutoff;
-}
-
 const requiredString = (label, max) => z.string({ required_error: `${label} is required` }).trim().min(1, `${label} is required`).max(max);
 
 const upperPattern = (label, regex, example) =>
@@ -24,10 +15,7 @@ const workerSchema = z.object({
   firstName: z.string().min(1, 'First name is required').max(100),
   middleName: optionalString(100),
   lastName: z.string().min(1, 'Last name is required').max(100),
-  fatherOrHusbandName: optionalString(150),
-  dob: z.coerce
-    .date({ errorMap: () => ({ message: 'Date of birth is required' }) })
-    .refine((d) => d <= latestAllowedDob(), `Worker must be at least ${MIN_WORKER_AGE} years old`),
+  dob: adultDob('Worker'),
   gender: z.enum(['MALE', 'FEMALE', 'OTHER'], { errorMap: () => ({ message: 'Select a gender' }) }),
   maritalStatus: z.enum(['MARRIED', 'UNMARRIED'], { errorMap: () => ({ message: 'Marital status is required' }) }),
   mobileNo: digitsString(10, 'Mobile number must be exactly 10 digits'),
@@ -43,7 +31,7 @@ const workerSchema = z.object({
   designationId: z.string().min(1, 'Designation is required'),
   labourCategoryId: z.string().min(1, 'Labour category is required'),
   idType: z.enum(['AADHAAR', 'PAN', 'VOTER_ID'], { errorMap: () => ({ message: 'Select an ID type' }) }),
-  idNumber: z.string().min(1, 'ID number is required').max(50),
+  idNumber: z.string().trim().min(1, 'ID number is required').max(15, 'ID number can be at most 15 characters'),
   bocwRegistrationNo: optionalString(50),
   bocwIssueDate: optionalDate(),
   bocwValidDate: optionalDate(),
@@ -52,7 +40,6 @@ const workerSchema = z.object({
   esicNumber: optionalDigitsString(17, 'ESIC number must be digits only'),
   panNumber: upperPattern('PAN number', PAN_REGEX, 'ABCDE1234F'),
   ipNumber: optionalDigitsString(10, 'IP number must be digits only'),
-  policeVerified: z.preprocess((v) => v === 'true' || v === true, z.boolean()).optional(),
   joinDate: z.coerce.date({ errorMap: () => ({ message: 'Join date is required' }) }),
   bankName: requiredString('Bank name', 100),
   bankBranch: requiredString('Bank branch', 100),

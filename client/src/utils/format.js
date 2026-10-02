@@ -85,6 +85,7 @@ export function statusColor(status) {
     case 'ACTIVE':
     case 'PRESENT':
     case 'PAID':
+    case 'VERIFIED':
       return 'status-badge-success';
     case 'INACTIVE':
     case 'HALF_DAY':
@@ -92,6 +93,7 @@ export function statusColor(status) {
       return 'status-badge-warning';
     case 'BLACKLISTED':
     case 'ABSENT':
+    case 'REJECTED':
       return 'status-badge-danger';
     default:
       return 'status-badge-neutral';

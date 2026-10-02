@@ -51,6 +51,14 @@ const SUPERVISOR_SECTIONS = [
     items: [{ to: '/reports/90-days', label: '90-Days Form', icon: FileText }],
   },
   {
+    title: 'Verification',
+    icon: ShieldCheck,
+    items: [
+      { to: '/verifications/aadhaar', label: 'Aadhaar Verification', icon: ShieldCheck },
+      { to: '/verifications/police', label: 'Police Verification', icon: ShieldCheck },
+    ],
+  },
+  {
     title: 'Notifications',
     icon: Bell,
     items: [{ to: '/notifications', label: 'Notifications', icon: Bell }],
@@ -151,6 +159,14 @@ const ADMIN_SECTIONS = [
       { to: '/kyc?type=supervisor', label: 'Supervisor KYC', icon: Search },
       { to: '/kyc?type=contractor', label: 'Contractor KYC', icon: Search },
       { to: '/kyc?type=worker', label: 'Worker KYC', icon: Search },
+    ],
+  },
+  {
+    title: 'Verification',
+    icon: ShieldCheck,
+    items: [
+      { to: '/verifications/aadhaar', label: 'Aadhaar Verification', icon: ShieldCheck },
+      { to: '/verifications/police', label: 'Police Verification', icon: ShieldCheck },
     ],
   },
   {

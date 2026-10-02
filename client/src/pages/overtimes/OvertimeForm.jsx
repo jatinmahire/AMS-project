@@ -15,6 +15,8 @@ import './OvertimeForm.css';
 
 const EMPTY_FORM = { otDate: '', hoursWorked: '', normalWageRate: '', otWageRate: '', remarks: '' };
 
+const POSITIVE_FIELDS = [['hoursWorked', 'Hours worked'], ['normalWageRate', 'Normal wage rate'], ['otWageRate', 'OT wage rate']];
+
 export default function OvertimeForm() {
   const { id } = useParams();
   const isEdit = !!id;
@@ -54,6 +56,14 @@ export default function OvertimeForm() {
     e.preventDefault();
     if (!worker) {
       setErrors({ workerId: 'Select a worker' });
+      return;
+    }
+    const amountErrors = {};
+    for (const [key, label] of POSITIVE_FIELDS) {
+      if (!(Number(form[key]) > 0)) amountErrors[key] = `${label} must be greater than 0`;
+    }
+    if (Object.keys(amountErrors).length) {
+      setErrors(amountErrors);
       return;
     }
     setSaving(true);
@@ -97,13 +107,13 @@ export default function OvertimeForm() {
             <TextInput type="date" {...field('otDate')} error={errors.otDate} />
           </FormField>
           <FormField label="Hours Worked" required error={errors.hoursWorked}>
-            <TextInput type="number" step="0.25" {...field('hoursWorked')} error={errors.hoursWorked} />
+            <TextInput type="number" step="0.25" min="0" {...field('hoursWorked')} error={errors.hoursWorked} />
           </FormField>
           <FormField label="Normal Wage Rate" required error={errors.normalWageRate}>
-            <TextInput type="number" step="0.01" {...field('normalWageRate')} error={errors.normalWageRate} />
+            <TextInput type="number" step="0.01" min="0" {...field('normalWageRate')} error={errors.normalWageRate} />
           </FormField>
           <FormField label="OT Wage Rate" required error={errors.otWageRate}>
-            <TextInput type="number" step="0.01" {...field('otWageRate')} error={errors.otWageRate} />
+            <TextInput type="number" step="0.01" min="0" {...field('otWageRate')} error={errors.otWageRate} />
           </FormField>
           <div className="overtime-form-earnings-box">
             Estimated OT Earnings: <span className="overtime-form-earnings-value">{formatCurrency(estimatedEarnings)}</span>

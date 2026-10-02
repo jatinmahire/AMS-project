@@ -170,7 +170,6 @@ async function statutoryRegister(type, { contractorId, month }) {
           workerCode: true,
           firstName: true,
           lastName: true,
-          fatherOrHusbandName: true,
           gender: true,
           designation: { select: { designationName: true } },
           contractor: { select: { contractorName: true } },

@@ -51,7 +51,30 @@ const optionalExactDigitsString = (length, message) => {
   return z.preprocess((v) => (v === '' || v === null || v === undefined ? undefined : v), base.optional());
 };
 
+const MIN_AGE = 18;
+const MIN_DOB_YEAR = 1900;
+
+// DOB for a person who must be an adult today. Recomputed per request, so the 18-year cutoff
+// moves forward each year with no code change. The strict YYYY-MM-DD check rejects values
+// like 26666-12-12 that some browsers' date inputs let through.
+const adultDob = (label = 'Person') =>
+  z
+    .string({ required_error: 'Date of birth is required' })
+    .regex(/^\d{4}-\d{2}-\d{2}/, 'Enter a valid date of birth (year must be 4 digits)')
+    .transform((v) => new Date(v))
+    .refine((d) => !Number.isNaN(d.getTime()), 'Enter a valid date of birth')
+    .refine(
+      (d) => d.getUTCFullYear() >= MIN_DOB_YEAR && d.getUTCFullYear() <= new Date().getFullYear(),
+      `Year must be between ${MIN_DOB_YEAR} and the current year`
+    )
+    .refine((d) => {
+      const cutoff = new Date();
+      cutoff.setFullYear(cutoff.getFullYear() - MIN_AGE);
+      return d <= cutoff;
+    }, `${label} must be at least ${MIN_AGE} years old`);
+
 module.exports = {
+  adultDob,
   optionalString,
   optionalDate,
   optionalNumber,
