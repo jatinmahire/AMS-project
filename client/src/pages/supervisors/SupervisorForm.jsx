@@ -201,7 +201,7 @@ export default function SupervisorForm() {
         {currentStep === 0 && (
           <FormSection title="Personal Info">
             <FormField label="Full Name" required error={errors.fullName}>
-              <TextInput {...field('fullName')} error={errors.fullName} />
+              <TextInput {...field('fullName')} maxLength={30} error={errors.fullName} />
             </FormField>
             <FormField label="Gender" required error={errors.gender}>
               <Select {...field('gender')}>

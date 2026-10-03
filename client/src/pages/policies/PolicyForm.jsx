@@ -138,10 +138,10 @@ export default function PolicyForm() {
             <TextInput type="number" min="0" {...field('workerCount')} error={errors.workerCount} />
           </FormField>
           <FormField label="Project Value" error={errors.projectValue}>
-            <TextInput type="number" step="0.01" {...field('projectValue')} error={errors.projectValue} />
+            <TextInput type="number" step="0.01" min="0" {...field('projectValue')} error={errors.projectValue} />
           </FormField>
           <FormField label="Person Value" error={errors.personValue}>
-            <TextInput type="number" step="0.01" {...field('personValue')} error={errors.personValue} />
+            <TextInput type="number" step="0.01" min="0" {...field('personValue')} error={errors.personValue} />
           </FormField>
           <FormField label="Remarks" error={errors.remarks} className="policy-form-col-span">
             <Textarea {...field('remarks')} error={errors.remarks} />

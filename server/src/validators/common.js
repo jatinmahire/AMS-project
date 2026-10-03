@@ -13,6 +13,15 @@ const optionalNumber = () => {
   return z.preprocess((v) => (v === '' || v === null || v === undefined ? undefined : v), z.coerce.number().optional());
 };
 
+// Same as optionalNumber, but rejects negatives — for optional currency/rate fields where a
+// value below 0 is never meaningful (wages payable, project/person value, etc.).
+const optionalNonNegativeNumber = (message = 'Must not be negative') => {
+  return z.preprocess(
+    (v) => (v === '' || v === null || v === undefined ? undefined : v),
+    z.coerce.number().nonnegative(message).optional()
+  );
+};
+
 const optionalInt = () => {
   return z.preprocess((v) => (v === '' || v === null || v === undefined ? undefined : v), z.coerce.number().int().optional());
 };
@@ -78,6 +87,7 @@ module.exports = {
   optionalString,
   optionalDate,
   optionalNumber,
+  optionalNonNegativeNumber,
   optionalInt,
   EMAIL_REGEX,
   emailString,

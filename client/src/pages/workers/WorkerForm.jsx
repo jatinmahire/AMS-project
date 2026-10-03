@@ -260,13 +260,13 @@ export default function WorkerForm() {
         {currentStep === 0 && (
           <FormSection title="Personal Info">
             <FormField label="First Name" required error={errors.firstName}>
-              <TextInput {...field('firstName')} error={errors.firstName} />
+              <TextInput {...field('firstName')} maxLength={30} error={errors.firstName} />
             </FormField>
             <FormField label="Middle Name" error={errors.middleName}>
-              <TextInput {...field('middleName')} error={errors.middleName} />
+              <TextInput {...field('middleName')} maxLength={30} error={errors.middleName} />
             </FormField>
             <FormField label="Last Name" required error={errors.lastName}>
-              <TextInput {...field('lastName')} error={errors.lastName} />
+              <TextInput {...field('lastName')} maxLength={30} error={errors.lastName} />
             </FormField>
             <FormField label="Date of Birth" required error={errors.dob}>
               <TextInput type="date" {...field('dob')} min={MIN_DOB} max={maxAdultDob()} error={errors.dob} />
@@ -414,7 +414,7 @@ export default function WorkerForm() {
           <>
             <FormSection title="Bank Details">
               <FormField label="Bank Name" required error={errors.bankName}>
-                <TextInput {...field('bankName')} error={errors.bankName} />
+                <TextInput {...field('bankName')} maxLength={30} error={errors.bankName} />
               </FormField>
               <FormField label="Bank Branch" required error={errors.bankBranch}>
                 <TextInput {...field('bankBranch')} error={errors.bankBranch} />
@@ -429,7 +429,7 @@ export default function WorkerForm() {
 
             <FormSection title="Nominee Details">
               <FormField label="Nominee Name" required error={errors.nomineeName}>
-                <TextInput {...field('nomineeName')} error={errors.nomineeName} />
+                <TextInput {...field('nomineeName')} maxLength={30} error={errors.nomineeName} />
               </FormField>
               <FormField label="Relation" required error={errors.nomineeRelation}>
                 <TextInput {...field('nomineeRelation')} error={errors.nomineeRelation} />

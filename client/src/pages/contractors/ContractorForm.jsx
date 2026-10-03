@@ -202,13 +202,13 @@ export default function ContractorForm() {
           <>
             <FormSection title="Basic Info">
               <FormField label="Contractor Name" required error={errors.contractorName}>
-                <TextInput {...field('contractorName')} error={errors.contractorName} />
+                <TextInput {...field('contractorName')} maxLength={30} error={errors.contractorName} />
               </FormField>
               <FormField label="Establishment Name" error={errors.establishmentName}>
-                <TextInput {...field('establishmentName')} error={errors.establishmentName} />
+                <TextInput {...field('establishmentName')} maxLength={30} error={errors.establishmentName} />
               </FormField>
               <FormField label="Contact Person" required error={errors.contactPerson}>
-                <TextInput {...field('contactPerson')} error={errors.contactPerson} />
+                <TextInput {...field('contactPerson')} maxLength={30} error={errors.contactPerson} />
               </FormField>
               <FormField label="Phone" required error={errors.phone}>
                 <NumericInput {...field('phone')} error={errors.phone} exactLength={10} label="Phone number" />
@@ -266,7 +266,12 @@ export default function ContractorForm() {
                 <NumericInput {...field('aadhaarNo')} error={errors.aadhaarNo} exactLength={12} label="Aadhaar number" />
               </FormField>
               <FormField label="PAN No." required error={errors.panNo}>
-                <TextInput {...field('panNo')} error={errors.panNo} maxLength={10} />
+                <TextInput
+                  value={form.panNo ?? ''}
+                  onChange={(e) => setForm({ ...form, panNo: e.target.value.toUpperCase() })}
+                  error={errors.panNo}
+                  maxLength={10}
+                />
               </FormField>
               <FormField label="RC" error={errors.rc}>
                 <TextInput {...field('rc')} error={errors.rc} />
@@ -275,7 +280,7 @@ export default function ContractorForm() {
 
             <FormSection title="Principal Employer">
               <FormField label="Principal Employer Name" error={errors.principalEmployerName}>
-                <TextInput {...field('principalEmployerName')} error={errors.principalEmployerName} />
+                <TextInput {...field('principalEmployerName')} maxLength={30} error={errors.principalEmployerName} />
               </FormField>
               <FormField label="Principal Employer Address" error={errors.principalEmployerAddress} className="contractor-form-col-span">
                 <TextInput {...field('principalEmployerAddress')} error={errors.principalEmployerAddress} />
@@ -344,7 +349,7 @@ export default function ContractorForm() {
                 <NumericInput {...field('ptrcNo')} error={errors.ptrcNo} maxLength={20} label="PTRC number" />
               </FormField>
               <FormField label="Building Name" error={errors.buildingName}>
-                <TextInput {...field('buildingName')} error={errors.buildingName} />
+                <TextInput {...field('buildingName')} maxLength={30} error={errors.buildingName} />
               </FormField>
             </FormSection>
 

@@ -2,9 +2,9 @@ const { z } = require('zod');
 const { optionalString, optionalDate, optionalInt, emailString, optionalEmailString, digitsString, optionalDigitsString, optionalExactDigitsString } = require('./common');
 
 const contractorSchema = z.object({
-  contractorName: z.string().min(1, 'Contractor name is required').max(150),
-  establishmentName: optionalString(150),
-  contactPerson: z.string().min(1, 'Contact person is required').max(100),
+  contractorName: z.string().min(1, 'Contractor name is required').max(30),
+  establishmentName: optionalString(30),
+  contactPerson: z.string().min(1, 'Contact person is required').max(30),
   phone: digitsString(10, 'Phone number must be exactly 10 digits'),
   email: emailString(),
   email2: optionalEmailString(),
@@ -19,7 +19,7 @@ const contractorSchema = z.object({
   aadhaarNo: digitsString(12, 'Aadhaar number must be exactly 12 digits'),
   panNo: z.string().regex(/^[A-Z]{5}\d{4}[A-Z]$/i, 'Enter a valid PAN number'),
   rc: optionalString(50),
-  principalEmployerName: optionalString(150),
+  principalEmployerName: optionalString(30),
   principalEmployerAddress: optionalString(),
   wcPolicyNo: optionalString(50),
   wcStartDate: optionalDate(),
@@ -40,7 +40,7 @@ const contractorSchema = z.object({
   mlwfNo: optionalDigitsString(20, 'MLWF number must be digits only'),
   ptecNo: optionalDigitsString(20, 'PTEC number must be digits only'),
   ptrcNo: optionalDigitsString(20, 'PTRC number must be digits only'),
-  buildingName: optionalString(150),
+  buildingName: optionalString(30),
   status: z.enum(['ACTIVE', 'INACTIVE', 'BLACKLISTED']).optional(),
   password: z.string().min(6, 'Password must be at least 6 characters').optional(),
 });

@@ -83,7 +83,7 @@ export default function LabourCategoryForm() {
             </Select>
           </FormField>
           <FormField label="Rate Per Day" required error={errors.ratePerDay}>
-            <TextInput type="number" step="0.01" {...field('ratePerDay')} error={errors.ratePerDay} />
+            <TextInput type="number" step="0.01" min="0" {...field('ratePerDay')} error={errors.ratePerDay} />
           </FormField>
         </FormSection>
 

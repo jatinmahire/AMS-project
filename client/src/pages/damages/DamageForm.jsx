@@ -102,10 +102,10 @@ export default function DamageForm() {
             <TextInput type="date" {...field('damageDate')} error={errors.damageDate} />
           </FormField>
           <FormField label="Name of Worksmen (if any)" error={errors.nameOfWorksmen}>
-            <TextInput {...field('nameOfWorksmen')} error={errors.nameOfWorksmen} />
+            <TextInput {...field('nameOfWorksmen')} maxLength={30} error={errors.nameOfWorksmen} />
           </FormField>
           <FormField label="Witness Name" error={errors.witnessName}>
-            <TextInput {...field('witnessName')} error={errors.witnessName} />
+            <TextInput {...field('witnessName')} maxLength={30} error={errors.witnessName} />
           </FormField>
           <FormField label="Particulars" required error={errors.particulars} className="damage-form-col-span">
             <Textarea {...field('particulars')} error={errors.particulars} />
@@ -117,7 +117,7 @@ export default function DamageForm() {
 
         <FormSection title="Deduction & Photo">
           <FormField label="Deduction Amount" required error={errors.deductionAmount}>
-            <TextInput type="number" step="0.01" {...field('deductionAmount')} error={errors.deductionAmount} />
+            <TextInput type="number" step="0.01" min="0" {...field('deductionAmount')} error={errors.deductionAmount} />
           </FormField>
           <FormField label="Installments" required error={errors.installments}>
             <TextInput type="number" min="1" {...field('installments')} error={errors.installments} />

@@ -12,9 +12,9 @@ const upperPattern = (label, regex, example) =>
   );
 
 const workerSchema = z.object({
-  firstName: z.string().min(1, 'First name is required').max(100),
-  middleName: optionalString(100),
-  lastName: z.string().min(1, 'Last name is required').max(100),
+  firstName: z.string().min(1, 'First name is required').max(30),
+  middleName: optionalString(30),
+  lastName: z.string().min(1, 'Last name is required').max(30),
   dob: adultDob('Worker'),
   gender: z.enum(['MALE', 'FEMALE', 'OTHER'], { errorMap: () => ({ message: 'Select a gender' }) }),
   maritalStatus: z.enum(['MARRIED', 'UNMARRIED'], { errorMap: () => ({ message: 'Marital status is required' }) }),
@@ -41,11 +41,11 @@ const workerSchema = z.object({
   panNumber: upperPattern('PAN number', PAN_REGEX, 'ABCDE1234F'),
   ipNumber: optionalDigitsString(10, 'IP number must be digits only'),
   joinDate: z.coerce.date({ errorMap: () => ({ message: 'Join date is required' }) }),
-  bankName: requiredString('Bank name', 100),
+  bankName: requiredString('Bank name', 30),
   bankBranch: requiredString('Bank branch', 100),
   accountNo: z.string({ required_error: 'Account number is required' }).regex(/^\d{1,18}$/, 'Account number must be up to 18 digits'),
   ifscCode: upperPattern('IFSC code', IFSC_REGEX, 'HDFC0001234'),
-  nomineeName: requiredString('Nominee name', 150),
+  nomineeName: requiredString('Nominee name', 30),
   nomineeRelation: requiredString('Nominee relation', 50),
   nomineeChildrenCount: z.preprocess(
     (v) => (v === '' || v === null || v === undefined ? undefined : Number(v)),

@@ -76,7 +76,7 @@ const REGISTER_TYPES = [
       { key: 'srNo', label: 'Sr. No.', render: (r, i) => i + 1 },
       { key: 'name', label: 'Name of Injured Person', render: workerName },
       { key: 'accidentDate', label: 'Date of Accident or Dangerous Occurrence', render: (r) => formatDate(r.accidentDate) },
-      { key: 'form24ReportDate', label: 'Date of Report (Form 24) to Inspector', render: (r) => (r.form24ReportDate ? formatDate(r.form24ReportDate) : '-') },
+      { key: 'form24ReportDate', label: 'Form 24 Report Date', render: (r) => (r.form24ReportDate ? formatDate(r.form24ReportDate) : '-') },
       { key: 'natureOfAccident', label: 'Nature of Accident or Dangerous Occurrence' },
       { key: 'dateReturnToWork', label: 'Date of Return of Injured Person to Work', render: (r) => (r.dateReturnToWork ? formatDate(r.dateReturnToWork) : '-') },
       { key: 'daysAbsent', label: 'Number of Days Injured Person was Absent from Work' },

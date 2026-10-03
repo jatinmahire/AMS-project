@@ -105,7 +105,7 @@ export default function FineForm() {
             <Textarea {...field('causeShown')} error={errors.causeShown} />
           </FormField>
           <FormField label="Witness Name" error={errors.witnessName}>
-            <TextInput {...field('witnessName')} error={errors.witnessName} />
+            <TextInput {...field('witnessName')} maxLength={30} error={errors.witnessName} />
           </FormField>
         </FormSection>
 
@@ -114,10 +114,10 @@ export default function FineForm() {
             <TextInput {...field('wagePeriod')} error={errors.wagePeriod} />
           </FormField>
           <FormField label="Wages Payable" error={errors.wagesPayable}>
-            <TextInput type="number" step="0.01" {...field('wagesPayable')} error={errors.wagesPayable} />
+            <TextInput type="number" step="0.01" min="0" {...field('wagesPayable')} error={errors.wagesPayable} />
           </FormField>
           <FormField label="Fine Amount" required error={errors.fineAmount}>
-            <TextInput type="number" step="0.01" {...field('fineAmount')} error={errors.fineAmount} />
+            <TextInput type="number" step="0.01" min="0" {...field('fineAmount')} error={errors.fineAmount} />
           </FormField>
           <FormField label="Date Realised" error={errors.dateRealised}>
             <TextInput type="date" {...field('dateRealised')} error={errors.dateRealised} />

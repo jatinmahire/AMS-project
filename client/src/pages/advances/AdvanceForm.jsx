@@ -100,7 +100,7 @@ export default function AdvanceForm() {
             <TextInput {...field('wagesPeriod')} error={errors.wagesPeriod} />
           </FormField>
           <FormField label="Wages Payable" error={errors.wagesPayable}>
-            <TextInput type="number" step="0.01" {...field('wagesPayable')} error={errors.wagesPayable} />
+            <TextInput type="number" step="0.01" min="0" {...field('wagesPayable')} error={errors.wagesPayable} />
           </FormField>
           <FormField label="Purpose" required error={errors.purpose} className="advance-form-col-span">
             <Textarea {...field('purpose')} error={errors.purpose} />
@@ -109,7 +109,7 @@ export default function AdvanceForm() {
 
         <FormSection title="Amount & Installments">
           <FormField label="Amount" required error={errors.amount}>
-            <TextInput type="number" step="0.01" {...field('amount')} error={errors.amount} disabled={isEdit} />
+            <TextInput type="number" step="0.01" min="0" {...field('amount')} error={errors.amount} disabled={isEdit} />
           </FormField>
           <FormField label="Installments" required error={errors.installmentsCount}>
             <TextInput type="number" min="1" {...field('installmentsCount')} error={errors.installmentsCount} disabled={isEdit} />
