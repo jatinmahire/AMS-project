@@ -4,8 +4,9 @@
   @apply flex flex-col items-center gap-4;
 }
 
+/* Plain, no border/shadow — just the centered content. */
 .worker-qr-card {
-  @apply flex w-80 flex-col items-center gap-3 rounded-xl border-2 border-slate-300 bg-white p-6 text-center;
+  @apply flex w-72 flex-col items-center gap-4 bg-white p-6 text-center;
 }
 
 .worker-qr-card-name {
@@ -17,17 +18,22 @@
 }
 
 .worker-qr-card-qr {
-  @apply rounded-md border border-slate-200 p-3;
+  @apply h-auto w-full max-w-[220px];
 }
 
-/* Used for the Worker Master row-print target: invisible on screen, shown centered only
-   when printing, so the rest of the page (wrapped in .no-print) doesn't appear. */
-.worker-qr-card-print-target {
+/* Used for the Worker Master row print action: invisible on screen, shown only when printing. */
+.worker-qr-card-hidden-until-print {
   @apply hidden;
 }
 
 @media print {
-  .worker-qr-card-print-target {
-    @apply fixed inset-0 z-50 m-auto flex;
+  /* Centers the card on the physical page, whatever its size (A4, A5, Letter, ...),
+     regardless of which screen it was printed from. */
+  .worker-qr-card-wrap {
+    @apply fixed inset-0 z-50 m-0 flex! items-center justify-center bg-white;
+  }
+
+  .worker-qr-card-hidden-until-print {
+    @apply flex!;
   }
 }

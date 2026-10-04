@@ -12,6 +12,13 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
   const [torchOn, setTorchOn] = useState(false);
   const [torchAvailable, setTorchAvailable] = useState(false);
 
+  // Keep the latest callbacks without them being effect dependencies — the parent
+  // re-rendering (e.g. on every scan result) must never tear down and restart the camera.
+  const onScanRef = useRef(onScan);
+  const onErrorRef = useRef(onError);
+  onScanRef.current = onScan;
+  onErrorRef.current = onError;
+
   useEffect(() => {
     let cancelled = false;
     const reader = new BrowserQRCodeReader();
@@ -32,12 +39,12 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
             if (now - lastTimeRef.current < (sameCode ? 3000 : 1000)) return;
             lastCodeRef.current = text;
             lastTimeRef.current = now;
-            onScan(text);
+            onScanRef.current(text);
             return;
           }
 
           controlsRef.current?.stop();
-          onScan(text);
+          onScanRef.current(text);
         }
       )
       .then((controls) => {
@@ -54,14 +61,14 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
       .catch((err) => {
         if (cancelled) return;
         setStatus('unavailable');
-        onError?.(err);
+        onErrorRef.current?.(err);
       });
 
     return () => {
       cancelled = true;
       controlsRef.current?.stop();
     };
-  }, [onScan, onError, continuous]);
+  }, [continuous]);
 
   function toggleTorch() {
     const next = !torchOn;
@@ -80,7 +87,7 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
 
   return (
     <div className={`qr-scanner-frame ${continuous ? 'qr-scanner-frame-fill' : ''}`}>
-      <video ref={videoRef} className="qr-scanner-video" muted playsInline />
+      <video ref={videoRef} className="qr-scanner-video" muted playsInline autoPlay />
       <div className="qr-scanner-guide" />
       {status === 'starting' && (
         <p className="qr-scanner-status-text">Starting camera...</p>

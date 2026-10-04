@@ -6,15 +6,13 @@ import './WorkerQrCard.css';
 
 // QR payload is always "AMS:<workerCode>" — never personal data — so the scanner can
 // reject unrelated QR codes by prefix alone.
-export default function WorkerQrCard({ worker, showPrintButton = true, printTargetClassName = '' }) {
+export default function WorkerQrCard({ worker, showPrintButton = true, hiddenUntilPrint = false }) {
   return (
-    <div className="worker-qr-card-wrap">
-      <div className={`worker-qr-card ${printTargetClassName}`}>
+    <div className={`worker-qr-card-wrap ${hiddenUntilPrint ? 'worker-qr-card-hidden-until-print' : ''}`}>
+      <div className="worker-qr-card">
         <p className="worker-qr-card-name">{worker.firstName} {worker.lastName}</p>
         <p className="worker-qr-card-id">ID: {worker.workerCode}</p>
-        <div className="worker-qr-card-qr">
-          <QRCodeSVG value={`AMS:${worker.workerCode}`} size={300} />
-        </div>
+        <QRCodeSVG value={`AMS:${worker.workerCode}`} size={300} className="worker-qr-card-qr" />
       </div>
       {showPrintButton && (
         <Button icon={Printer} onClick={printNow} className="no-print">

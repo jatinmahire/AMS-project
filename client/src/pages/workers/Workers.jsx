@@ -273,7 +273,7 @@ export default function Workers() {
       </div>
 
       {printWorker && (
-        <WorkerQrCard worker={printWorker} showPrintButton={false} printTargetClassName="worker-qr-card-print-target" />
+        <WorkerQrCard worker={printWorker} showPrintButton={false} hiddenUntilPrint />
       )}
     </div>
   );
