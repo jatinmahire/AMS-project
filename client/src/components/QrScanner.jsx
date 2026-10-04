@@ -54,6 +54,9 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
         }
         controlsRef.current = controls;
         setStatus('scanning');
+        // Belt-and-suspenders: some mobile browsers (seen on Brave/Android) silently drop
+        // zxing's own autoplay call, leaving the stream attached but the frame stuck black.
+        videoRef.current?.play?.().catch(() => {});
         controls.isTorchAvailable?.()
           .then((available) => !cancelled && setTorchAvailable(!!available))
           .catch(() => {});
@@ -87,7 +90,14 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
 
   return (
     <div className={`qr-scanner-frame ${continuous ? 'qr-scanner-frame-fill' : ''}`}>
-      <video ref={videoRef} className="qr-scanner-video" muted playsInline autoPlay />
+      <video
+        ref={videoRef}
+        className="qr-scanner-video"
+        muted
+        playsInline
+        autoPlay
+        onCanPlay={(e) => e.currentTarget.play?.().catch(() => {})}
+      />
       <div className="qr-scanner-guide" />
       {status === 'starting' && (
         <p className="qr-scanner-status-text">Starting camera...</p>
