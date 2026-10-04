@@ -19,7 +19,16 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
   onScanRef.current = onScan;
   onErrorRef.current = onError;
 
+  const startedRef = useRef(false);
+
   useEffect(() => {
+    // React StrictMode (dev only) runs this effect twice in a row on the same <video> element
+    // to check cleanup correctness. For a real camera stream that's not a no-op: the second
+    // attach races the first one's pending play(), which is exactly the "interrupted by a new
+    // load request" AbortError. Skip the synthetic re-run; the first attach is still live.
+    if (startedRef.current) return undefined;
+    startedRef.current = true;
+
     let cancelled = false;
     const reader = new BrowserQRCodeReader();
 
@@ -54,9 +63,6 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
         }
         controlsRef.current = controls;
         setStatus('scanning');
-        // Belt-and-suspenders: some mobile browsers (seen on Brave/Android) silently drop
-        // zxing's own autoplay call, leaving the stream attached but the frame stuck black.
-        videoRef.current?.play?.().catch(() => {});
         controls.isTorchAvailable?.()
           .then((available) => !cancelled && setTorchAvailable(!!available))
           .catch(() => {});
@@ -70,6 +76,7 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
     return () => {
       cancelled = true;
       controlsRef.current?.stop();
+      startedRef.current = false;
     };
   }, [continuous]);
 
@@ -90,14 +97,7 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
 
   return (
     <div className={`qr-scanner-frame ${continuous ? 'qr-scanner-frame-fill' : ''}`}>
-      <video
-        ref={videoRef}
-        className="qr-scanner-video"
-        muted
-        playsInline
-        autoPlay
-        onCanPlay={(e) => e.currentTarget.play?.().catch(() => {})}
-      />
+      <video ref={videoRef} className="qr-scanner-video" muted playsInline autoPlay />
       <div className="qr-scanner-guide" />
       {status === 'starting' && (
         <p className="qr-scanner-status-text">Starting camera...</p>
