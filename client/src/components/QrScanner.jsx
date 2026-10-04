@@ -3,6 +3,17 @@ import { BrowserQRCodeReader } from '@zxing/browser';
 import { CameraOff, Flashlight, FlashlightOff } from 'lucide-react';
 import './QrScanner.css';
 
+// Module-level (not per-component) so camera sessions never overlap even across React
+// StrictMode's dev-only double-mount: on phones, opening a second getUserMedia session
+// before the first one's tracks are fully released can hand back a dead/black stream.
+// Chaining every open/close through one queue, with a short release delay, avoids that.
+let cameraQueue = Promise.resolve();
+function queueCameraTask(task) {
+  const run = cameraQueue.then(task, task);
+  cameraQueue = run.catch(() => {});
+  return run;
+}
+
 export default function QrScanner({ onScan, onError, continuous = false }) {
   const videoRef = useRef(null);
   const controlsRef = useRef(null);
@@ -19,64 +30,65 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
   onScanRef.current = onScan;
   onErrorRef.current = onError;
 
-  const startedRef = useRef(false);
-
   useEffect(() => {
-    // React StrictMode (dev only) runs this effect twice in a row on the same <video> element
-    // to check cleanup correctness. For a real camera stream that's not a no-op: the second
-    // attach races the first one's pending play(), which is exactly the "interrupted by a new
-    // load request" AbortError. Skip the synthetic re-run; the first attach is still live.
-    if (startedRef.current) return undefined;
-    startedRef.current = true;
-
     let cancelled = false;
-    const reader = new BrowserQRCodeReader();
 
-    reader
-      .decodeFromConstraints(
-        { video: { facingMode: { ideal: 'environment' } } },
-        videoRef.current,
-        (result) => {
-          if (cancelled || !result) return;
-          const text = result.getText();
+    queueCameraTask(async () => {
+      if (cancelled) return;
+      const reader = new BrowserQRCodeReader();
 
-          if (continuous) {
-            // Cameras redecode the same QR many times a second — ignore the same code for
-            // ~3s, and any code for ~1s, so one physical scan doesn't fire repeatedly.
-            const now = Date.now();
-            const sameCode = text === lastCodeRef.current;
-            if (now - lastTimeRef.current < (sameCode ? 3000 : 1000)) return;
-            lastCodeRef.current = text;
-            lastTimeRef.current = now;
+      let controls;
+      try {
+        controls = await reader.decodeFromConstraints(
+          { video: { facingMode: { ideal: 'environment' } } },
+          videoRef.current,
+          (result) => {
+            if (cancelled || !result) return;
+            const text = result.getText();
+
+            if (continuous) {
+              // Cameras redecode the same QR many times a second — ignore the same code for
+              // ~3s, and any code for ~1s, so one physical scan doesn't fire repeatedly.
+              const now = Date.now();
+              const sameCode = text === lastCodeRef.current;
+              if (now - lastTimeRef.current < (sameCode ? 3000 : 1000)) return;
+              lastCodeRef.current = text;
+              lastTimeRef.current = now;
+              onScanRef.current(text);
+              return;
+            }
+
+            controlsRef.current?.stop();
             onScanRef.current(text);
-            return;
           }
+        );
+      } catch (err) {
+        if (!cancelled) {
+          setStatus('unavailable');
+          onErrorRef.current?.(err);
+        }
+        return;
+      }
 
-          controlsRef.current?.stop();
-          onScanRef.current(text);
-        }
-      )
-      .then((controls) => {
-        if (cancelled) {
-          controls.stop();
-          return;
-        }
-        controlsRef.current = controls;
-        setStatus('scanning');
-        controls.isTorchAvailable?.()
-          .then((available) => !cancelled && setTorchAvailable(!!available))
-          .catch(() => {});
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setStatus('unavailable');
-        onErrorRef.current?.(err);
-      });
+      if (cancelled) {
+        controls.stop();
+        // Give the camera hardware a moment to actually release before anything else in the
+        // queue (e.g. a StrictMode re-mount) tries to open it again.
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        return;
+      }
+
+      controlsRef.current = controls;
+      setStatus('scanning');
+      controls.isTorchAvailable?.()
+        .then((available) => !cancelled && setTorchAvailable(!!available))
+        .catch(() => {});
+    });
 
     return () => {
       cancelled = true;
       controlsRef.current?.stop();
-      startedRef.current = false;
+      controlsRef.current = null;
     };
   }, [continuous]);
 
