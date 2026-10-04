@@ -7,6 +7,7 @@ import FormSection from '../../components/FormSection';
 import FormField, { TextInput, Select } from '../../components/FormField';
 import NumericInput from '../../components/NumericInput';
 import StateCityFields from '../../components/StateCityFields';
+import WorkerQrCard from '../../components/WorkerQrCard';
 import Button from '../../components/Button';
 import { getWorker, createWorker, updateWorker } from '../../api/workers';
 import { contractorDropdown } from '../../api/contractors';
@@ -96,6 +97,7 @@ export default function WorkerForm() {
   const [files, setFiles] = useState({});
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState(isEdit ? [0, 1, 2, 3] : []);
+  const [registeredWorker, setRegisteredWorker] = useState(null);
 
   useEffect(() => {
     Promise.all([isScopedRole ? Promise.resolve([]) : contractorDropdown(), listDesignations(), listLabourCategories()])
@@ -229,7 +231,7 @@ export default function WorkerForm() {
       } else {
         const created = await createWorker(payload);
         showToast('Worker created');
-        navigate(`/workers/${created.id}`, { replace: true });
+        setRegisteredWorker(created);
         return;
       }
     } catch (err) {
@@ -244,6 +246,35 @@ export default function WorkerForm() {
   }
 
   if (loading) return <div className="worker-form-loading">Loading...</div>;
+
+  if (registeredWorker) {
+    return (
+      <div>
+        <div className="no-print">
+          <PageHeader
+            title="Worker Registered"
+            description={`${registeredWorker.firstName} ${registeredWorker.lastName} (${registeredWorker.workerCode}) has been added.`}
+          />
+        </div>
+        <WorkerQrCard worker={registeredWorker} />
+        <div className="no-print worker-form-success-actions">
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setRegisteredWorker(null);
+              setForm(isScopedRole ? { ...EMPTY_FORM, contractorId: user.assignedContractorId || '' } : EMPTY_FORM);
+              setFiles({});
+              setCurrentStep(0);
+              setCompletedSteps([]);
+            }}
+          >
+            Register Another Worker
+          </Button>
+          <Button onClick={() => navigate('/workers')}>Go to Worker List</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

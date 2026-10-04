@@ -27,3 +27,7 @@
 .worker-form-actions-right {
   @apply flex gap-3;
 }
+
+.worker-form-success-actions {
+  @apply mt-6 flex justify-center gap-3;
+}

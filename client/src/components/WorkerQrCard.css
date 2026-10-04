@@ -1,0 +1,33 @@
+@reference "../index.css";
+
+.worker-qr-card-wrap {
+  @apply flex flex-col items-center gap-4;
+}
+
+.worker-qr-card {
+  @apply flex w-80 flex-col items-center gap-3 rounded-xl border-2 border-slate-300 bg-white p-6 text-center;
+}
+
+.worker-qr-card-name {
+  @apply text-xl font-bold text-slate-900;
+}
+
+.worker-qr-card-id {
+  @apply text-sm text-slate-600;
+}
+
+.worker-qr-card-qr {
+  @apply rounded-md border border-slate-200 p-3;
+}
+
+/* Used for the Worker Master row-print target: invisible on screen, shown centered only
+   when printing, so the rest of the page (wrapped in .no-print) doesn't appear. */
+.worker-qr-card-print-target {
+  @apply hidden;
+}
+
+@media print {
+  .worker-qr-card-print-target {
+    @apply fixed inset-0 z-50 m-auto flex;
+  }
+}

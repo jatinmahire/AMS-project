@@ -22,4 +22,9 @@ const update = asyncHandler(async (req, res) => {
   res.json(attendance);
 });
 
-module.exports = { list, getById, create, update };
+const scan = asyncHandler(async (req, res) => {
+  const result = await attendanceService.scan(req.body.code, req.user.id, req.user);
+  res.json(result);
+});
+
+module.exports = { list, getById, create, update, scan };

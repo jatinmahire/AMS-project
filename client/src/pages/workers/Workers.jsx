@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, Eye, Pencil, Ban, CheckCircle, FileSpreadsheet } from 'lucide-react';
+import { Plus, Eye, Pencil, Ban, CheckCircle, FileSpreadsheet, Printer } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 import Button from '../../components/Button';
+import WorkerQrCard from '../../components/WorkerQrCard';
 import FilterBar from '../../components/FilterBar';
 import Pagination from '../../components/Pagination';
 import StatusBadge from '../../components/StatusBadge';
@@ -14,6 +16,7 @@ import { formatDate } from '../../utils/format';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import { exportToCsv } from '../../utils/exportCsv';
+import { printNow } from '../../utils/printExport';
 import './Workers.css';
 
 const EXPORT_FIELDS = [
@@ -74,6 +77,12 @@ export default function Workers() {
   const [loading, setLoading] = useState(true);
   const [statusTarget, setStatusTarget] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [printWorker, setPrintWorker] = useState(null);
+
+  function handlePrintRow(row) {
+    setPrintWorker(row);
+    setTimeout(() => window.print(), 50);
+  }
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { user } = useAuth();
@@ -182,6 +191,18 @@ export default function Workers() {
     { key: 'sector', label: 'Sector', render: (row) => row.sector || '-' },
     { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> },
     {
+      key: 'qrCode',
+      label: 'QR Code',
+      render: (row) => (
+        <div className="workers-qr-cell">
+          <QRCodeSVG value={`AMS:${row.workerCode}`} size={40} />
+          <button onClick={() => handlePrintRow(row)} className="workers-action-btn" title="Print QR card">
+            <Printer size={16} />
+          </button>
+        </div>
+      ),
+    },
+    {
       key: 'actions',
       label: 'Actions',
       render: (row) => (
@@ -223,6 +244,7 @@ export default function Workers() {
 
   return (
     <div>
+      <div className="no-print">
       <PageHeader
         title="Workers"
         description="All registered workers across contractors."
@@ -248,6 +270,11 @@ export default function Workers() {
         onConfirm={handleToggleStatus}
         onCancel={() => setStatusTarget(null)}
       />
+      </div>
+
+      {printWorker && (
+        <WorkerQrCard worker={printWorker} showPrintButton={false} printTargetClassName="worker-qr-card-print-target" />
+      )}
     </div>
   );
 }

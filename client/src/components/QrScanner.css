@@ -27,3 +27,11 @@
 .qr-scanner-status-text {
   @apply absolute inset-x-0 bottom-2 text-center text-xs text-white/80;
 }
+
+.qr-scanner-frame-fill {
+  @apply max-w-full;
+}
+
+.qr-scanner-torch-btn {
+  @apply absolute right-3 top-3 rounded-full bg-black/50 p-2 text-white;
+}

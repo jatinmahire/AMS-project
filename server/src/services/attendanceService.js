@@ -135,4 +135,80 @@ async function update(id, data, userId, user) {
   return updated;
 }
 
-module.exports = { list, getById, create, update };
+function todayDateOnly() {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+}
+
+function nowTimeString() {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+}
+
+function workerSummary(worker) {
+  return { name: `${worker.firstName} ${worker.lastName}`, code: worker.workerCode, photoUrl: worker.photoUrl };
+}
+
+// Accepts the new "AMS:<workerCode>" format and, for backward compatibility, a bare
+// workerCode (the format older-generated ID cards may still carry).
+function extractWorkerCode(raw) {
+  const text = String(raw || '').trim();
+  const prefixed = /^AMS:(.+)$/i.exec(text);
+  if (prefixed) return prefixed[1].trim();
+  if (/^WRK\d+$/i.test(text)) return text;
+  return null;
+}
+
+async function scan(code, userId, user) {
+  const workerCode = extractWorkerCode(code);
+  if (!workerCode) throw new ApiError(400, 'Not a valid AMS QR code');
+
+  const worker = await prisma.worker.findUnique({ where: { workerCode } });
+  const scopedContractorId = await resolveScope(user);
+  if (!worker || (scopedContractorId && worker.contractorId !== scopedContractorId)) {
+    throw new ApiError(404, 'Worker not found or not under your contractor');
+  }
+
+  if (worker.status !== 'ACTIVE') {
+    return { action: 'INACTIVE', worker: workerSummary(worker) };
+  }
+
+  const date = todayDateOnly();
+  const existing = await prisma.attendance.findUnique({ where: { workerId_date: { workerId: worker.id, date } } });
+
+  if (!existing) {
+    await prisma.$transaction(async (tx) => {
+      const result = await tx.attendance.create({
+        data: { workerId: worker.id, date, day: dayOf(date), inTime: nowTimeString(), status: 'PRESENT', source: 'QR_SCAN', markedByUserId: userId },
+      });
+      await recordAudit(
+        { userId, action: 'CREATE_ATTENDANCE', entityType: 'Attendance', entityId: result.id, contractorId: worker.contractorId, newValue: { ...result, worker } },
+        tx
+      );
+    });
+    return { action: 'CHECK_IN', worker: workerSummary(worker) };
+  }
+
+  if (!existing.outTime) {
+    await prisma.$transaction(async (tx) => {
+      const result = await tx.attendance.update({ where: { id: existing.id }, data: { outTime: nowTimeString() } });
+      await recordAudit(
+        {
+          userId,
+          action: 'UPDATE_ATTENDANCE',
+          entityType: 'Attendance',
+          entityId: existing.id,
+          contractorId: worker.contractorId,
+          oldValue: { ...existing, worker },
+          newValue: { ...result, worker },
+        },
+        tx
+      );
+    });
+    return { action: 'CHECK_OUT', worker: workerSummary(worker) };
+  }
+
+  return { action: 'ALREADY_COMPLETE', worker: workerSummary(worker) };
+}
+
+module.exports = { list, getById, create, update, scan };

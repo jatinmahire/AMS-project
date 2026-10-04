@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { BrowserQRCodeReader } from '@zxing/browser';
-import { CameraOff } from 'lucide-react';
+import { CameraOff, Flashlight, FlashlightOff } from 'lucide-react';
 import './QrScanner.css';
 
-export default function QrScanner({ onScan, onError }) {
+export default function QrScanner({ onScan, onError, continuous = false }) {
   const videoRef = useRef(null);
   const controlsRef = useRef(null);
+  const lastCodeRef = useRef(null);
+  const lastTimeRef = useRef(0);
   const [status, setStatus] = useState('starting');
+  const [torchOn, setTorchOn] = useState(false);
+  const [torchAvailable, setTorchAvailable] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -14,12 +18,26 @@ export default function QrScanner({ onScan, onError }) {
 
     reader
       .decodeFromConstraints(
-        { video: { facingMode: 'environment' } },
+        { video: { facingMode: { ideal: 'environment' } } },
         videoRef.current,
-        (result, err) => {
+        (result) => {
           if (cancelled || !result) return;
+          const text = result.getText();
+
+          if (continuous) {
+            // Cameras redecode the same QR many times a second — ignore the same code for
+            // ~3s, and any code for ~1s, so one physical scan doesn't fire repeatedly.
+            const now = Date.now();
+            const sameCode = text === lastCodeRef.current;
+            if (now - lastTimeRef.current < (sameCode ? 3000 : 1000)) return;
+            lastCodeRef.current = text;
+            lastTimeRef.current = now;
+            onScan(text);
+            return;
+          }
+
           controlsRef.current?.stop();
-          onScan(result.getText());
+          onScan(text);
         }
       )
       .then((controls) => {
@@ -29,6 +47,9 @@ export default function QrScanner({ onScan, onError }) {
         }
         controlsRef.current = controls;
         setStatus('scanning');
+        controls.isTorchAvailable?.()
+          .then((available) => !cancelled && setTorchAvailable(!!available))
+          .catch(() => {});
       })
       .catch((err) => {
         if (cancelled) return;
@@ -40,7 +61,13 @@ export default function QrScanner({ onScan, onError }) {
       cancelled = true;
       controlsRef.current?.stop();
     };
-  }, [onScan, onError]);
+  }, [onScan, onError, continuous]);
+
+  function toggleTorch() {
+    const next = !torchOn;
+    controlsRef.current?.switchTorch?.(next);
+    setTorchOn(next);
+  }
 
   if (status === 'unavailable') {
     return (
@@ -52,11 +79,16 @@ export default function QrScanner({ onScan, onError }) {
   }
 
   return (
-    <div className="qr-scanner-frame">
+    <div className={`qr-scanner-frame ${continuous ? 'qr-scanner-frame-fill' : ''}`}>
       <video ref={videoRef} className="qr-scanner-video" muted playsInline />
       <div className="qr-scanner-guide" />
       {status === 'starting' && (
         <p className="qr-scanner-status-text">Starting camera...</p>
+      )}
+      {torchAvailable && (
+        <button type="button" onClick={toggleTorch} className="qr-scanner-torch-btn" aria-label="Toggle flashlight">
+          {torchOn ? <FlashlightOff size={18} /> : <Flashlight size={18} />}
+        </button>
       )}
     </div>
   );

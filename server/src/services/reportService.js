@@ -37,7 +37,7 @@ async function generateIdCard(workerId, validityMonths) {
       validityMonths,
       issueDate,
       expiryDate,
-      qrCodeData: worker.workerCode,
+      qrCodeData: `AMS:${worker.workerCode}`,
     },
   });
 }

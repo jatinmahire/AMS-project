@@ -66,6 +66,18 @@ npm run dev    # starts the app on http://localhost:5173, proxying /api to the s
 
 Open `http://localhost:5173` and log in with the Admin credentials above.
 
+## Testing QR scanning on a phone
+
+Camera access requires HTTPS (or `localhost`) — a phone loading the dev server over a plain
+`http://<lan-ip>:5173` URL will have the camera blocked by the browser. To test on a real
+device, either serve the client over HTTPS, or use a quick tunnel:
+
+```bash
+cloudflared tunnel --url http://localhost:5173
+```
+
+Open the `https://*.trycloudflare.com` URL it gives you on your phone.
+
 ## Project layout
 
 ```

@@ -10,4 +10,8 @@ const attendanceSchema = z.object({
   buildingNo: optionalString(50),
 });
 
-module.exports = { attendanceSchema };
+const scanSchema = z.object({
+  code: z.string().min(1, 'QR code is required'),
+});
+
+module.exports = { attendanceSchema, scanSchema };

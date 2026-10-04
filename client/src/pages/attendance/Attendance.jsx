@@ -1,18 +1,28 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, Eye, Pencil } from 'lucide-react';
+import { Plus, Eye, Pencil, ScanLine, Search } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 import Button from '../../components/Button';
 import { TextInput } from '../../components/FormField';
 import Pagination from '../../components/Pagination';
 import StatusBadge from '../../components/StatusBadge';
-import { listAttendance } from '../../api/attendance';
+import QrScanner from '../../components/QrScanner';
+import { listAttendance, scanAttendance } from '../../api/attendance';
+import { enqueueAttendance } from '../../utils/offlineQueue';
+import { isNetworkError } from '../../utils/offlineSync';
 import { getErrorMessage } from '../../utils/errorMessage';
 import { displayName, formatDate } from '../../utils/format';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import './Attendance.css';
+
+const ACTION_LABEL = {
+  CHECK_IN: 'Checked in',
+  CHECK_OUT: 'Checked out',
+  ALREADY_COMPLETE: 'Already completed today',
+  INACTIVE: 'Worker is not active',
+};
 
 const LIMIT = 25;
 
@@ -31,6 +41,33 @@ export default function Attendance() {
   const { showToast } = useToast();
   const { user } = useAuth();
   const isReadOnly = user?.role === 'CONTRACTOR';
+  const canScan = !isReadOnly;
+  const [scanMode, setScanMode] = useState(false);
+  const [banner, setBanner] = useState(null);
+
+  function showBanner(type, message) {
+    setBanner({ type, message });
+    setTimeout(() => setBanner(null), 2500);
+  }
+
+  async function handleScanResult(code) {
+    try {
+      const result = await scanAttendance({ code });
+      const isSuccess = result.action === 'CHECK_IN' || result.action === 'CHECK_OUT';
+      showBanner(isSuccess ? 'success' : 'warn', `${ACTION_LABEL[result.action]}: ${result.worker.name} (${result.worker.code})`);
+      if (isSuccess) {
+        navigator.vibrate?.(100);
+        load();
+      }
+    } catch (err) {
+      if (isNetworkError(err)) {
+        await enqueueAttendance({ isScan: true, payload: { code }, createdAt: Date.now() });
+        showBanner('offline', 'No connection — scan queued and will sync automatically');
+        return;
+      }
+      showBanner('error', getErrorMessage(err));
+    }
+  }
 
   function load() {
     setLoading(true);
@@ -88,8 +125,30 @@ export default function Attendance() {
       <PageHeader
         title="Daily Attendance"
         description="Mark and review worker attendance by date."
-        action={!isReadOnly && <Button icon={Plus} onClick={() => navigate('/attendance/new')}>Add Attendance</Button>}
+        action={
+          !isReadOnly && (
+            <div className="attendance-header-actions">
+              {canScan && (
+                <Button variant="secondary" icon={ScanLine} onClick={() => setScanMode((v) => !v)}>
+                  {scanMode ? 'Close Scanner' : 'Scan QR'}
+                </Button>
+              )}
+              <Button icon={Plus} onClick={() => navigate('/attendance/new')}>Add Attendance</Button>
+            </div>
+          )
+        }
       />
+
+      {banner && <div className={`attendance-scan-banner attendance-scan-banner-${banner.type}`}>{banner.message}</div>}
+
+      {scanMode && (
+        <div className="attendance-scan-wrap">
+          <QrScanner continuous onScan={handleScanResult} />
+          <button type="button" onClick={() => navigate('/attendance/new')} className="attendance-scan-fallback-link">
+            <Search size={14} /> Camera not working? Mark manually instead
+          </button>
+        </div>
+      )}
 
       <div className="attendance-date-filter-row">
         <label className="attendance-date-filter-label">Date</label>

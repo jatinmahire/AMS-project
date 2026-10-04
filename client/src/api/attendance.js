@@ -15,3 +15,7 @@ export function createAttendance(payload) {
 export function updateAttendance(id, payload) {
   return api.put(`/attendance/${id}`, payload).then((res) => res.data);
 }
+
+export function scanAttendance(payload) {
+  return api.post('/attendance/scan', payload).then((res) => res.data);
+}

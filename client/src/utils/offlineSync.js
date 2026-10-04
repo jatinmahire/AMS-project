@@ -1,5 +1,5 @@
 import { getQueuedAttendance, removeQueuedAttendance, countQueuedAttendance } from './offlineQueue';
-import { createAttendance, updateAttendance } from '../api/attendance';
+import { createAttendance, updateAttendance, scanAttendance } from '../api/attendance';
 
 export function isNetworkError(err) {
   return !err.response;
@@ -29,7 +29,9 @@ export async function flushAttendanceQueue() {
     const items = await getQueuedAttendance();
     for (const item of items) {
       try {
-        if (item.isEdit) {
+        if (item.isScan) {
+          await scanAttendance(item.payload);
+        } else if (item.isEdit) {
           await updateAttendance(item.editId, item.payload);
         } else {
           await createAttendance(item.payload);
