@@ -18,7 +18,7 @@ import { toDateInputValue } from '../../utils/format';
 import { toFormData } from '../../utils/toFormData';
 import { getErrorMessage, getFieldErrors } from '../../utils/errorMessage';
 import {
-  AADHAAR_FILE_RULE, IFSC_REGEX, MIN_DOB, PAN_REGEX, maxAdultDob, validateDob, validatePattern, validateUploadFile,
+  AADHAAR_FILE_RULE, DOCUMENT_FILE_RULE, IFSC_REGEX, MIN_DOB, PAN_REGEX, maxAdultDob, validateDob, validatePattern, validateUploadFile,
 } from '../../utils/validators';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
@@ -36,10 +36,10 @@ const EMPTY_FORM = {
 };
 
 const FILE_FIELDS = [
-  { key: 'photo', label: 'Photo', urlKey: 'photoUrl' },
+  { key: 'photo', label: 'Photo', urlKey: 'photoUrl', rule: DOCUMENT_FILE_RULE },
   { key: 'idFront', label: 'ID Front', urlKey: 'idFrontUrl', rule: AADHAAR_FILE_RULE },
   { key: 'idBack', label: 'ID Back', urlKey: 'idBackUrl', rule: AADHAAR_FILE_RULE },
-  { key: 'bankPassbook', label: 'Bank Passbook', urlKey: 'bankPassbookUrl' },
+  { key: 'bankPassbook', label: 'Bank Passbook', urlKey: 'bankPassbookUrl', rule: DOCUMENT_FILE_RULE },
 ];
 
 const MOBILE_REGEX = /^[6-9]\d{9}$/;

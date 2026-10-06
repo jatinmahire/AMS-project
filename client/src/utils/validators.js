@@ -47,6 +47,15 @@ export const AADHAAR_FILE_RULE = {
   sizeLabel: '700KB',
 };
 
+// Same 700KB cap as AADHAAR_FILE_RULE, for the forms whose file input also accepts PNG.
+export const DOCUMENT_FILE_RULE = {
+  accept: '.pdf,.jpg,.jpeg,.png',
+  extensions: ['pdf', 'jpg', 'jpeg', 'png'],
+  typeLabel: 'PDF or JPEG/PNG',
+  maxBytes: 700 * 1024,
+  sizeLabel: '700KB',
+};
+
 export function validateUploadFile(file, rule) {
   if (!file) return undefined;
   const ext = file.name.split('.').pop().toLowerCase();

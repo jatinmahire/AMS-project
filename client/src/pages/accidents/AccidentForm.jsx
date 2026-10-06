@@ -52,6 +52,20 @@ export default function AccidentForm() {
     return { value: form[name] ?? '', onChange: (e) => setForm({ ...form, [name]: e.target.value }) };
   }
 
+  function handlePhotoChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const maxSize = 700 * 1024; // 700 KB
+    if (file.size > maxSize) {
+      setErrors((prev) => ({ ...prev, photoSize: 'File size must not exceed 700 KB (PDF or JPEG/PNG).' }));
+      setPhoto(null);
+      e.target.value = '';
+      return;
+    }
+    setErrors((prev) => { const next = { ...prev }; delete next.photoSize; return next; });
+    setPhoto(file);
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     if (!worker) {
@@ -98,7 +112,7 @@ export default function AccidentForm() {
           <FormField label="Accident Date" required error={errors.accidentDate}>
             <TextInput type="date" {...field('accidentDate')} error={errors.accidentDate} />
           </FormField>
-          <FormField label="Form 24 Report Date" error={errors.form24ReportDate}>
+          <FormField label="Form 24 hours Report Date" error={errors.form24ReportDate}>
             <TextInput type="date" {...field('form24ReportDate')} error={errors.form24ReportDate} />
           </FormField>
           <FormField label="Date Return to Work" error={errors.dateReturnToWork}>
@@ -110,8 +124,8 @@ export default function AccidentForm() {
           <FormField label="Nature of Accident" required error={errors.natureOfAccident} className="accident-form-col-span">
             <Textarea {...field('natureOfAccident')} error={errors.natureOfAccident} />
           </FormField>
-          <FormField label="Photo" error={errors.photoUrl}>
-            <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => setPhoto(e.target.files[0])}
+          <FormField label="Photo (PDF or JPEG, max 700KB)" required error={errors.photoUrl || errors.photoSize}>
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handlePhotoChange}
               className="accident-form-file-input" />
             {currentPhotoUrl && <a href={currentPhotoUrl} target="_blank" rel="noreferrer" className="accident-form-current-file-link">View current file</a>}
           </FormField>

@@ -19,10 +19,10 @@ export function TextInput({ error, className = '', onWheel, onChange, ...props }
   // Scrolling the page over a focused number input silently changes its value — blur it instead.
   const handleWheel = props.type === 'number' ? (e) => { e.currentTarget.blur(); onWheel?.(e); } : onWheel;
 
-  // Native date inputs let you keep typing digits into the year segment past 4 (e.g.
+  // Native date/month inputs let you keep typing digits into the year segment past 4 (e.g.
   // "26666-12-12") — the HTML spec doesn't cap it. Clamp the moment it overflows, everywhere
-  // a date input is used, since every one of them renders through this component.
-  const handleChange = props.type === 'date'
+  // a date or month input is used, since every one of them renders through this component.
+  const handleChange = (props.type === 'date' || props.type === 'month')
     ? (e) => {
         const [year, ...rest] = e.target.value.split('-');
         if (year && year.length > 4) {

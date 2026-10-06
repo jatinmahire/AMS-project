@@ -21,7 +21,10 @@ async function assignedContractor(user) {
 const SELECTED_ROLE_LABELS = { ADMIN: 'Admin', SUPERVISOR: 'Supervisor', CONTRACTOR: 'Contractor' };
 
 async function login(loginId, password, selectedRole) {
-  const user = await prisma.user.findUnique({ where: { loginId } });
+  // Case-insensitive and trimmed: mobile keyboards auto-capitalize the first letter and
+  // autofill/suggestion taps can leave a stray space, so the same login ID can arrive
+  // slightly different between attempts — that must not read as a wrong password.
+  const user = await prisma.user.findFirst({ where: { loginId: { equals: loginId.trim(), mode: 'insensitive' } } });
 
   if (!user || !user.isActive) {
     throw new ApiError(401, 'Invalid login ID or password');

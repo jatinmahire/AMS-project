@@ -12,6 +12,7 @@ import { getDamage, createDamage, updateDamage } from '../../api/damages';
 import { toDateInputValue } from '../../utils/format';
 import { toFormData } from '../../utils/toFormData';
 import { getErrorMessage, getFieldErrors } from '../../utils/errorMessage';
+import { DOCUMENT_FILE_RULE, validateUploadFile } from '../../utils/validators';
 import { useToast } from '../../context/ToastContext';
 import './DamageForm.css';
 
@@ -123,8 +124,14 @@ export default function DamageForm() {
           <FormField label="Installments" required error={errors.installments}>
             <TextInput type="number" min="1" {...field('installments')} error={errors.installments} />
           </FormField>
-          <FormField label="Photo" error={errors.imageUrl}>
-            <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => setImage(e.target.files[0])}
+          <FormField label={`Photo (${DOCUMENT_FILE_RULE.typeLabel}, max ${DOCUMENT_FILE_RULE.sizeLabel})`} error={errors.imageUrl}>
+            <input type="file" accept={DOCUMENT_FILE_RULE.accept} onChange={(e) => {
+              const file = e.target.files[0] || null;
+              const error = file ? validateUploadFile(file, DOCUMENT_FILE_RULE) : undefined;
+              setErrors((prev) => ({ ...prev, imageUrl: error }));
+              if (error) { e.target.value = ''; setImage(null); return; }
+              setImage(file);
+            }}
               className="damage-form-file-input" />
             {currentImageUrl && <a href={currentImageUrl} target="_blank" rel="noreferrer" className="damage-form-current-file-link">View current file</a>}
           </FormField>

@@ -10,6 +10,7 @@ import { contractorDropdown } from '../../api/contractors';
 import { toDateInputValue } from '../../utils/format';
 import { toFormData } from '../../utils/toFormData';
 import { getErrorMessage, getFieldErrors } from '../../utils/errorMessage';
+import { DOCUMENT_FILE_RULE, validateUploadFile } from '../../utils/validators';
 import { useToast } from '../../context/ToastContext';
 import './PolicyForm.css';
 
@@ -149,8 +150,14 @@ export default function PolicyForm() {
         </FormSection>
 
         <FormSection title="Policy Document">
-          <FormField label="Policy File" required={!isEdit} error={errors.fileUrl} className="policy-form-col-span">
-            <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(e) => setFile(e.target.files[0])}
+          <FormField label={`Policy File (${DOCUMENT_FILE_RULE.typeLabel}, max ${DOCUMENT_FILE_RULE.sizeLabel})`} required={!isEdit} error={errors.fileUrl} className="policy-form-col-span">
+            <input type="file" accept={DOCUMENT_FILE_RULE.accept} onChange={(e) => {
+              const file = e.target.files[0] || null;
+              const error = file ? validateUploadFile(file, DOCUMENT_FILE_RULE) : undefined;
+              setErrors((prev) => ({ ...prev, fileUrl: error }));
+              if (error) { e.target.value = ''; setFile(null); return; }
+              setFile(file);
+            }}
               className="policy-form-file-input" />
             {existingFileUrl && <a href={existingFileUrl} target="_blank" rel="noreferrer" className="policy-form-current-file-link">View current file</a>}
           </FormField>

@@ -5,6 +5,7 @@ import FormField, { Select } from '../../components/FormField';
 import { uploadContractorDocument, deleteContractorDocument } from '../../api/contractors';
 import { toFormData } from '../../utils/toFormData';
 import { getErrorMessage } from '../../utils/errorMessage';
+import { DOCUMENT_FILE_RULE, validateUploadFile } from '../../utils/validators';
 import { useToast } from '../../context/ToastContext';
 import './ContractorDocuments.css';
 
@@ -13,6 +14,7 @@ const DOC_TYPES = ['SHOP_ACT', 'PF_CODE', 'ESIC_CODE', 'PTEC', 'PTRC', 'MLWF_COD
 export default function ContractorDocuments({ contractorId, documents, onChange }) {
   const [docType, setDocType] = useState(DOC_TYPES[0]);
   const [file, setFile] = useState(null);
+  const [fileError, setFileError] = useState(undefined);
   const [uploading, setUploading] = useState(false);
   const { showToast } = useToast();
 
@@ -85,11 +87,17 @@ export default function ContractorDocuments({ contractorId, documents, onChange 
             ))}
           </Select>
         </FormField>
-        <FormField label="File" className="contractor-documents-file-field">
+        <FormField label={`File (${DOCUMENT_FILE_RULE.typeLabel}, max ${DOCUMENT_FILE_RULE.sizeLabel})`} className="contractor-documents-file-field" error={fileError}>
           <input
             type="file"
-            accept=".pdf,.jpg,.jpeg,.png"
-            onChange={(e) => setFile(e.target.files[0])}
+            accept={DOCUMENT_FILE_RULE.accept}
+            onChange={(e) => {
+              const picked = e.target.files[0] || null;
+              const error = picked ? validateUploadFile(picked, DOCUMENT_FILE_RULE) : undefined;
+              setFileError(error);
+              if (error) { e.target.value = ''; setFile(null); return; }
+              setFile(picked);
+            }}
             className="contractor-documents-file-input"
           />
         </FormField>

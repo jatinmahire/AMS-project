@@ -7,6 +7,7 @@ import FormField, { Select, TextInput, Textarea } from '../../components/FormFie
 import Button from '../../components/Button';
 import { getVerification, saveVerification } from '../../api/verifications';
 import { VERIFICATION_TYPES } from '../../constants/verificationTypes';
+import { DOCUMENT_FILE_RULE, validateUploadFile } from '../../utils/validators';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { displayName, formatDate } from '../../utils/format';
@@ -118,11 +119,21 @@ export default function VerificationForm() {
             <Textarea value={form.remarks} onChange={(e) => setForm({ ...form, remarks: e.target.value })} maxLength={500} />
           </FormField>
 
-          <FormField label="Supporting Document" required className="verification-form-col-span" error={errors.document}>
+          <FormField label={`Supporting Document (${DOCUMENT_FILE_RULE.typeLabel}, max ${DOCUMENT_FILE_RULE.sizeLabel})`} required className="verification-form-col-span" error={errors.document}>
             <input
               type="file"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => setDocument(e.target.files[0] || null)}
+              accept={DOCUMENT_FILE_RULE.accept}
+              onChange={(e) => {
+                const file = e.target.files[0] || null;
+                const error = file ? validateUploadFile(file, DOCUMENT_FILE_RULE) : undefined;
+                setErrors((prev) => ({ ...prev, document: error }));
+                if (error) {
+                  e.target.value = '';
+                  setDocument(null);
+                  return;
+                }
+                setDocument(file);
+              }}
               className="verification-form-file-input"
             />
             {record?.documentUrl && (
