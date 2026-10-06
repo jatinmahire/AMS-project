@@ -142,22 +142,33 @@ async function search(term, contractorId, user) {
   });
 }
 
+// Every worker's QR (shown right after registration, printed on ID cards, etc.) encodes
+// "AMS:<workerCode>" — this must read the Worker table directly rather than requiring a
+// separately-issued IdCard record, otherwise a freshly registered worker's own QR fails here.
+function extractWorkerCode(raw) {
+  const text = String(raw || '').trim();
+  const prefixed = /^AMS:(.+)$/i.exec(text);
+  if (prefixed) return prefixed[1].trim();
+  if (/^WRK\d+$/i.test(text)) return text;
+  return null;
+}
+
 async function findByQrCode(qrCodeData, user) {
-  const idCard = await prisma.idCard.findFirst({
-    where: { qrCodeData },
-    orderBy: { issueDate: 'desc' },
-    include: {
-      worker: { select: { id: true, workerCode: true, firstName: true, lastName: true, status: true, contractorId: true, contractor: { select: { contractorName: true } }, designation: { select: { designationName: true } } } },
-    },
+  const workerCode = extractWorkerCode(qrCodeData);
+  if (!workerCode) throw new ApiError(404, 'No worker found for this QR code');
+
+  const worker = await prisma.worker.findFirst({
+    where: { workerCode: { equals: workerCode, mode: 'insensitive' } },
+    select: { id: true, workerCode: true, firstName: true, lastName: true, status: true, contractorId: true, contractor: { select: { contractorName: true } }, designation: { select: { designationName: true } } },
   });
-  if (!idCard) throw new ApiError(404, 'No worker found for this QR code');
+  if (!worker) throw new ApiError(404, 'No worker found for this QR code');
 
   const scopedContractorId = await resolveScope(user);
-  if (scopedContractorId && idCard.worker.contractorId !== scopedContractorId) {
+  if (scopedContractorId && worker.contractorId !== scopedContractorId) {
     throw new ApiError(404, 'No worker found for this QR code');
   }
 
-  return idCard.worker;
+  return worker;
 }
 
 module.exports = { list, getById, create, update, updateStatus, search, findByQrCode };
