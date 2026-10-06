@@ -18,20 +18,19 @@ import { translateDesignation } from '../../utils/designationTranslations';
 import { toDevanagariDigits } from '../../utils/devanagariDigits';
 import './NinetyDaysForm.css';
 
-// Must match the fields the certificate actually renders (see the prefilled mapping below) —
-// "city" isn't used by the template for either record, so checking it here blocked printing
-// over a field the form never asks for and can't be fixed. The Contractor record has no
-// District column; the template uses its "state" for that slot, so that's what's checked.
+// The database record only pre-fills these boxes for convenience — what actually gets
+// printed, and so what must actually be checked, is the editable certificate text itself.
+// A worker/contractor whose own profile never had Taluka/District on file can still type
+// them in here and print; the printed form never reads the database directly.
 const REQUIRED_PRINT_FIELDS = {
-  Worker: [['taluka', 'Taluka'], ['district', 'District']],
-  Contractor: [['taluka', 'Taluka'], ['state', 'District']],
+  Worker: [['workerTaluka', 'Taluka'], ['workerDistrict', 'District']],
+  Contractor: [['employerTaluka', 'Taluka'], ['employerDistrict', 'District']],
 };
 
-function missingPrintFields(worker) {
-  const records = { Worker: worker, Contractor: worker?.contractor };
+function missingPrintFields(editable) {
   return Object.entries(REQUIRED_PRINT_FIELDS)
     .map(([recordLabel, fields]) => {
-      const missing = fields.filter(([key]) => !records[recordLabel]?.[key]?.trim()).map(([, label]) => label);
+      const missing = fields.filter(([key]) => !editable?.[key]?.trim()).map(([, label]) => label);
       return missing.length ? `${recordLabel}: ${missing.join(', ')}` : null;
     })
     .filter(Boolean);
@@ -224,11 +223,9 @@ export default function NinetyDaysForm() {
       showToast('Search for a worker before printing the certificate', 'error');
       return;
     }
-    const missing = missingPrintFields(result.worker);
+    const missing = missingPrintFields(editable);
     if (missing.length) {
-      // These come from the Worker/Contractor's own master record, not the editable boxes
-      // on this certificate — editing the certificate's fields doesn't save back to them.
-      showToast(`Cannot print — add these on the Worker/Contractor's own profile page first (editing the boxes below won't save there): ${missing.join('; ')}`, 'error');
+      showToast(`Cannot print — fill in the missing details first. ${missing.join('; ')}`, 'error');
       return;
     }
     printNow();
