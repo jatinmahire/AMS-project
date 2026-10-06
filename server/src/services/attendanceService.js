@@ -163,7 +163,7 @@ async function scan(code, userId, user) {
   const workerCode = extractWorkerCode(code);
   if (!workerCode) throw new ApiError(400, 'Not a valid AMS QR code');
 
-  const worker = await prisma.worker.findUnique({ where: { workerCode } });
+  const worker = await prisma.worker.findFirst({ where: { workerCode: { equals: workerCode, mode: 'insensitive' } } });
   const scopedContractorId = await resolveScope(user);
   if (!worker || (scopedContractorId && worker.contractorId !== scopedContractorId)) {
     throw new ApiError(404, 'Worker not found or not under your contractor');

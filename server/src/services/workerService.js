@@ -72,8 +72,20 @@ async function create(data, user) {
     throw new ApiError(403, 'Your account is not linked to a contractor, so you cannot register workers');
   }
 
-  const workerCode = await generateCode('worker');
-  const worker = await prisma.worker.create({ data: { ...data, workerCode } });
+  // generateCode reads the current max then +1, which isn't atomic — two registrations
+  // submitted close together can land on the same code. Retry with a freshly generated
+  // code instead of failing the whole registration if that unique constraint fires.
+  let worker;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const workerCode = await generateCode('worker');
+    try {
+      worker = await prisma.worker.create({ data: { ...data, workerCode } });
+      break;
+    } catch (err) {
+      if (err.code === 'P2002' && attempt < 2) continue;
+      throw err;
+    }
+  }
   await recordAudit({
     userId: user.id,
     action: 'CREATE_WORKER',
