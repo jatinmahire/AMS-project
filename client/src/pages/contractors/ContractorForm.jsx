@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
@@ -7,6 +7,7 @@ import StepIndicator from '../../components/StepIndicator';
 import FormSection from '../../components/FormSection';
 import FormField, { TextInput, Select } from '../../components/FormField';
 import NumericInput from '../../components/NumericInput';
+import AlphabetInput from '../../components/AlphabetInput';
 import EmailInput from '../../components/EmailInput';
 import StateCityFields from '../../components/StateCityFields';
 import Button from '../../components/Button';
@@ -47,10 +48,57 @@ const STEP_FIELDS = [
 ];
 
 const STEP_REQUIRED_FIELDS = [
-  ['contractorName', 'contactPerson', 'phone', 'email', 'address'],
+  ['contractorName', 'contactPerson', 'phone', 'email', 'address', 'village', 'taluka', 'state', 'city', 'pincode'],
   ['aadhaarNo', 'panNo'],
   [],
 ];
+
+
+// Alpha-only input: blocks digit keystrokes and shows a brief red flash message,
+// matching the NumericInput flash pattern exactly (same CSS classes).
+function AlphaInput({ value, onChange, error, className = '', ...props }) {
+  const [flash, setFlash] = useState('');
+  const [flashVisible, setFlashVisible] = useState(false);
+  const hideRef = useRef(null);
+  const clearRef = useRef(null);
+  useEffect(() => () => { clearTimeout(hideRef.current); clearTimeout(clearRef.current); }, []);
+
+  function showFlash(msg) {
+    clearTimeout(hideRef.current); clearTimeout(clearRef.current);
+    setFlash(msg); setFlashVisible(true);
+    hideRef.current = setTimeout(() => setFlashVisible(false), 2000);
+    clearRef.current = setTimeout(() => setFlash(''), 2300);
+  }
+
+  function handleKeyDown(e) {
+    if ((e.ctrlKey || e.metaKey) && ['a','c','v','x'].includes(e.key.toLowerCase())) return;
+    const CTRL = new Set(['Backspace','Delete','Tab','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','Enter','Escape']);
+    if (CTRL.has(e.key)) return;
+    if (e.key.length === 1 && /[0-9]/.test(e.key)) {
+      e.preventDefault();
+      showFlash('Only letters are allowed');
+    }
+  }
+
+  function handlePaste(e) {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text');
+    const lettersOnly = pasted.replace(/[0-9]/g, '');
+    if (lettersOnly.length < pasted.length) showFlash('Only letters are allowed');
+    const input = e.target;
+    const start = input.selectionStart ?? input.value.length;
+    const end = input.selectionEnd ?? input.value.length;
+    const next = input.value.slice(0, start) + lettersOnly + input.value.slice(end);
+    onChange({ target: { value: next, name: props.name } });
+  }
+
+  return (
+    <div className="numeric-input-wrapper">
+      <TextInput value={value} onChange={onChange} onKeyDown={handleKeyDown} onPaste={handlePaste} error={error} className={className} {...props} />
+      {flash && <p className={`numeric-input-flash ${flashVisible ? '' : 'numeric-input-flash-hidden'}`}>{flash}</p>}
+    </div>
+  );
+}
 
 export default function ContractorForm() {
   const { id } = useParams();
@@ -208,7 +256,7 @@ export default function ContractorForm() {
                 <TextInput {...field('establishmentName')} maxLength={30} error={errors.establishmentName} />
               </FormField>
               <FormField label="Contact Person" required error={errors.contactPerson}>
-                <TextInput {...field('contactPerson')} maxLength={30} error={errors.contactPerson} />
+                <AlphabetInput {...field('contactPerson')} maxLength={30} error={errors.contactPerson} />
               </FormField>
               <FormField label="Phone" required error={errors.phone}>
                 <NumericInput {...field('phone')} error={errors.phone} exactLength={10} label="Phone number" />
@@ -240,19 +288,20 @@ export default function ContractorForm() {
               <FormField label="Address" required error={errors.address} className="contractor-form-col-span">
                 <TextInput {...field('address')} error={errors.address} />
               </FormField>
-              <FormField label="Village" error={errors.village}>
-                <TextInput {...field('village')} error={errors.village} />
+              <FormField label="Village" required error={errors.village}>
+                <AlphaInput {...field('village')} error={errors.village} />
               </FormField>
-              <FormField label="Taluka" error={errors.taluka}>
-                <TextInput {...field('taluka')} error={errors.taluka} />
+              <FormField label="Taluka" required error={errors.taluka}>
+                <AlphaInput {...field('taluka')} error={errors.taluka} />
               </FormField>
               <StateCityFields
                 state={form.state}
                 city={form.city}
                 onChange={(changes) => setForm((prev) => ({ ...prev, ...changes }))}
                 errors={errors}
+                required
               />
-              <FormField label="Pincode" error={errors.pincode}>
+              <FormField label="Pincode" required error={errors.pincode}>
                 <NumericInput {...field('pincode')} error={errors.pincode} exactLength={6} label="Pincode" />
               </FormField>
             </FormSection>

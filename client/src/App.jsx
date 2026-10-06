@@ -116,7 +116,7 @@ export default function App() {
 
             <Route path="/kyc" element={<Protected roles={ALL_ROLES}><KycLookup /></Protected>} />
             <Route path="/attendance" element={<Protected roles={ALL_ROLES}><Attendance /></Protected>} />
-            <Route path="/attendance/new" element={<Protected roles={SHARED_ROLES}><AttendanceForm /></Protected>} />
+            <Route path="/attendance/new" element={<Protected roles={ALL_ROLES}><AttendanceForm /></Protected>} />
             <Route path="/attendance/:id/edit" element={<Protected roles={SHARED_ROLES}><AttendanceForm /></Protected>} />
             <Route path="/attendance/:id" element={<Protected roles={ALL_ROLES}><AttendanceView /></Protected>} />
             <Route path="/gate-logs" element={<Protected><GateLogs /></Protected>} />

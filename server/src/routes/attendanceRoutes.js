@@ -10,8 +10,8 @@ router.use(authenticate);
 
 router.get('/', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), attendanceController.list);
 router.get('/:id', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), attendanceController.getById);
-router.post('/scan', requireRole('ADMIN', 'SUPERVISOR'), validate(scanSchema), attendanceController.scan);
-router.post('/', requireRole('ADMIN', 'SUPERVISOR'), validate(attendanceSchema), attendanceController.create);
-router.put('/:id', requireRole('ADMIN', 'SUPERVISOR'), validate(attendanceSchema), attendanceController.update);
+router.post('/scan', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), validate(scanSchema), attendanceController.scan);
+router.post('/', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), validate(attendanceSchema), attendanceController.create);
+router.put('/:id', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), validate(attendanceSchema), attendanceController.update);
 
 module.exports = router;

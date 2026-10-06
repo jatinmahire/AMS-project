@@ -40,8 +40,10 @@ export default function Attendance() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { user } = useAuth();
-  const isReadOnly = user?.role === 'CONTRACTOR';
-  const canScan = !isReadOnly;
+  // Contractor can mark attendance (add + scan) same as Admin/Supervisor, but editing an
+  // already-marked record stays Admin/Supervisor only.
+  const canEdit = user?.role !== 'CONTRACTOR';
+  const canScan = true;
   const [scanMode, setScanMode] = useState(false);
   const [banner, setBanner] = useState(null);
 
@@ -110,7 +112,7 @@ export default function Attendance() {
           <button onClick={() => navigate(`/attendance/${row.id}`)} className="attendance-action-btn">
             <Eye size={16} />
           </button>
-          {!isReadOnly && (
+          {canEdit && (
             <button onClick={() => navigate(`/attendance/${row.id}/edit`)} className="attendance-action-btn">
               <Pencil size={16} />
             </button>
@@ -126,7 +128,7 @@ export default function Attendance() {
         title="Daily Attendance"
         description="Mark and review worker attendance by date."
         action={
-          !isReadOnly && (
+          (
             <div className="attendance-header-actions">
               {canScan && (
                 <Button variant="secondary" icon={ScanLine} onClick={() => setScanMode((v) => !v)}>

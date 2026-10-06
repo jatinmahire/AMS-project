@@ -5,6 +5,7 @@ import BackButton from '../../components/BackButton';
 import FormSection from '../../components/FormSection';
 import FormField, { TextInput, Textarea } from '../../components/FormField';
 import Button from '../../components/Button';
+import AlphabetInput from '../../components/AlphabetInput';
 import WorkerSearchSelect from '../../components/WorkerSearchSelect';
 import WorkerInfoCard from '../../components/WorkerInfoCard';
 import { getFine, createFine, updateFine } from '../../api/fines';
@@ -105,7 +106,7 @@ export default function FineForm() {
             <Textarea {...field('causeShown')} error={errors.causeShown} />
           </FormField>
           <FormField label="Witness Name" error={errors.witnessName}>
-            <TextInput {...field('witnessName')} maxLength={30} error={errors.witnessName} />
+            <AlphabetInput {...field('witnessName')} maxLength={30} error={errors.witnessName} />
           </FormField>
         </FormSection>
 

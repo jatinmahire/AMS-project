@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import BackButton from '../../components/BackButton';
@@ -6,6 +6,7 @@ import StepIndicator from '../../components/StepIndicator';
 import FormSection from '../../components/FormSection';
 import FormField, { TextInput, Select } from '../../components/FormField';
 import NumericInput from '../../components/NumericInput';
+import AlphabetInput from '../../components/AlphabetInput';
 import StateCityFields from '../../components/StateCityFields';
 import WorkerQrCard from '../../components/WorkerQrCard';
 import Button from '../../components/Button';
@@ -60,13 +61,59 @@ const STEP_FIELDS = [
 
 const STEP_REQUIRED_FIELDS = [
   ['firstName', 'lastName', 'dob', 'gender', 'maritalStatus', 'mobileNo'],
-  ['permanentAddress', 'state', 'city', 'district', 'pincode'],
+  ['permanentAddress', 'taluka', 'state', 'city', 'district', 'pincode'],
   ['contractorId', 'designationId', 'labourCategoryId', 'idType', 'idNumber', 'joinDate', 'panNumber'],
   [
     'bankName', 'bankBranch', 'accountNo', 'ifscCode',
     'nomineeName', 'nomineeRelation', 'nomineeChildrenCount', 'nomineeQualification', 'nomineeMobile',
   ],
 ];
+
+// Alpha-only input: blocks digit keystrokes and shows a brief red flash message,
+// matching the NumericInput flash pattern exactly (same CSS classes).
+function AlphaInput({ value, onChange, error, className = '', ...props }) {
+  const [flash, setFlash] = useState('');
+  const [flashVisible, setFlashVisible] = useState(false);
+  const hideRef = useRef(null);
+  const clearRef = useRef(null);
+  useEffect(() => () => { clearTimeout(hideRef.current); clearTimeout(clearRef.current); }, []);
+
+  function showFlash(msg) {
+    clearTimeout(hideRef.current); clearTimeout(clearRef.current);
+    setFlash(msg); setFlashVisible(true);
+    hideRef.current = setTimeout(() => setFlashVisible(false), 2000);
+    clearRef.current = setTimeout(() => setFlash(''), 2300);
+  }
+
+  function handleKeyDown(e) {
+    if ((e.ctrlKey || e.metaKey) && ['a','c','v','x'].includes(e.key.toLowerCase())) return;
+    const CTRL = new Set(['Backspace','Delete','Tab','ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','Enter','Escape']);
+    if (CTRL.has(e.key)) return;
+    if (e.key.length === 1 && /[0-9]/.test(e.key)) {
+      e.preventDefault();
+      showFlash('Only letters are allowed');
+    }
+  }
+
+  function handlePaste(e) {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text');
+    const lettersOnly = pasted.replace(/[0-9]/g, '');
+    if (lettersOnly.length < pasted.length) showFlash('Only letters are allowed');
+    const input = e.target;
+    const start = input.selectionStart ?? input.value.length;
+    const end = input.selectionEnd ?? input.value.length;
+    const next = input.value.slice(0, start) + lettersOnly + input.value.slice(end);
+    onChange({ target: { value: next, name: props.name } });
+  }
+
+  return (
+    <div className="numeric-input-wrapper">
+      <TextInput value={value} onChange={onChange} onKeyDown={handleKeyDown} onPaste={handlePaste} error={error} className={className} {...props} />
+      {flash && <p className={`numeric-input-flash ${flashVisible ? '' : 'numeric-input-flash-hidden'}`}>{flash}</p>}
+    </div>
+  );
+}
 
 function isBlank(value) {
   return value === '' || value === null || value === undefined;
@@ -291,13 +338,13 @@ export default function WorkerForm() {
         {currentStep === 0 && (
           <FormSection title="Personal Info">
             <FormField label="First Name" required error={errors.firstName}>
-              <TextInput {...field('firstName')} maxLength={30} error={errors.firstName} />
+              <AlphabetInput {...field('firstName')} maxLength={30} error={errors.firstName} />
             </FormField>
             <FormField label="Middle Name" error={errors.middleName}>
-              <TextInput {...field('middleName')} maxLength={30} error={errors.middleName} />
+              <AlphabetInput {...field('middleName')} maxLength={30} error={errors.middleName} />
             </FormField>
             <FormField label="Last Name" required error={errors.lastName}>
-              <TextInput {...field('lastName')} maxLength={30} error={errors.lastName} />
+              <AlphabetInput {...field('lastName')} maxLength={30} error={errors.lastName} />
             </FormField>
             <FormField label="Date of Birth" required error={errors.dob}>
               <TextInput type="date" {...field('dob')} min={MIN_DOB} max={maxAdultDob()} error={errors.dob} />
@@ -331,10 +378,10 @@ export default function WorkerForm() {
               <TextInput {...field('currentAddress')} error={errors.currentAddress} />
             </FormField>
             <FormField label="Village" error={errors.village}>
-              <TextInput {...field('village')} error={errors.village} />
+              <AlphaInput {...field('village')} error={errors.village} />
             </FormField>
-            <FormField label="Taluka" error={errors.taluka}>
-              <TextInput {...field('taluka')} error={errors.taluka} />
+            <FormField label="Taluka" required error={errors.taluka}>
+              <AlphaInput {...field('taluka')} error={errors.taluka} />
             </FormField>
             <StateCityFields
               state={form.state}
@@ -400,7 +447,7 @@ export default function WorkerForm() {
                 <TextInput {...field('idNumber')} maxLength={15} error={errors.idNumber} />
               </FormField>
               {FILE_FIELDS.map((f) => (
-                <FormField label={f.rule ? `${f.label} (${f.rule.typeLabel}, max ${f.rule.sizeLabel})` : f.label} key={f.key} error={errors[f.key]}>
+                <FormField label={f.rule ? `${f.label} (${f.rule.typeLabel}, max ${f.rule.sizeLabel})` : f.label} key={f.key} required error={errors[f.key]}>
                   <input
                     type="file"
                     accept={f.rule?.accept || '.pdf,.jpg,.jpeg,.png'}
@@ -460,7 +507,7 @@ export default function WorkerForm() {
 
             <FormSection title="Nominee Details">
               <FormField label="Nominee Name" required error={errors.nomineeName}>
-                <TextInput {...field('nomineeName')} maxLength={30} error={errors.nomineeName} />
+                <AlphabetInput {...field('nomineeName')} maxLength={30} error={errors.nomineeName} />
               </FormField>
               <FormField label="Relation" required error={errors.nomineeRelation}>
                 <TextInput {...field('nomineeRelation')} error={errors.nomineeRelation} />

@@ -7,6 +7,7 @@ import StepIndicator from '../../components/StepIndicator';
 import FormSection from '../../components/FormSection';
 import FormField, { TextInput, Select } from '../../components/FormField';
 import NumericInput from '../../components/NumericInput';
+import AlphabetInput from '../../components/AlphabetInput';
 import EmailInput from '../../components/EmailInput';
 import StateCityFields from '../../components/StateCityFields';
 import Button from '../../components/Button';
@@ -201,7 +202,7 @@ export default function SupervisorForm() {
         {currentStep === 0 && (
           <FormSection title="Personal Info">
             <FormField label="Full Name" required error={errors.fullName}>
-              <TextInput {...field('fullName')} maxLength={30} error={errors.fullName} />
+              <AlphabetInput {...field('fullName')} maxLength={30} error={errors.fullName} />
             </FormField>
             <FormField label="Gender" required error={errors.gender}>
               <Select {...field('gender')}>
@@ -222,12 +223,12 @@ export default function SupervisorForm() {
             <FormField label="Aadhaar No." required error={errors.aadhaarNo}>
               <NumericInput {...field('aadhaarNo')} error={errors.aadhaarNo} exactLength={12} label="Aadhaar number" />
             </FormField>
-            <FormField label={`Aadhaar Front (${AADHAAR_FILE_RULE.typeLabel}, max ${AADHAAR_FILE_RULE.sizeLabel})`} error={errors.aadhaarFront}>
+            <FormField label={`Aadhaar Front (${AADHAAR_FILE_RULE.typeLabel}, max ${AADHAAR_FILE_RULE.sizeLabel})`} required error={errors.aadhaarFront}>
               <input type="file" accept={AADHAAR_FILE_RULE.accept} onChange={(e) => handleAadhaarFile('aadhaarFront', setAadhaarFront, e)}
                 className="supervisor-form-file-input" />
               {supervisor?.aadhaarFrontUrl && <a href={supervisor.aadhaarFrontUrl} target="_blank" rel="noreferrer" className="supervisor-form-current-file-link">View current file</a>}
             </FormField>
-            <FormField label={`Aadhaar Back (${AADHAAR_FILE_RULE.typeLabel}, max ${AADHAAR_FILE_RULE.sizeLabel})`} error={errors.aadhaarBack}>
+            <FormField label={`Aadhaar Back (${AADHAAR_FILE_RULE.typeLabel}, max ${AADHAAR_FILE_RULE.sizeLabel})`} required error={errors.aadhaarBack}>
               <input type="file" accept={AADHAAR_FILE_RULE.accept} onChange={(e) => handleAadhaarFile('aadhaarBack', setAadhaarBack, e)}
                 className="supervisor-form-file-input" />
               {supervisor?.aadhaarBackUrl && <a href={supervisor.aadhaarBackUrl} target="_blank" rel="noreferrer" className="supervisor-form-current-file-link">View current file</a>}
