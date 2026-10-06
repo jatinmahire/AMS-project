@@ -12,7 +12,7 @@ router.get('/supervisor-counts', requireRole('SUPERVISOR'), dashboardController.
 router.get('/contractor-counts', requireRole('CONTRACTOR'), dashboardController.getContractorCounts);
 router.get('/recent-activity', dashboardController.getRecentActivity);
 router.get('/attendance-overview', dashboardController.getAttendanceOverview);
-router.get('/recent-registrations', requireRole('ADMIN'), dashboardController.getRecentRegistrations);
+router.get('/recent-registrations', dashboardController.getRecentRegistrations);
 router.get('/activity', dashboardController.getActivity);
 
 module.exports = router;

@@ -12,6 +12,6 @@
   @apply w-full sm:w-auto;
 }
 
-.supervisor-dashboard-updates {
-  @apply mt-6;
+.supervisor-dashboard-feature-row {
+  @apply mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3;
 }

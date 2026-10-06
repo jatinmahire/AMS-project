@@ -34,7 +34,7 @@ const getActivity = asyncHandler(async (req, res) => {
 
 const getRecentRegistrations = asyncHandler(async (req, res) => {
   const type = req.query.type || 'ALL';
-  const rows = await dashboardService.getRecentRegistrations(type);
+  const rows = await dashboardService.getRecentRegistrations(type, req.user);
   res.json(rows);
 });
 

@@ -60,6 +60,10 @@ export default function VerificationForm() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (!document && !record?.documentUrl) {
+      setErrors({ document: 'Upload a supporting document' });
+      return;
+    }
     setSaving(true);
     setErrors({});
     try {
@@ -114,7 +118,7 @@ export default function VerificationForm() {
             <Textarea value={form.remarks} onChange={(e) => setForm({ ...form, remarks: e.target.value })} maxLength={500} />
           </FormField>
 
-          <FormField label="Supporting Document (optional)" className="verification-form-col-span" error={errors.document}>
+          <FormField label="Supporting Document" required className="verification-form-col-span" error={errors.document}>
             <input
               type="file"
               accept=".pdf,.jpg,.jpeg,.png"

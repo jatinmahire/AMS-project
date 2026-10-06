@@ -262,32 +262,54 @@ function toRegistrationRow(type, row) {
   return { ...base, id: row.id, code: row.supervisorCode, name: row.fullName };
 }
 
-async function getRecentRegistrations(type = 'ALL') {
-  const take = RECENT_REGISTRATIONS_LIMIT;
+const CREATE_ACTION_BY_TYPE = { WORKER: 'CREATE_WORKER', CONTRACTOR: 'CREATE_CONTRACTOR', SUPERVISOR: 'CREATE_SUPERVISOR' };
 
-  if (type === 'WORKER') {
+// Who registered each row isn't stored on the Worker/Contractor/Supervisor tables
+// themselves — it's recovered from the audit trail each create() call already writes.
+async function attachRegisteredBy(rows) {
+  if (rows.length === 0) return rows;
+  const logs = await prisma.auditLog.findMany({
+    where: {
+      entityId: { in: rows.map((r) => r.id) },
+      action: { in: Object.values(CREATE_ACTION_BY_TYPE) },
+    },
+    select: { entityId: true, user: { select: { fullName: true, role: true } } },
+  });
+  const byEntityId = new Map(logs.map((l) => [l.entityId, l.user]));
+  return rows.map((r) => ({ ...r, registeredBy: byEntityId.get(r.id) || null }));
+}
+
+async function getRecentRegistrations(type = 'ALL', user) {
+  const take = RECENT_REGISTRATIONS_LIMIT;
+  const contractorId = await scopedContractorId(user);
+  // A supervisor/contractor only sees their own contractor's workers — contractor and
+  // supervisor registrations aren't theirs to browse, so those types never apply to them.
+  const effectiveType = contractorId ? 'WORKER' : type;
+
+  if (effectiveType === 'WORKER') {
     const rows = await prisma.worker.findMany({
+      where: contractorId ? { contractorId } : {},
       orderBy: { createdAt: 'desc' },
       take,
       select: { id: true, workerCode: true, firstName: true, lastName: true, photoUrl: true, createdAt: true },
     });
-    return rows.map((r) => toRegistrationRow('WORKER', r));
+    return attachRegisteredBy(rows.map((r) => toRegistrationRow('WORKER', r)));
   }
-  if (type === 'CONTRACTOR') {
+  if (effectiveType === 'CONTRACTOR') {
     const rows = await prisma.contractor.findMany({
       orderBy: { createdAt: 'desc' },
       take,
       select: { id: true, contractorCode: true, contractorName: true, createdAt: true },
     });
-    return rows.map((r) => toRegistrationRow('CONTRACTOR', r));
+    return attachRegisteredBy(rows.map((r) => toRegistrationRow('CONTRACTOR', r)));
   }
-  if (type === 'SUPERVISOR') {
+  if (effectiveType === 'SUPERVISOR') {
     const rows = await prisma.supervisor.findMany({
       orderBy: { createdAt: 'desc' },
       take,
       select: { id: true, supervisorCode: true, fullName: true, createdAt: true },
     });
-    return rows.map((r) => toRegistrationRow('SUPERVISOR', r));
+    return attachRegisteredBy(rows.map((r) => toRegistrationRow('SUPERVISOR', r)));
   }
 
   const [workers, contractors, supervisors] = await Promise.all([
@@ -314,7 +336,8 @@ async function getRecentRegistrations(type = 'ALL') {
     ...supervisors.map((r) => toRegistrationRow('SUPERVISOR', r)),
   ];
 
-  return merged.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, take);
+  const sorted = merged.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, take);
+  return attachRegisteredBy(sorted);
 }
 
 module.exports = {

@@ -27,23 +27,25 @@ const TYPE_META = {
   },
 };
 
-export default function RecentRegistrationsCard({ items, loading, type, onTypeChange }) {
+export default function RecentRegistrationsCard({ items, loading, type, onTypeChange, showTypeFilter = true }) {
   const navigate = useNavigate();
 
   return (
     <div className="recent-registrations-card">
       <div className="recent-registrations-card-header">
         <h2 className="recent-registrations-card-header-title">Recent Registrations</h2>
-        <Select
-          value={type}
-          onChange={(e) => onTypeChange(e.target.value)}
-          className="recent-registrations-filter"
-        >
-          <option value="ALL">All</option>
-          <option value="CONTRACTOR">Contractors</option>
-          <option value="SUPERVISOR">Supervisors</option>
-          <option value="WORKER">Workers</option>
-        </Select>
+        {showTypeFilter && (
+          <Select
+            value={type}
+            onChange={(e) => onTypeChange(e.target.value)}
+            className="recent-registrations-filter"
+          >
+            <option value="ALL">All</option>
+            <option value="CONTRACTOR">Contractors</option>
+            <option value="SUPERVISOR">Supervisors</option>
+            <option value="WORKER">Workers</option>
+          </Select>
+        )}
       </div>
 
       {loading ? (
@@ -67,7 +69,10 @@ export default function RecentRegistrationsCard({ items, loading, type, onTypeCh
                   </span>
                   <span className="recent-registrations-card-item-body">
                     <span className="recent-registrations-card-item-name">{item.name}</span>
-                    <span className="recent-registrations-card-item-code">{item.code}</span>
+                    <span className="recent-registrations-card-item-code">
+                      {item.code}
+                      {item.registeredBy && ` • Added by ${item.registeredBy.fullName}`}
+                    </span>
                   </span>
                   <span className={`recent-registrations-badge ${meta.badgeClass}`}>{meta.label}</span>
                 </button>

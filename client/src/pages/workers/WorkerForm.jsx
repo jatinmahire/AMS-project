@@ -42,9 +42,17 @@ const FILE_FIELDS = [
   { key: 'bankPassbook', label: 'Bank Passbook', urlKey: 'bankPassbookUrl' },
 ];
 
+const MOBILE_REGEX = /^[6-9]\d{9}$/;
+
 const PATTERN_FIELDS = {
   panNumber: { regex: PAN_REGEX, label: 'PAN number', example: 'ABCDE1234F' },
   ifscCode: { regex: IFSC_REGEX, label: 'IFSC code', example: 'HDFC0001234' },
+};
+
+const ID_NUMBER_RULES = {
+  AADHAAR: { regex: /^\d{12}$/, message: 'Enter a valid 12-digit Aadhaar number' },
+  PAN: { regex: PAN_REGEX, message: 'Enter a valid PAN, e.g. ABCDE1234F' },
+  VOTER_ID: { regex: /^[A-Z]{3}[0-9]{7}$/, message: 'Enter a valid Voter ID, e.g. ABC1234567' },
 };
 
 const STEP_LABELS = ['Personal Info', 'Address', 'Employment & Documents', 'Bank & Nominee'];
@@ -215,6 +223,15 @@ export default function WorkerForm() {
         if (patternError) stepErrors[key] = patternError;
       }
     }
+    for (const key of ['mobileNo', 'nomineeMobile']) {
+      if (STEP_FIELDS[stepIndex].includes(key) && !stepErrors[key] && form[key] && !MOBILE_REGEX.test(form[key])) {
+        stepErrors[key] = 'Enter a valid 10-digit mobile number';
+      }
+    }
+    if (STEP_FIELDS[stepIndex].includes('idNumber') && !stepErrors.idNumber && form.idNumber) {
+      const rule = ID_NUMBER_RULES[form.idType];
+      if (rule && !rule.regex.test(form.idNumber)) stepErrors.idNumber = rule.message;
+    }
     return stepErrors;
   }
 
@@ -325,7 +342,7 @@ export default function WorkerForm() {
 
   return (
     <div>
-      <BackButton to={isEdit ? `/workers/${id}` : '/workers'} />
+      {isEdit && <BackButton to={`/workers/${id}`} />}
 
       <PageHeader
         title={isEdit ? `Edit Worker — ${worker?.workerCode}` : 'Add Worker'}
@@ -437,14 +454,29 @@ export default function WorkerForm() {
 
             <FormSection title="Identity Documents">
               <FormField label="ID Type" required error={errors.idType}>
-                <Select {...field('idType')}>
+                <Select
+                  value={form.idType}
+                  onChange={(e) => {
+                    setForm({ ...form, idType: e.target.value, idNumber: '' });
+                    setErrors((prev) => ({ ...prev, idNumber: undefined }));
+                  }}
+                >
                   <option value="AADHAAR">Aadhaar</option>
                   <option value="PAN">PAN</option>
                   <option value="VOTER_ID">Voter ID</option>
                 </Select>
               </FormField>
               <FormField label="ID Number" required error={errors.idNumber}>
-                <TextInput {...field('idNumber')} maxLength={15} error={errors.idNumber} />
+                {form.idType === 'AADHAAR' ? (
+                  <NumericInput {...field('idNumber')} error={errors.idNumber} exactLength={12} label="Aadhaar number" />
+                ) : (
+                  <TextInput
+                    value={form.idNumber ?? ''}
+                    onChange={(e) => setForm({ ...form, idNumber: e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '') })}
+                    maxLength={10}
+                    error={errors.idNumber}
+                  />
+                )}
               </FormField>
               {FILE_FIELDS.map((f) => (
                 <FormField label={f.rule ? `${f.label} (${f.rule.typeLabel}, max ${f.rule.sizeLabel})` : f.label} key={f.key} required error={errors[f.key]}>

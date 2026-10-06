@@ -22,6 +22,7 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
   const [status, setStatus] = useState('starting');
   const [torchOn, setTorchOn] = useState(false);
   const [torchAvailable, setTorchAvailable] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
 
   // Keep the latest callbacks without them being effect dependencies — the parent
   // re-rendering (e.g. on every scan result) must never tear down and restart the camera.
@@ -83,6 +84,15 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
       controls.isTorchAvailable?.()
         .then((available) => !cancelled && setTorchAvailable(!!available))
         .catch(() => {});
+
+      // Some devices hand back a "live" stream that never actually paints a frame (the
+      // black-screen case) — decodeFromConstraints has no way to detect that itself, so
+      // watch the video element directly and offer a manual restart if it never grows.
+      setTimeout(() => {
+        if (!cancelled && videoRef.current && videoRef.current.videoWidth === 0) {
+          setStatus('stalled');
+        }
+      }, 2500);
     });
 
     return () => {
@@ -90,7 +100,12 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
       controlsRef.current?.stop();
       controlsRef.current = null;
     };
-  }, [continuous]);
+  }, [continuous, retryKey]);
+
+  function retryCamera() {
+    setStatus('starting');
+    setRetryKey((k) => k + 1);
+  }
 
   function toggleTorch() {
     const next = !torchOn;
@@ -113,6 +128,12 @@ export default function QrScanner({ onScan, onError, continuous = false }) {
       <div className="qr-scanner-guide" />
       {status === 'starting' && (
         <p className="qr-scanner-status-text">Starting camera...</p>
+      )}
+      {status === 'stalled' && (
+        <div className="qr-scanner-stalled">
+          <p className="qr-scanner-status-text">Camera feed stuck.</p>
+          <button type="button" onClick={retryCamera} className="qr-scanner-retry-btn">Retry camera</button>
+        </div>
       )}
       {torchAvailable && (
         <button type="button" onClick={toggleTorch} className="qr-scanner-torch-btn" aria-label="Toggle flashlight">
