@@ -1,66 +1,67 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './routes/ProtectedRoute';
 import AppShell from './components/AppShell';
-import NotFound from './pages/NotFound';
+const NotFound = lazy(() => import('./pages/NotFound'));
 
-import Login from './pages/auth/Login';
-import Dashboard from './pages/dashboard/Dashboard';
-import SupervisorDashboard from './pages/dashboard/SupervisorDashboard';
-import ContractorDashboard from './pages/dashboard/ContractorDashboard';
-import ProfilePage from './pages/profile/ProfilePage';
-import Designations from './pages/designations/Designations';
-import DesignationForm from './pages/designations/DesignationForm';
-import DesignationView from './pages/designations/DesignationView';
-import LabourCategories from './pages/labourCategories/LabourCategories';
-import LabourCategoryForm from './pages/labourCategories/LabourCategoryForm';
-import LabourCategoryView from './pages/labourCategories/LabourCategoryView';
-import Contractors from './pages/contractors/Contractors';
-import ContractorForm from './pages/contractors/ContractorForm';
-import ContractorView from './pages/contractors/ContractorView';
-import Supervisors from './pages/supervisors/Supervisors';
-import SupervisorForm from './pages/supervisors/SupervisorForm';
-import SupervisorView from './pages/supervisors/SupervisorView';
-import Workers from './pages/workers/Workers';
-import VerificationList from './pages/verifications/VerificationList';
-import VerificationForm from './pages/verifications/VerificationForm';
-import WorkerForm from './pages/workers/WorkerForm';
-import WorkerView from './pages/workers/WorkerView';
-import KycLookup from './pages/kyc/KycLookup';
-import Attendance from './pages/attendance/Attendance';
-import AttendanceForm from './pages/attendance/AttendanceForm';
-import AttendanceView from './pages/attendance/AttendanceView';
-import GateLogs from './pages/gateLogs/GateLogs';
-import GateLogForm from './pages/gateLogs/GateLogForm';
-import Damages from './pages/damages/Damages';
-import DamageForm from './pages/damages/DamageForm';
-import DamageView from './pages/damages/DamageView';
-import Fines from './pages/fines/Fines';
-import FineForm from './pages/fines/FineForm';
-import FineView from './pages/fines/FineView';
-import Accidents from './pages/accidents/Accidents';
-import AccidentForm from './pages/accidents/AccidentForm';
-import AccidentView from './pages/accidents/AccidentView';
-import Advances from './pages/advances/Advances';
-import AdvanceForm from './pages/advances/AdvanceForm';
-import AdvanceView from './pages/advances/AdvanceView';
-import Overtimes from './pages/overtimes/Overtimes';
-import OvertimeForm from './pages/overtimes/OvertimeForm';
-import OvertimeView from './pages/overtimes/OvertimeView';
-import Policies from './pages/policies/Policies';
-import PolicyForm from './pages/policies/PolicyForm';
-import PolicyView from './pages/policies/PolicyView';
-import Holidays from './pages/holidays/Holidays';
-import HolidayForm from './pages/holidays/HolidayForm';
-import HolidayView from './pages/holidays/HolidayView';
-import Notifications from './pages/notifications/Notifications';
-import ActivityLog from './pages/activity/ActivityLog';
-import WorkerIdCard from './pages/reports/WorkerIdCard';
-import NinetyDaysForm from './pages/reports/NinetyDaysForm';
-import StatutoryRegisters from './pages/reports/StatutoryRegisters';
-import MusterRoll from './pages/reports/MusterRoll';
-import PfChalan from './pages/reports/PfChalan';
+const Login = lazy(() => import('./pages/auth/Login'));
+const Dashboard = lazy(() => import('./pages/dashboard/Dashboard'));
+const SupervisorDashboard = lazy(() => import('./pages/dashboard/SupervisorDashboard'));
+const ContractorDashboard = lazy(() => import('./pages/dashboard/ContractorDashboard'));
+const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'));
+const Designations = lazy(() => import('./pages/designations/Designations'));
+const DesignationForm = lazy(() => import('./pages/designations/DesignationForm'));
+const DesignationView = lazy(() => import('./pages/designations/DesignationView'));
+const LabourCategories = lazy(() => import('./pages/labourCategories/LabourCategories'));
+const LabourCategoryForm = lazy(() => import('./pages/labourCategories/LabourCategoryForm'));
+const LabourCategoryView = lazy(() => import('./pages/labourCategories/LabourCategoryView'));
+const Contractors = lazy(() => import('./pages/contractors/Contractors'));
+const ContractorForm = lazy(() => import('./pages/contractors/ContractorForm'));
+const ContractorView = lazy(() => import('./pages/contractors/ContractorView'));
+const Supervisors = lazy(() => import('./pages/supervisors/Supervisors'));
+const SupervisorForm = lazy(() => import('./pages/supervisors/SupervisorForm'));
+const SupervisorView = lazy(() => import('./pages/supervisors/SupervisorView'));
+const Workers = lazy(() => import('./pages/workers/Workers'));
+const VerificationList = lazy(() => import('./pages/verifications/VerificationList'));
+const VerificationForm = lazy(() => import('./pages/verifications/VerificationForm'));
+const WorkerForm = lazy(() => import('./pages/workers/WorkerForm'));
+const WorkerView = lazy(() => import('./pages/workers/WorkerView'));
+const KycLookup = lazy(() => import('./pages/kyc/KycLookup'));
+const Attendance = lazy(() => import('./pages/attendance/Attendance'));
+const AttendanceForm = lazy(() => import('./pages/attendance/AttendanceForm'));
+const AttendanceView = lazy(() => import('./pages/attendance/AttendanceView'));
+const GateLogs = lazy(() => import('./pages/gateLogs/GateLogs'));
+const GateLogForm = lazy(() => import('./pages/gateLogs/GateLogForm'));
+const Damages = lazy(() => import('./pages/damages/Damages'));
+const DamageForm = lazy(() => import('./pages/damages/DamageForm'));
+const DamageView = lazy(() => import('./pages/damages/DamageView'));
+const Fines = lazy(() => import('./pages/fines/Fines'));
+const FineForm = lazy(() => import('./pages/fines/FineForm'));
+const FineView = lazy(() => import('./pages/fines/FineView'));
+const Accidents = lazy(() => import('./pages/accidents/Accidents'));
+const AccidentForm = lazy(() => import('./pages/accidents/AccidentForm'));
+const AccidentView = lazy(() => import('./pages/accidents/AccidentView'));
+const Advances = lazy(() => import('./pages/advances/Advances'));
+const AdvanceForm = lazy(() => import('./pages/advances/AdvanceForm'));
+const AdvanceView = lazy(() => import('./pages/advances/AdvanceView'));
+const Overtimes = lazy(() => import('./pages/overtimes/Overtimes'));
+const OvertimeForm = lazy(() => import('./pages/overtimes/OvertimeForm'));
+const OvertimeView = lazy(() => import('./pages/overtimes/OvertimeView'));
+const Policies = lazy(() => import('./pages/policies/Policies'));
+const PolicyForm = lazy(() => import('./pages/policies/PolicyForm'));
+const PolicyView = lazy(() => import('./pages/policies/PolicyView'));
+const Holidays = lazy(() => import('./pages/holidays/Holidays'));
+const HolidayForm = lazy(() => import('./pages/holidays/HolidayForm'));
+const HolidayView = lazy(() => import('./pages/holidays/HolidayView'));
+const Notifications = lazy(() => import('./pages/notifications/Notifications'));
+const ActivityLog = lazy(() => import('./pages/activity/ActivityLog'));
+const WorkerIdCard = lazy(() => import('./pages/reports/WorkerIdCard'));
+const NinetyDaysForm = lazy(() => import('./pages/reports/NinetyDaysForm'));
+const StatutoryRegisters = lazy(() => import('./pages/reports/StatutoryRegisters'));
+const MusterRoll = lazy(() => import('./pages/reports/MusterRoll'));
+const PfChalan = lazy(() => import('./pages/reports/PfChalan'));
 
 function Protected({ children, roles = ['ADMIN'] }) {
   return (
@@ -79,6 +80,7 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <ToastProvider>
+          <Suspense fallback={<div style={{ padding: 24 }}>Loading...</div>}>
           <Routes>
             <Route path="/login" element={<Login />} />
 
@@ -163,6 +165,7 @@ export default function App() {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </ToastProvider>
       </AuthProvider>
     </BrowserRouter>

@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const { clientUrl } = require('./config/env');
@@ -20,6 +21,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.use(helmet());
+app.use(compression());
 app.use(cors({ origin: clientUrl }));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: true, legacyHeaders: false }));
 app.use(express.json());
