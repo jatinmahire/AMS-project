@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import './FormField.css';
 
 export default function FormField({ label, error, required, children, className = '' }) {
@@ -20,13 +21,21 @@ export function TextInput({ error, className = '', onWheel, onChange, ...props }
   const handleWheel = props.type === 'number' ? (e) => { e.currentTarget.blur(); onWheel?.(e); } : onWheel;
 
   // Native date/month inputs let you keep typing digits into the year segment past 4 (e.g.
-  // "26666-12-12") — the HTML spec doesn't cap it. Clamp the moment it overflows, everywhere
-  // a date or month input is used, since every one of them renders through this component.
-  const handleChange = (props.type === 'date' || props.type === 'month')
+  // typing "2","0","2","6","0","0" shows "200600") — the HTML spec doesn't cap it, and once
+  // it overflows, the browser's own composed value is no longer simply "the digits typed in
+  // order" (slicing the first/last 4 characters of it can silently produce a wrong-but-valid-
+  // looking year like "0002"). Reverting fully to the last known-good value is the only
+  // outcome that's never silently wrong, everywhere a date or month input renders through
+  // this component.
+  const lastValidRef = useRef(props.value ?? '');
+  const isDateLike = props.type === 'date' || props.type === 'month';
+  const handleChange = isDateLike
     ? (e) => {
-        const [year, ...rest] = e.target.value.split('-');
+        const [year] = e.target.value.split('-');
         if (year && year.length > 4) {
-          e.target.value = [year.slice(0, 4), ...rest].join('-');
+          e.target.value = lastValidRef.current || '';
+        } else {
+          lastValidRef.current = e.target.value;
         }
         onChange?.(e);
       }

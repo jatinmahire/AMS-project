@@ -226,7 +226,9 @@ export default function NinetyDaysForm() {
     }
     const missing = missingPrintFields(result.worker);
     if (missing.length) {
-      showToast(`Cannot print — fill in the missing details first. ${missing.join('; ')}`, 'error');
+      // These come from the Worker/Contractor's own master record, not the editable boxes
+      // on this certificate — editing the certificate's fields doesn't save back to them.
+      showToast(`Cannot print — add these on the Worker/Contractor's own profile page first (editing the boxes below won't save there): ${missing.join('; ')}`, 'error');
       return;
     }
     printNow();
