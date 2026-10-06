@@ -18,10 +18,13 @@ import { translateDesignation } from '../../utils/designationTranslations';
 import { toDevanagariDigits } from '../../utils/devanagariDigits';
 import './NinetyDaysForm.css';
 
+// Must match the fields the certificate actually renders (see the prefilled mapping below) —
+// "city" isn't used by the template for either record, so checking it here blocked printing
+// over a field the form never asks for and can't be fixed. The Contractor record has no
+// District column; the template uses its "state" for that slot, so that's what's checked.
 const REQUIRED_PRINT_FIELDS = {
-  Worker: [['taluka', 'Taluka'], ['city', 'City'], ['district', 'District']],
-  // The Contractor record has no District column, so only Taluka and City can be checked there.
-  Contractor: [['taluka', 'Taluka'], ['city', 'City']],
+  Worker: [['taluka', 'Taluka'], ['district', 'District']],
+  Contractor: [['taluka', 'Taluka'], ['state', 'District']],
 };
 
 function missingPrintFields(worker) {
