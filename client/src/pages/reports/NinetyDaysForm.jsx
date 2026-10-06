@@ -278,13 +278,6 @@ export default function NinetyDaysForm() {
           <Button type="submit" icon={Search} disabled={searching}>{searching ? 'Searching...' : 'Search'}</Button>
           <Button type="button" variant="secondary" icon={Printer} onClick={handlePrint}>Print</Button>
         </form>
-
-        {result && (
-          <p className="ninety-days-form-note">
-            Every field below is editable — values are auto-filled (and, where applicable, transliterated to Devanagari)
-            from the database, but review and correct anything before printing.
-          </p>
-        )}
       </div>
 
       {result && (
