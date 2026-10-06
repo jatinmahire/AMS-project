@@ -233,7 +233,10 @@ export default function NinetyDaysForm() {
   }
 
   function viewCertificate(workerCode) {
-    navigate(`/reports/90-days/${workerCode}`);
+    // Keep the history filters (contractor/date range/page) in the URL so viewing a
+    // certificate and going back doesn't reset the filter the user had just set.
+    const query = searchParams.toString();
+    navigate(`/reports/90-days/${workerCode}${query ? `?${query}` : ''}`);
   }
 
   const historyColumns = [
