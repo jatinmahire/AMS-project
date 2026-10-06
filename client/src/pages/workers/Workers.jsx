@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, Eye, Pencil, Ban, CheckCircle, FileSpreadsheet, Printer } from 'lucide-react';
+import { Eye, Pencil, Ban, CheckCircle, FileSpreadsheet, Printer } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
@@ -16,7 +16,6 @@ import { formatDate } from '../../utils/format';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import { exportToCsv } from '../../utils/exportCsv';
-import { printNow } from '../../utils/printExport';
 import './Workers.css';
 
 const EXPORT_FIELDS = [

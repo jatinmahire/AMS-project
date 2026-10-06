@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Plus, Eye, Pencil, Ban, CheckCircle, FileSpreadsheet } from 'lucide-react';
+import { Eye, Pencil, Ban, CheckCircle, FileSpreadsheet } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 import Button from '../../components/Button';
