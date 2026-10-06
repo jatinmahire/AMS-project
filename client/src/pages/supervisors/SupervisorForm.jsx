@@ -36,7 +36,7 @@ const STEP_FIELDS = [
 
 const STEP_REQUIRED_FIELDS = [
   ['fullName', 'gender', 'dob', 'contactNo', 'email', 'aadhaarNo'],
-  [],
+  ['street', 'city', 'state', 'pincode'],
 ];
 
 const LAST_STEP = STEP_LABELS.length - 1;
@@ -239,7 +239,7 @@ export default function SupervisorForm() {
         {currentStep === 1 && (
           <>
             <FormSection title="Address">
-              <FormField label="Street" error={errors.street}>
+              <FormField label="Street" required error={errors.street}>
                 <TextInput {...field('street')} error={errors.street} />
               </FormField>
               <StateCityFields
@@ -247,8 +247,9 @@ export default function SupervisorForm() {
                 city={form.city}
                 onChange={(changes) => setForm((prev) => ({ ...prev, ...changes }))}
                 errors={errors}
+                required
               />
-              <FormField label="Pincode" error={errors.pincode}>
+              <FormField label="Pincode" required error={errors.pincode}>
                 <NumericInput {...field('pincode')} error={errors.pincode} exactLength={6} label="Pincode" />
               </FormField>
             </FormSection>
