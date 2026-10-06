@@ -154,7 +154,7 @@ export default function Attendance() {
 
       <div className="attendance-date-filter-row">
         <label className="attendance-date-filter-label">Date</label>
-        <TextInput type="date" value={date} onChange={(e) => updateParams({ date: e.target.value, page: null })} className="attendance-date-filter-input" />
+        <TextInput type="date" name="attendance-filter-date" autoComplete="off" value={date} onChange={(e) => updateParams({ date: e.target.value, page: null })} className="attendance-date-filter-input" />
       </div>
 
       <DataTable columns={columns} rows={result.data} loading={loading} emptyMessage="No attendance marked for this date" scrollable fullWidth maxHeight="500px" />

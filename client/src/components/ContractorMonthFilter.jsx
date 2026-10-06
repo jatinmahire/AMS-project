@@ -23,7 +23,7 @@ export default function ContractorMonthFilter({ contractorId, onContractorChange
       </div>
       <div className="contractor-month-filter-month-field">
         <label className="contractor-month-filter-label">Month</label>
-        <TextInput type="month" value={month} onChange={(e) => onMonthChange(e.target.value)} />
+        <TextInput type="month" name="contractor-month-filter" autoComplete="off" value={month} onChange={(e) => onMonthChange(e.target.value)} />
       </div>
     </div>
   );

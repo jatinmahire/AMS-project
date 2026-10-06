@@ -62,6 +62,8 @@ export default function FilterBar({ filters, values, onChange }) {
               <label className="filter-bar-label">{filter.label || 'Date'}</label>
               <TextInput
                 type="date"
+                name={`filter-${filter.key}`}
+                autoComplete="off"
                 value={values[filter.key] || ''}
                 onChange={(e) => onChange(filter.key, e.target.value)}
               />
@@ -75,6 +77,8 @@ export default function FilterBar({ filters, values, onChange }) {
               <label className="filter-bar-label">{filter.label || 'Month'}</label>
               <TextInput
                 type="month"
+                name={`filter-${filter.key}`}
+                autoComplete="off"
                 value={values[filter.key] || ''}
                 onChange={(e) => onChange(filter.key, e.target.value)}
               />
@@ -89,6 +93,8 @@ export default function FilterBar({ filters, values, onChange }) {
                 <label className="filter-bar-label">From</label>
                 <TextInput
                   type="date"
+                  name={`filter-${filter.key}-from`}
+                  autoComplete="off"
                   value={values[`${filter.key}From`] || ''}
                   onChange={(e) => onChange(`${filter.key}From`, e.target.value)}
                 />
@@ -97,6 +103,8 @@ export default function FilterBar({ filters, values, onChange }) {
                 <label className="filter-bar-label">To</label>
                 <TextInput
                   type="date"
+                  name={`filter-${filter.key}-to`}
+                  autoComplete="off"
                   value={values[`${filter.key}To`] || ''}
                   onChange={(e) => onChange(`${filter.key}To`, e.target.value)}
                 />
