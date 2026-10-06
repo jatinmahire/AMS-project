@@ -4,12 +4,16 @@
   @apply mb-6 flex flex-col items-center gap-3 border-b border-slate-100 pb-5 text-center;
 }
 
+/* 1fr | title | 1fr: equal flanking columns keep the title centered on the page's full
+   width, not just the space left over after the action button — a plain flex row with
+   flex-1 on the title would center it only within that remainder, visibly off-center
+   whenever the action has any real width. */
 .page-header {
-  @apply mb-6 flex flex-col gap-3 border-b border-slate-100 pb-5 sm:flex-row sm:items-center sm:justify-between;
+  @apply mb-6 grid grid-cols-1 items-center gap-3 border-b border-slate-100 pb-5 sm:grid-cols-[1fr_auto_1fr];
 }
 
 .page-header-titles {
-  @apply text-center sm:flex-1;
+  @apply text-center sm:col-start-2;
 }
 
 .page-header-title {
@@ -21,5 +25,5 @@
 }
 
 .page-header-action {
-  @apply flex-none;
+  @apply flex-none justify-self-center sm:col-start-3 sm:justify-self-end;
 }
