@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const ApiError = require('./ApiError');
 
-const ALLOWED_TYPES = ['.jpg', '.jpeg', '.png', '.pdf'];
+const ALLOWED_TYPES = ['.jpg', '.jpeg', '.pdf'];
 const MAX_SIZE = 700 * 1024;
 
 const AADHAAR_RULE = { types: ['.pdf', '.jpg', '.jpeg'], typeLabel: 'PDF or JPEG', maxSize: 700 * 1024, sizeLabel: '700KB' };

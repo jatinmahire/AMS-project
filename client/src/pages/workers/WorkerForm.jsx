@@ -482,7 +482,7 @@ export default function WorkerForm() {
                 <FormField label={f.rule ? `${f.label} (${f.rule.typeLabel}, max ${f.rule.sizeLabel})` : f.label} key={f.key} required error={errors[f.key]}>
                   <input
                     type="file"
-                    accept={f.rule?.accept || '.pdf,.jpg,.jpeg,.png'}
+                    accept={f.rule?.accept || '.pdf,.jpg,.jpeg'}
                     onChange={(e) => handleFileChange(f, e)}
                     className="worker-form-file-input"
                   />

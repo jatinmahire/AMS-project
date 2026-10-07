@@ -47,11 +47,12 @@ export const AADHAAR_FILE_RULE = {
   sizeLabel: '700KB',
 };
 
-// Same 700KB cap as AADHAAR_FILE_RULE, for the forms whose file input also accepts PNG.
+// Same rule as AADHAAR_FILE_RULE — kept as a separate export since it's used by forms
+// unrelated to Aadhaar, so the name at each call site still reads correctly.
 export const DOCUMENT_FILE_RULE = {
-  accept: '.pdf,.jpg,.jpeg,.png',
-  extensions: ['pdf', 'jpg', 'jpeg', 'png'],
-  typeLabel: 'PDF or JPEG/PNG',
+  accept: '.pdf,.jpg,.jpeg',
+  extensions: ['pdf', 'jpg', 'jpeg'],
+  typeLabel: 'PDF or JPEG',
   maxBytes: 700 * 1024,
   sizeLabel: '700KB',
 };

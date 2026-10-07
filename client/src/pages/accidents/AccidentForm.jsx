@@ -125,7 +125,7 @@ export default function AccidentForm() {
             <Textarea {...field('natureOfAccident')} error={errors.natureOfAccident} />
           </FormField>
           <FormField label="Photo (PDF or JPEG, max 700KB)" required error={errors.photoUrl || errors.photoSize}>
-            <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handlePhotoChange}
+            <input type="file" accept=".pdf,.jpg,.jpeg" onChange={handlePhotoChange}
               className="accident-form-file-input" />
             {currentPhotoUrl && <a href={currentPhotoUrl} target="_blank" rel="noreferrer" className="accident-form-current-file-link">View current file</a>}
           </FormField>
