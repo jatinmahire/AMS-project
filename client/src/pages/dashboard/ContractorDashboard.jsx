@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Users, CalendarCheck } from 'lucide-react';
 import { getContractorCounts, getRecentActivity, getRecentRegistrations } from '../../api/dashboard';
 import PageHeader from '../../components/PageHeader';
 import StatCard from '../../components/StatCard';
+import Button from '../../components/Button';
 import RecentUpdatesCard from '../../components/RecentUpdatesCard';
 import RecentRegistrationsCard from '../../components/RecentRegistrationsCard';
 import AttendanceOverviewCard from '../../components/AttendanceOverviewCard';
@@ -26,6 +28,7 @@ export default function ContractorDashboard() {
   const [registrationsLoading, setRegistrationsLoading] = useState(true);
   const { user } = useAuth();
   const { showToast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     getContractorCounts()
@@ -56,6 +59,12 @@ export default function ContractorDashboard() {
         {CARDS.map((card) => (
           <StatCard key={card.key} label={card.label} icon={card.icon} value={loading ? '-' : counts?.[card.key] ?? 0} />
         ))}
+      </div>
+
+      <div className="contractor-dashboard-action-row">
+        <Button className="contractor-dashboard-action-button" icon={CalendarCheck} onClick={() => navigate('/attendance/new')}>
+          Mark Daily Attendance
+        </Button>
       </div>
 
       <div className="contractor-dashboard-feature-row">

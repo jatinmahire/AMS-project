@@ -542,7 +542,7 @@ export default function WorkerForm() {
                 <AlphabetInput {...field('nomineeName')} maxLength={30} error={errors.nomineeName} />
               </FormField>
               <FormField label="Relation" required error={errors.nomineeRelation}>
-                <TextInput {...field('nomineeRelation')} error={errors.nomineeRelation} />
+                <AlphabetInput {...field('nomineeRelation')} maxLength={30} error={errors.nomineeRelation} />
               </FormField>
               <FormField label="Children Count" required error={errors.nomineeChildrenCount}>
                 <TextInput type="number" min={0} {...field('nomineeChildrenCount')} error={errors.nomineeChildrenCount} />

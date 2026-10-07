@@ -157,6 +157,9 @@ export default function ContractorForm() {
         if (emailErr) stepErrors[key] = emailErr;
       }
     }
+    if (STEP_FIELDS[stepIndex].includes('phone') && !stepErrors.phone && form.phone && !/^\d{10}$/.test(form.phone)) {
+      stepErrors.phone = 'Enter a valid 10-digit phone number';
+    }
     return stepErrors;
   }
 

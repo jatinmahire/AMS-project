@@ -109,6 +109,9 @@ export default function SupervisorForm() {
       const dobError = validateDob(form.dob, 'Supervisor');
       if (dobError) stepErrors.dob = dobError;
     }
+    if (STEP_FIELDS[stepIndex].includes('contactNo') && !stepErrors.contactNo && form.contactNo && !/^\d{10}$/.test(form.contactNo)) {
+      stepErrors.contactNo = 'Enter a valid 10-digit contact number';
+    }
     return stepErrors;
   }
 
