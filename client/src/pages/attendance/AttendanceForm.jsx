@@ -24,6 +24,11 @@ function buildEmptyForm() {
   return { date: todayIso(), inTime: '', outTime: '', status: 'PRESENT', buildingNo: '' };
 }
 
+function nowTimeString() {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+}
+
 function ReadOnlyField({ label, value }) {
   return (
     <FormField label={label}>
@@ -50,6 +55,7 @@ export default function AttendanceForm() {
       scanWorkerQr(code)
         .then((scannedWorker) => {
           setWorker(scannedWorker);
+          setForm((prev) => ({ ...prev, inTime: prev.inTime || nowTimeString() }));
           setErrors({});
           setScannerMode(false);
           showToast(`Scanned ${scannedWorker.workerCode} — ${scannedWorker.firstName} ${scannedWorker.lastName}`);

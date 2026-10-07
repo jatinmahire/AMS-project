@@ -23,7 +23,7 @@ router.use(authenticate);
 
 router.get('/', requireRole('ADMIN', 'CONTRACTOR'), workerController.list);
 router.get('/search', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), workerController.searchWorkers);
-router.get('/scan/:code', requireRole('ADMIN', 'SUPERVISOR'), workerController.scanQr);
+router.get('/scan/:code', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), workerController.scanQr);
 router.get('/:id', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), workerController.getById);
 router.post('/', requireRole('ADMIN', 'SUPERVISOR', 'CONTRACTOR'), uploadFields, validate(workerSchema), workerController.create);
 router.put('/:id', requireRole('ADMIN'), uploadFields, validate(workerSchema), workerController.update);
