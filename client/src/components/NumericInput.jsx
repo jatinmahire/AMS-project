@@ -76,12 +76,23 @@ export default function NumericInput({ value, onChange, error, exactLength, maxL
     onChange({ target: { value: next, name: props.name } });
   }
 
+  // keydown/paste stop most invalid input before it lands, but autofill, IME input, and some
+  // mobile keyboards can insert text without firing either — so also sanitize on every change
+  // as a backstop, regardless of how the character arrived.
+  function handleChange(e) {
+    let clean = e.target.value.replace(/\D/g, '');
+    const wasInvalid = clean !== e.target.value;
+    if (limit && clean.length > limit) clean = clean.slice(0, limit);
+    if (wasInvalid) showFlash('Only numbers are allowed');
+    onChange({ target: { value: clean, name: e.target.name } });
+  }
+
   return (
     <div className="numeric-input-wrapper">
       <TextInput
         inputMode="numeric"
         value={value}
-        onChange={onChange}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
         onPaste={handlePaste}
         error={error}

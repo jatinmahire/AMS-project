@@ -55,11 +55,20 @@ export default function AlphabetInput({ value, onChange, error, className = '', 
     onChange({ target: { value: next, name: props.name } });
   }
 
+  // keydown/paste stop most invalid characters before they land, but autofill, IME input,
+  // and some mobile keyboards can insert text without firing either — so also sanitize
+  // on every change as a backstop, regardless of how the character arrived.
+  function handleChange(e) {
+    const clean = e.target.value.replace(LETTER_ONLY, '');
+    if (clean !== e.target.value) showFlash();
+    onChange({ target: { value: clean, name: e.target.name } });
+  }
+
   return (
     <div className="numeric-input-wrapper">
       <TextInput
         value={value}
-        onChange={onChange}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
         onPaste={handlePaste}
         error={error}
