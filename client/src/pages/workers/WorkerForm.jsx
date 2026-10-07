@@ -545,7 +545,7 @@ export default function WorkerForm() {
                 <AlphabetInput {...field('nomineeRelation')} maxLength={30} error={errors.nomineeRelation} />
               </FormField>
               <FormField label="Children Count" required error={errors.nomineeChildrenCount}>
-                <TextInput type="number" min={0} {...field('nomineeChildrenCount')} error={errors.nomineeChildrenCount} />
+                <NumericInput {...field('nomineeChildrenCount')} error={errors.nomineeChildrenCount} label="Children count" />
               </FormField>
               <FormField label="Qualification" required error={errors.nomineeQualification}>
                 <TextInput {...field('nomineeQualification')} error={errors.nomineeQualification} />

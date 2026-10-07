@@ -26,6 +26,15 @@ const optionalInt = () => {
   return z.preprocess((v) => (v === '' || v === null || v === undefined ? undefined : v), z.coerce.number().int().optional());
 };
 
+// Same pattern as optionalNonNegativeNumber, but for count-type fields (worker count, RC
+// count, number of children, installments, etc.) where a fractional value never makes sense.
+const optionalNonNegativeInt = (message = 'Must not be negative') => {
+  return z.preprocess(
+    (v) => (v === '' || v === null || v === undefined ? undefined : v),
+    z.coerce.number().int('Must be a whole number').nonnegative(message).optional()
+  );
+};
+
 // Same pattern the frontend's shared validators.js uses for both the
 // NumericInput components (client-side keystroke/paste blocking) and
 // EmailInput (blur validation) — kept in sync here so a value that slips
@@ -88,6 +97,7 @@ module.exports = {
   optionalDate,
   optionalNumber,
   optionalNonNegativeNumber,
+  optionalNonNegativeInt,
   optionalInt,
   EMAIL_REGEX,
   emailString,

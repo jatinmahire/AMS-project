@@ -6,6 +6,7 @@ import FormSection from '../../components/FormSection';
 import FormField, { TextInput, Textarea } from '../../components/FormField';
 import Button from '../../components/Button';
 import AlphabetInput from '../../components/AlphabetInput';
+import NumericInput from '../../components/NumericInput';
 import WorkerSearchSelect from '../../components/WorkerSearchSelect';
 import WorkerInfoCard from '../../components/WorkerInfoCard';
 import { getDamage, createDamage, updateDamage } from '../../api/damages';
@@ -122,7 +123,7 @@ export default function DamageForm() {
             <TextInput type="number" step="0.01" min="0" {...field('deductionAmount')} error={errors.deductionAmount} />
           </FormField>
           <FormField label="Installments" required error={errors.installments}>
-            <TextInput type="number" min="1" {...field('installments')} error={errors.installments} />
+            <NumericInput {...field('installments')} error={errors.installments} label="Installments" />
           </FormField>
           <FormField label={`Photo (${DOCUMENT_FILE_RULE.typeLabel}, max ${DOCUMENT_FILE_RULE.sizeLabel})`} error={errors.imageUrl}>
             <input type="file" accept={DOCUMENT_FILE_RULE.accept} onChange={(e) => {

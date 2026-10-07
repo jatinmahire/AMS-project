@@ -1,5 +1,5 @@
 const { z } = require('zod');
-const { optionalString, optionalNumber, optionalNonNegativeNumber } = require('./common');
+const { optionalString, optionalNumber, optionalNonNegativeInt } = require('./common');
 
 const policySchema = z.object({
   contractorId: z.string().min(1, 'Contractor is required'),
@@ -10,8 +10,8 @@ const policySchema = z.object({
   policyDate: z.coerce.date({ errorMap: () => ({ message: 'Policy date is required' }) }),
   validDate: z.coerce.date({ errorMap: () => ({ message: 'Valid date is required' }) }),
   workerCount: z.coerce.number().int().nonnegative('Worker count cannot be negative'),
-  projectValue: optionalNonNegativeNumber('Project value must not be negative'),
-  personValue: optionalNonNegativeNumber('Person value must not be negative'),
+  projectValue: optionalNonNegativeInt('Project value must not be negative'),
+  personValue: optionalNonNegativeInt('Person value must not be negative'),
   remarks: optionalString(),
 });
 

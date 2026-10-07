@@ -4,6 +4,8 @@ import PageHeader from '../../components/PageHeader';
 import BackButton from '../../components/BackButton';
 import FormSection from '../../components/FormSection';
 import FormField, { TextInput, Select, Textarea } from '../../components/FormField';
+import NumericInput from '../../components/NumericInput';
+import AlphabetInput from '../../components/AlphabetInput';
 import Button from '../../components/Button';
 import { getPolicy, createPolicy, updatePolicy } from '../../api/policies';
 import { contractorDropdown } from '../../api/contractors';
@@ -115,10 +117,10 @@ export default function PolicyForm() {
 
         <FormSection title="Policy Details">
           <FormField label="Policy Name" required error={errors.policyName}>
-            <TextInput {...field('policyName')} error={errors.policyName} />
+            <AlphabetInput {...field('policyName')} error={errors.policyName} />
           </FormField>
           <FormField label="Policy Number" required error={errors.policyNumber}>
-            <TextInput {...field('policyNumber')} error={errors.policyNumber} />
+            <NumericInput {...field('policyNumber')} error={errors.policyNumber} maxLength={13} label="Policy number" />
           </FormField>
           <FormField label="Insurance Company" required error={errors.insuranceCompany}>
             <TextInput {...field('insuranceCompany')} error={errors.insuranceCompany} />
@@ -136,13 +138,13 @@ export default function PolicyForm() {
 
         <FormSection title="Coverage">
           <FormField label="Worker Count" required error={errors.workerCount}>
-            <TextInput type="number" min="0" {...field('workerCount')} error={errors.workerCount} />
+            <NumericInput {...field('workerCount')} error={errors.workerCount} label="Worker count" />
           </FormField>
           <FormField label="Project Value" error={errors.projectValue}>
-            <TextInput type="number" step="0.01" min="0" {...field('projectValue')} error={errors.projectValue} />
+            <NumericInput {...field('projectValue')} error={errors.projectValue} label="Project value" />
           </FormField>
           <FormField label="Person Value" error={errors.personValue}>
-            <TextInput type="number" step="0.01" min="0" {...field('personValue')} error={errors.personValue} />
+            <NumericInput {...field('personValue')} error={errors.personValue} label="Person value" />
           </FormField>
           <FormField label="Remarks" error={errors.remarks} className="policy-form-col-span">
             <Textarea {...field('remarks')} error={errors.remarks} />
