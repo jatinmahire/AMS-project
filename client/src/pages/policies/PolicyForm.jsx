@@ -123,10 +123,10 @@ export default function PolicyForm() {
             <NumericInput {...field('policyNumber')} error={errors.policyNumber} maxLength={13} label="Policy number" />
           </FormField>
           <FormField label="Insurance Company" required error={errors.insuranceCompany}>
-            <TextInput {...field('insuranceCompany')} error={errors.insuranceCompany} />
+            <AlphabetInput {...field('insuranceCompany')} error={errors.insuranceCompany} />
           </FormField>
           <FormField label="Project Name" error={errors.projectName}>
-            <TextInput {...field('projectName')} error={errors.projectName} />
+            <AlphabetInput {...field('projectName')} error={errors.projectName} />
           </FormField>
           <FormField label="Policy Date" required error={errors.policyDate}>
             <TextInput type="date" {...field('policyDate')} error={errors.policyDate} />
