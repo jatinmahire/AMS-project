@@ -45,10 +45,14 @@ html {
   }
 
   /* Scrollable table containers must render in full on print, not just
-     whatever portion happened to be scrolled into view on screen. */
+     whatever portion happened to be scrolled into view on screen. DataTable's
+     own wrapper applies overflow-auto through @apply (so the compiled class
+     is data-table-container, not overflow-auto) — the rules below never
+     matched it, so its scrollbar and scrolled-away rows printed as-is. */
   .overflow-auto,
   .overflow-x-auto,
-  .overflow-y-auto {
+  .overflow-y-auto,
+  .data-table-container {
     overflow: visible !important;
     max-height: none !important;
   }
@@ -58,6 +62,20 @@ html {
      scrollbar/clipping around, so it's released to grow with the content. */
   .h-screen {
     height: auto !important;
+  }
+
+  /* AppShell.css applies these utilities through @apply, so the rules above
+     never match them directly (the compiled class name is app-shell/
+     app-shell-main, not h-screen/overflow-y-auto) — the printed page still
+     carried the scrollable main panel's scrollbar and its reserved gutter
+     space as a visible stripe down the side. Reset the real selectors too. */
+  .app-shell {
+    height: auto !important;
+  }
+
+  .app-shell-main {
+    overflow: visible !important;
+    scrollbar-gutter: auto !important;
   }
 
   table {
