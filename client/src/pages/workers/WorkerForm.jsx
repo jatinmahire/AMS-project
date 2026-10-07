@@ -524,10 +524,10 @@ export default function WorkerForm() {
           <>
             <FormSection title="Bank Details">
               <FormField label="Bank Name" required error={errors.bankName}>
-                <TextInput {...field('bankName')} maxLength={30} error={errors.bankName} />
+                <AlphabetInput {...field('bankName')} maxLength={30} error={errors.bankName} />
               </FormField>
               <FormField label="Bank Branch" required error={errors.bankBranch}>
-                <TextInput {...field('bankBranch')} error={errors.bankBranch} />
+                <AlphabetInput {...field('bankBranch')} maxLength={30} error={errors.bankBranch} />
               </FormField>
               <FormField label="Account No." required error={errors.accountNo}>
                 <NumericInput {...field('accountNo')} error={errors.accountNo} maxLength={18} label="Account number" />

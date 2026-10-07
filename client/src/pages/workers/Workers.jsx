@@ -5,6 +5,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import PageHeader from '../../components/PageHeader';
 import DataTable from '../../components/DataTable';
 import Button from '../../components/Button';
+import Modal from '../../components/Modal';
 import WorkerQrCard from '../../components/WorkerQrCard';
 import FilterBar from '../../components/FilterBar';
 import Pagination from '../../components/Pagination';
@@ -77,6 +78,7 @@ export default function Workers() {
   const [statusTarget, setStatusTarget] = useState(null);
   const [saving, setSaving] = useState(false);
   const [printWorker, setPrintWorker] = useState(null);
+  const [qrPreviewWorker, setQrPreviewWorker] = useState(null);
 
   function handlePrintRow(row) {
     setPrintWorker(row);
@@ -194,7 +196,9 @@ export default function Workers() {
       label: 'QR Code',
       render: (row) => (
         <div className="workers-qr-cell">
-          <QRCodeSVG value={`AMS:${row.workerCode}`} size={40} />
+          <button onClick={() => setQrPreviewWorker(row)} className="workers-qr-cell-thumb" title="View QR code">
+            <QRCodeSVG value={`AMS:${row.workerCode}`} size={40} />
+          </button>
           <button onClick={() => handlePrintRow(row)} className="workers-action-btn" title="Print QR card">
             <Printer size={16} />
           </button>
@@ -274,6 +278,10 @@ export default function Workers() {
       {printWorker && (
         <WorkerQrCard worker={printWorker} showPrintButton={false} hiddenUntilPrint />
       )}
+
+      <Modal open={!!qrPreviewWorker} onClose={() => setQrPreviewWorker(null)} title="Worker QR Code" size="sm">
+        {qrPreviewWorker && <WorkerQrCard worker={qrPreviewWorker} showPrintButton={false} />}
+      </Modal>
     </div>
   );
 }

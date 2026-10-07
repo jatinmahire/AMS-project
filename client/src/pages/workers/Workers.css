@@ -27,3 +27,7 @@
 .workers-qr-cell {
   @apply flex items-center gap-2;
 }
+
+.workers-qr-cell-thumb {
+  @apply flex rounded-md hover:opacity-75;
+}
