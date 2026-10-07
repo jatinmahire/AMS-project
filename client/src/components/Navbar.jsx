@@ -19,7 +19,6 @@ import {
   ShieldCheck,
   CalendarDays,
   ChevronDown,
-  Bell,
 } from 'lucide-react';
 import './Navbar.css';
 import { useAuth } from '../context/AuthContext';
@@ -58,11 +57,6 @@ const SUPERVISOR_SECTIONS = [
       { to: '/verifications/police', label: 'Police Verification', icon: ShieldCheck },
     ],
   },
-  {
-    title: 'Notifications',
-    icon: Bell,
-    items: [{ to: '/notifications', label: 'Notifications', icon: Bell }],
-  },
 ];
 
 const CONTRACTOR_SECTIONS = [
@@ -95,11 +89,6 @@ const CONTRACTOR_SECTIONS = [
     title: 'Policies',
     icon: ShieldCheck,
     items: [{ to: '/policies', label: 'Policies', icon: ShieldCheck }],
-  },
-  {
-    title: 'Notifications',
-    icon: Bell,
-    items: [{ to: '/notifications', label: 'Notifications', icon: Bell }],
   },
 ];
 

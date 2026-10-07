@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Plus, Eye, Pencil, ScanLine, Search } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
@@ -90,6 +90,23 @@ export default function Attendance() {
     });
   }
 
+  // The date input's own underlying value goes blank and unreadable for as long as its year
+  // segment has overflowed past 4 digits — including mid-typing, before the day/month are even
+  // touched — with no way to tell that apart from the user genuinely clearing the field.
+  // Committing that immediately reloaded the list with today's date. Delaying only the empty
+  // case gives a momentary glitch a chance to resolve before it's treated as a real clear.
+  const dateClearTimerRef = useRef(null);
+  function handleDateFilterChange(value) {
+    clearTimeout(dateClearTimerRef.current);
+    if (value) {
+      updateParams({ date: value, page: null });
+      return;
+    }
+    dateClearTimerRef.current = setTimeout(() => updateParams({ date: value, page: null }), 700);
+  }
+
+  useEffect(() => () => clearTimeout(dateClearTimerRef.current), []);
+
   const columns = [
     { key: 'workerCode', label: 'Worker Code', render: (row) => row.worker.workerCode },
     { key: 'name', label: 'Name', render: (row) => `${row.worker.firstName} ${row.worker.lastName}` },
@@ -152,7 +169,7 @@ export default function Attendance() {
 
       <div className="attendance-date-filter-row">
         <label className="attendance-date-filter-label">Date</label>
-        <TextInput type="date" name="attendance-filter-date" autoComplete="off" value={date} onChange={(e) => updateParams({ date: e.target.value, page: null })} className="attendance-date-filter-input" />
+        <TextInput type="date" name="attendance-filter-date" autoComplete="off" value={date} onChange={(e) => handleDateFilterChange(e.target.value)} className="attendance-date-filter-input" />
       </div>
 
       <DataTable columns={columns} rows={result.data} loading={loading} emptyMessage="No attendance marked for this date" scrollable fullWidth maxHeight="500px" />
