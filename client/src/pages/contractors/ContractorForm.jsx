@@ -215,7 +215,12 @@ export default function ContractorForm() {
     setErrors({});
     try {
       if (isEdit) {
-        await updateContractor(id, form);
+        // The password field only exists for setting the login at creation — it's never
+        // shown on this step while editing, but form.password still sat at '' from the
+        // initial state and got sent along regardless, failing the server's min-length
+        // check on an empty (not just a missing) password.
+        const { password, ...editPayload } = form;
+        await updateContractor(id, editPayload);
         showToast('Contractor updated');
         navigate(`/contractors/${id}`, { replace: true });
         return;

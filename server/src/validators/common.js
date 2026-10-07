@@ -69,6 +69,16 @@ const optionalExactDigitsString = (length, message) => {
   return z.preprocess((v) => (v === '' || v === null || v === undefined ? undefined : v), base.optional());
 };
 
+// An edit form's password field is only ever shown at creation, but a client can still send
+// along whatever the form's initial state was — '' rather than simply omitting the key — so
+// '' must read the same as "not provided" here, not as "an empty password was submitted".
+const optionalPassword = (message = 'Password must be at least 6 characters') => {
+  return z.preprocess(
+    (v) => (v === '' || v === null || v === undefined ? undefined : v),
+    z.string().min(6, message).optional()
+  );
+};
+
 const MIN_AGE = 18;
 const MIN_DOB_YEAR = 1900;
 
@@ -99,6 +109,7 @@ module.exports = {
   optionalNonNegativeNumber,
   optionalNonNegativeInt,
   optionalInt,
+  optionalPassword,
   EMAIL_REGEX,
   emailString,
   optionalEmailString,

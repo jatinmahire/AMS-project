@@ -1,5 +1,5 @@
 const { z } = require('zod');
-const { optionalString, optionalDate, optionalInt, emailString, optionalEmailString, digitsString, optionalDigitsString, optionalExactDigitsString } = require('./common');
+const { optionalString, optionalDate, optionalInt, optionalPassword, emailString, optionalEmailString, digitsString, optionalDigitsString, optionalExactDigitsString } = require('./common');
 
 const contractorSchema = z.object({
   contractorName: z.string().min(1, 'Contractor name is required').max(30),
@@ -42,7 +42,7 @@ const contractorSchema = z.object({
   ptrcNo: optionalDigitsString(20, 'PTRC number must be digits only'),
   buildingName: optionalString(30),
   status: z.enum(['ACTIVE', 'INACTIVE', 'BLACKLISTED']).optional(),
-  password: z.string().min(6, 'Password must be at least 6 characters').optional(),
+  password: optionalPassword(),
 });
 
 module.exports = { contractorSchema };

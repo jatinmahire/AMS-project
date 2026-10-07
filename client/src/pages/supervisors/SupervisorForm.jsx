@@ -166,7 +166,14 @@ export default function SupervisorForm() {
     setSaving(true);
     setErrors({});
     try {
-      const payload = toFormData({ ...form, aadhaarFront, aadhaarBack });
+      // The password field only exists for setting the login at creation — it's never shown
+      // on this step while editing, but form.password still sat at '' from the initial state
+      // and got sent along regardless, failing the server's min-length check on an empty
+      // (not just a missing) password.
+      const { password, ...formWithoutPassword } = form;
+      const payload = isEdit
+        ? toFormData({ ...formWithoutPassword, aadhaarFront, aadhaarBack })
+        : toFormData({ ...form, aadhaarFront, aadhaarBack });
       if (isEdit) {
         await updateSupervisor(id, payload);
         showToast('Supervisor updated');

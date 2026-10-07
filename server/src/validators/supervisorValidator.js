@@ -1,5 +1,5 @@
 const { z } = require('zod');
-const { adultDob, optionalString, optionalDate, emailString, digitsString } = require('./common');
+const { adultDob, optionalString, optionalDate, optionalPassword, emailString, digitsString } = require('./common');
 
 const supervisorSchema = z.object({
   fullName: z.string().min(1, 'Full name is required').max(30),
@@ -14,7 +14,7 @@ const supervisorSchema = z.object({
   pincode: digitsString(6, 'Pincode must be exactly 6 digits'),
   assignedContractorId: optionalString(),
   status: z.enum(['ACTIVE', 'INACTIVE', 'BLACKLISTED']).optional(),
-  password: z.string().min(6, 'Password must be at least 6 characters').optional(),
+  password: optionalPassword(),
 });
 
 module.exports = { supervisorSchema };
