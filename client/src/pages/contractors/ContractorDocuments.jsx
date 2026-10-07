@@ -18,8 +18,7 @@ export default function ContractorDocuments({ contractorId, documents, onChange 
   const [uploading, setUploading] = useState(false);
   const { showToast } = useToast();
 
-  async function handleUpload(e) {
-    e.preventDefault();
+  async function handleUpload() {
     if (!file) {
       showToast('Please choose a file first', 'error');
       return;
@@ -77,7 +76,11 @@ export default function ContractorDocuments({ contractorId, documents, onChange 
         ))}
       </div>
 
-      <form onSubmit={handleUpload} className="contractor-documents-form">
+      {/* This whole page already renders inside the Add/Edit Contractor wizard's own
+          <form> — nesting a second <form> here is invalid HTML (browsers silently merge
+          the two), which was causing Upload to submit the outer wizard form instead of
+          just uploading the document, dumping the user back out of the page. */}
+      <div className="contractor-documents-form">
         <FormField label="Document Type" className="contractor-documents-type-field">
           <Select value={docType} onChange={(e) => setDocType(e.target.value)}>
             {DOC_TYPES.map((type) => (
@@ -101,10 +104,10 @@ export default function ContractorDocuments({ contractorId, documents, onChange 
             className="contractor-documents-file-input"
           />
         </FormField>
-        <Button type="submit" icon={Upload} disabled={uploading}>
+        <Button type="button" onClick={handleUpload} icon={Upload} disabled={uploading}>
           {uploading ? 'Uploading...' : 'Upload'}
         </Button>
-      </form>
+      </div>
     </div>
   );
 }
