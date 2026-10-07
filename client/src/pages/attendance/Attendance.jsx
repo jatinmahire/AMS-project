@@ -14,7 +14,6 @@ import { isNetworkError } from '../../utils/offlineSync';
 import { getErrorMessage } from '../../utils/errorMessage';
 import { displayName, formatDate, formatTime12hr } from '../../utils/format';
 import { useToast } from '../../context/ToastContext';
-import { useAuth } from '../../context/AuthContext';
 import './Attendance.css';
 
 const ACTION_LABEL = {
@@ -39,10 +38,9 @@ export default function Attendance() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { user } = useAuth();
-  // Contractor can mark attendance (add + scan) same as Admin/Supervisor, but editing an
-  // already-marked record stays Admin/Supervisor only.
-  const canEdit = user?.role !== 'CONTRACTOR';
+  // Every role that can mark attendance (scan or manual) can also correct a time it
+  // auto-filled — the server scopes a contractor's edit to their own workers regardless.
+  const canEdit = true;
   const canScan = true;
   const [scanMode, setScanMode] = useState(false);
   const [banner, setBanner] = useState(null);
