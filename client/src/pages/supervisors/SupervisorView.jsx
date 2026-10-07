@@ -39,7 +39,7 @@ export default function SupervisorView() {
         title={supervisor.fullName}
         description={`Supervisor Code: ${supervisor.supervisorCode}`}
         action={
-          <div className="supervisor-view-actions">
+          <div className="supervisor-view-actions no-print">
             <Button variant="secondary" icon={Printer} onClick={printNow}>Print</Button>
             <Button variant="secondary" icon={Download} onClick={() => downloadElementAsPdf(cardRef.current, `supervisor-${supervisor.supervisorCode}.pdf`)}>
               Download PDF

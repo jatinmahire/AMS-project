@@ -39,7 +39,7 @@ export default function ContractorView() {
         title={contractor.contractorName}
         description={`Contractor Code: ${contractor.contractorCode}`}
         action={
-          <div className="contractor-view-actions">
+          <div className="contractor-view-actions no-print">
             <Button variant="secondary" icon={Printer} onClick={printNow}>Print</Button>
             <Button variant="secondary" icon={Download} onClick={() => downloadElementAsPdf(cardRef.current, `contractor-${contractor.contractorCode}.pdf`)}>
               Download PDF

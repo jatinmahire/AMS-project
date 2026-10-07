@@ -43,7 +43,7 @@ export default function WorkerView() {
         title={`${worker.firstName} ${worker.lastName}`}
         description={`Worker Code: ${worker.workerCode}`}
         action={
-          <div className="worker-view-actions">
+          <div className="worker-view-actions no-print">
             <Button variant="secondary" icon={Printer} onClick={printNow}>Print</Button>
             <Button variant="secondary" icon={Download} onClick={() => downloadElementAsPdf(cardRef.current, `worker-${worker.workerCode}.pdf`)}>
               Download PDF

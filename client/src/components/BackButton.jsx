@@ -13,7 +13,7 @@ export default function BackButton({ to, label = 'Back' }) {
   return (
     <button
       onClick={handleClick}
-      className="back-button"
+      className="back-button no-print"
     >
       <ArrowLeft size={16} /> {label}
     </button>
