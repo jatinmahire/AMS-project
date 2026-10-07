@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Search, Printer } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
@@ -49,11 +49,64 @@ const HISTORY_FILTERS = [
 // (wages, dates, reference numbers) is reliably derivable automatically —
 // so every field on the certificate renders as an editable input, not
 // locked read-only text, letting Admin correct anything before printing.
+// Lets someone type these fields on a plain QWERTY keyboard and see Marathi appear live,
+// the way Google's Indic input tools work — romanRef accumulates the raw Latin characters
+// typed since the last reset, re-transliterating the whole thing fresh on every keystroke
+// (so a word doesn't need to be "finished" to preview correctly) and baselineRef holds
+// whatever Devanagari text came before that typing session started, so it isn't clobbered.
+// This only tracks forward typing at the cursor's end reliably — editing or inserting
+// mid-text falls back to plain literal editing, same as before this existed.
 function InlineInput({ value, onChange, minWidth = 10 }) {
+  const romanRef = useRef('');
+  const baselineRef = useRef(value ?? '');
+  const lastEmittedRef = useRef(value ?? '');
+
+  if (value !== lastEmittedRef.current) {
+    romanRef.current = '';
+    baselineRef.current = value ?? '';
+    lastEmittedRef.current = value ?? '';
+  }
+
+  function handleChange(e) {
+    const newValue = e.target.value;
+    const prevValue = value ?? '';
+
+    if (newValue.length < prevValue.length) {
+      romanRef.current = romanRef.current.slice(0, -1);
+      if (!romanRef.current) {
+        // Backspaced past the live-typed portion into the baseline text itself — drop back
+        // to plain literal editing so deleting/fixing existing content still works normally.
+        baselineRef.current = newValue;
+        lastEmittedRef.current = newValue;
+        onChange(newValue);
+        return;
+      }
+    } else {
+      const added = newValue.slice(prevValue.length);
+      if (!/^[A-Za-z\s]*$/.test(added)) {
+        // Not plain ASCII letters (pasted Devanagari, punctuation typed mid-word, etc.) —
+        // don't try to transliterate it, just accept the edit as-is and re-baseline.
+        romanRef.current = '';
+        baselineRef.current = newValue;
+        lastEmittedRef.current = newValue;
+        onChange(newValue);
+        return;
+      }
+      romanRef.current += added;
+    }
+
+    const result = baselineRef.current + transliterateToDevanagari(romanRef.current);
+    // The parent's onChange handler runs every value through toDevanagariDigits before
+    // storing it — predict that here too, or a freshly-typed digit would make the next
+    // render's value look like an outside change and wrongly reset the typing session.
+    lastEmittedRef.current = toDevanagariDigits(result);
+    onChange(result);
+  }
+
   return (
     <input
       value={value ?? ''}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={handleChange}
       className="ninety-days-form-input"
       style={{ width: `${Math.max((value?.length || 0) + 2, minWidth)}ch` }}
     />

@@ -91,3 +91,44 @@
 .ninety-days-form-align-group {
   @apply grid grid-cols-[minmax(0,max-content)] justify-center;
 }
+
+/* The certificate's cumulative spacing (p-8, mb-3/4/8 throughout) adds up to just over one
+   A4 page, pushing the signature line alone onto a second sheet. Tighten print-only spacing
+   so the whole thing reliably fits on one page without touching the on-screen layout. */
+@media print {
+  .ninety-days-form-certificate {
+    padding: 1rem !important;
+  }
+
+  .ninety-days-form-title-bar {
+    margin-bottom: 0.5rem !important;
+    padding: 0.4rem 1rem !important;
+  }
+
+  .ninety-days-form-ref-row,
+  .ninety-days-form-row {
+    margin-bottom: 0.4rem !important;
+  }
+
+  .ninety-days-form-row-lg {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .ninety-days-form-legal-text {
+    margin-bottom: 0.5rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .ninety-days-form-row-xl {
+    margin-bottom: 0.75rem !important;
+  }
+
+  .ninety-days-form-signature-line {
+    margin-top: 1rem !important;
+  }
+
+  .ninety-days-form-photo-box {
+    height: 4.5rem !important;
+    width: 4rem !important;
+  }
+}

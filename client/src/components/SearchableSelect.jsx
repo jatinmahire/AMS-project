@@ -42,6 +42,12 @@ export default function SearchableSelect({ value, onChange, options, placeholder
   }
 
   function handleKeyDown(e) {
+    // Only ever lists place names (states/cities) — a digit can never match anything, so
+    // typing one is always a mistake rather than a valid filter.
+    if (e.key.length === 1 && /[0-9]/.test(e.key)) {
+      e.preventDefault();
+      return;
+    }
     if (!open) {
       if (e.key === 'ArrowDown') {
         e.preventDefault();

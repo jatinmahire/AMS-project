@@ -12,7 +12,7 @@ import { listAttendance, scanAttendance } from '../../api/attendance';
 import { enqueueAttendance } from '../../utils/offlineQueue';
 import { isNetworkError } from '../../utils/offlineSync';
 import { getErrorMessage } from '../../utils/errorMessage';
-import { displayName, formatDate } from '../../utils/format';
+import { displayName, formatDate, formatTime12hr } from '../../utils/format';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import './Attendance.css';
@@ -98,8 +98,8 @@ export default function Attendance() {
     { key: 'contractor', label: 'Contractor', render: (row) => row.worker.contractor?.contractorName || '-' },
     { key: 'date', label: 'Date', render: (row) => formatDate(row.date) },
     { key: 'day', label: 'Day' },
-    { key: 'inTime', label: 'In Time' },
-    { key: 'outTime', label: 'Out Time', render: (row) => row.outTime || '-' },
+    { key: 'inTime', label: 'In Time', render: (row) => formatTime12hr(row.inTime) },
+    { key: 'outTime', label: 'Out Time', render: (row) => formatTime12hr(row.outTime) },
     { key: 'status', label: 'Status', render: (row) => <StatusBadge status={row.status} /> },
     { key: 'buildingNo', label: 'Building', render: (row) => row.buildingNo || '-' },
     { key: 'source', label: 'Source' },

@@ -3,6 +3,18 @@ export function formatDate(value) {
   return new Date(value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
+// Attendance in/out times are stored as a plain "HH:MM" 24-hour string, not a date — display
+// as 12-hour with AM/PM wherever they're shown to the user.
+export function formatTime12hr(value) {
+  if (!value) return '-';
+  const [hourStr, minute] = value.split(':');
+  const hour = Number(hourStr);
+  if (Number.isNaN(hour) || minute === undefined) return value;
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12;
+  return `${String(hour12).padStart(2, '0')}:${minute} ${period}`;
+}
+
 export function formatDDMMYYYY(value) {
   if (!value) return '';
   const d = new Date(value);

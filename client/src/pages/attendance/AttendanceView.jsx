@@ -8,7 +8,7 @@ import WorkerInfoCard from '../../components/WorkerInfoCard';
 import StatusBadge from '../../components/StatusBadge';
 import ViewCard, { ViewField, ViewSection } from '../../components/ViewField';
 import { getAttendance } from '../../api/attendance';
-import { displayName, formatDate } from '../../utils/format';
+import { displayName, formatDate, formatTime12hr } from '../../utils/format';
 import { getErrorMessage } from '../../utils/errorMessage';
 import { useToast } from '../../context/ToastContext';
 import './AttendanceView.css';
@@ -51,8 +51,8 @@ export default function AttendanceView() {
           <ViewSection title="Attendance Details">
             <ViewField label="Date" value={formatDate(attendance.date)} />
             <ViewField label="Day" value={attendance.day} />
-            <ViewField label="In Time" value={attendance.inTime} />
-            <ViewField label="Out Time" value={attendance.outTime} />
+            <ViewField label="In Time" value={formatTime12hr(attendance.inTime)} />
+            <ViewField label="Out Time" value={formatTime12hr(attendance.outTime)} />
             <ViewField label="Status" value={<StatusBadge status={attendance.status} />} />
             <ViewField label="Building Number" value={attendance.buildingNo} />
             <ViewField label="Source" value={attendance.source} />

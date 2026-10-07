@@ -408,7 +408,7 @@ export default function WorkerForm() {
               required
             />
             <FormField label="District" required error={errors.district}>
-              <TextInput {...field('district')} error={errors.district} />
+              <AlphaInput {...field('district')} error={errors.district} />
             </FormField>
             <FormField label="Pincode" required error={errors.pincode}>
               <NumericInput {...field('pincode')} error={errors.pincode} exactLength={6} label="Pincode" />
