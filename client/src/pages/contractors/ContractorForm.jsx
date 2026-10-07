@@ -258,10 +258,10 @@ export default function ContractorForm() {
           <>
             <FormSection title="Basic Info">
               <FormField label="Contractor Name" required error={errors.contractorName}>
-                <TextInput {...field('contractorName')} maxLength={30} error={errors.contractorName} />
+                <AlphabetInput {...field('contractorName')} maxLength={30} error={errors.contractorName} />
               </FormField>
               <FormField label="Establishment Name" error={errors.establishmentName}>
-                <TextInput {...field('establishmentName')} maxLength={30} error={errors.establishmentName} />
+                <AlphabetInput {...field('establishmentName')} maxLength={30} error={errors.establishmentName} />
               </FormField>
               <FormField label="Contact Person" required error={errors.contactPerson}>
                 <AlphabetInput {...field('contactPerson')} maxLength={30} error={errors.contactPerson} />
