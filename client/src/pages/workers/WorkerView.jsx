@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Pencil, Printer, Download, FileText } from 'lucide-react';
+import { Pencil, Printer, Download, FileText, QrCode } from 'lucide-react';
 import PageHeader from '../../components/PageHeader';
 import BackButton from '../../components/BackButton';
 import Button from '../../components/Button';
+import Modal from '../../components/Modal';
+import WorkerQrCard from '../../components/WorkerQrCard';
 import ViewCard, { ViewField, ViewSection } from '../../components/ViewField';
 import StatusBadge from '../../components/StatusBadge';
 import { getWorker } from '../../api/workers';
@@ -23,6 +25,7 @@ export default function WorkerView() {
   const canView90Days = user?.role === 'ADMIN' || user?.role === 'SUPERVISOR';
   const [worker, setWorker] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [qrOpen, setQrOpen] = useState(false);
   const cardRef = useRef(null);
 
   useEffect(() => {
@@ -44,6 +47,7 @@ export default function WorkerView() {
         description={`Worker Code: ${worker.workerCode}`}
         action={
           <div className="worker-view-actions no-print">
+            <Button variant="secondary" icon={QrCode} onClick={() => setQrOpen(true)}>Show QR</Button>
             <Button variant="secondary" icon={Printer} onClick={printNow}>Print</Button>
             <Button variant="secondary" icon={Download} onClick={() => downloadElementAsPdf(cardRef.current, `worker-${worker.workerCode}.pdf`)}>
               Download PDF
@@ -114,6 +118,10 @@ export default function WorkerView() {
           <ViewField label="Mobile" value={worker.nomineeMobile} />
         </ViewSection>
       </ViewCard>
+
+      <Modal open={qrOpen} onClose={() => setQrOpen(false)} title="Worker QR Code" size="sm">
+        <WorkerQrCard worker={worker} showPrintButton={false} />
+      </Modal>
     </div>
   );
 }
